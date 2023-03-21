@@ -1,5 +1,7 @@
 # Fallen-Corsair
 
+## Description du projet
+
 ## Team-members
 
 *Concept Artists*:
@@ -16,10 +18,10 @@
 - ROUCHAUD Fabrice
 - GENOU Marius
 - PICARD Manoa
-- BRUNETO Quentin
+- BRUNETEAU Quentin
 
 *Programmers*:
 - LY Benjamin
 - JUVENTIN Ariitea
-- BLANCHET Kevin
+- BLANCHET Kévin
 - AURIOL Thomas

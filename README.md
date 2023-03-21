@@ -20,6 +20,6 @@
 
 *Programmers*:
 - LY Benjamin
-- JUVENTIN Arritea
+- JUVENTIN Ariitea
 - BLANCHET Kevin
 - AURIOL Thomas

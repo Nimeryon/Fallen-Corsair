@@ -16,7 +16,7 @@
 - ROUCHAUD Fabrice
 - GENOU Marius
 - PICARD Manoa
-- BRUNETO Quentin
+- BRUNETEAU Quentin
 
 *Programmers*:
 - LY Benjamin

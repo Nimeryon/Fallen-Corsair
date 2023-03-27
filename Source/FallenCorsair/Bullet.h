@@ -11,6 +11,12 @@ class FALLENCORSAIR_API ABullet : public AActor
 {
 	GENERATED_BODY()
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
+	class UStaticMeshComponent* bulletMesh;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Collision")
+	class USphereComponent* bulletCollision;
+	
 public:	
 	// Sets default values for this actor's properties
 	ABullet();
@@ -23,6 +29,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UProjectileMovementComponent* projectileMovement;
 
 public:	
 	// Called every frame

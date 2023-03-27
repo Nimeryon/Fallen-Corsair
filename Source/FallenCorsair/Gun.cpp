@@ -60,11 +60,11 @@ void UGun::Shoot()
 		/// trace
 		GetWorld()->LineTraceSingleByChannel(outHit, start, end, ECC_Visibility);
 
-		FActorSpawnParameters SpawnParameters;
+		FActorSpawnParameters SpawnInfo;
 		if(m_bullet)
 		{
 			/// spawn bullet, rotation base on camera rotation
-			//GetWorld()->SpawnActor(m_bullet, start, GetOwner()->GetActorRotation(), SpawnParameters);
+			GetWorld()->SpawnActor<AActor>(m_bullet, start, GetOwner()->GetActorRotation(), SpawnInfo);
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Shoot"));
 		m_gunAmmo -= m_ammoCost;

@@ -52,11 +52,11 @@ private:
 	UPROPERTY()
 	float m_distance;
 
+	UPROPERTY(EditAnywhere, Category = "Gun", meta = (displayName = "Projectile"))
+	TSubclassOf<AActor> m_bullet;
+	
 	UPROPERTY(EditAnywhere, Category = "Barrel", meta = (ClampMin = 1, UIMin = 1), meta = (displayName = "Coût tir puissant"))
-	int m_soulGauge;
-
-	UPROPERTY()
-	AActor* m_bullet;
+    int m_soulGauge;
 	
 public:
 	UFUNCTION()

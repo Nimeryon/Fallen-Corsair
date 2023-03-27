@@ -25,5 +25,3 @@
 - JUVENTIN Ariitea
 - BLANCHET Kévin
 - AURIOL Thomas
-
-test

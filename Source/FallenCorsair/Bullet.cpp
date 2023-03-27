@@ -11,10 +11,10 @@ ABullet::ABullet()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	bulletMesh = CreateDefaultSubobject<UStaticMeshComponent>("CoinMesh");
+	bulletMesh = CreateDefaultSubobject<UStaticMeshComponent>("BulletMesh");
 	bulletMesh->SetupAttachment(RootComponent);
 
-	bulletCollision = CreateDefaultSubobject<USphereComponent>("CoinCollision");
+	bulletCollision = CreateDefaultSubobject<USphereComponent>("BulletCollision");
 	bulletCollision->SetupAttachment(bulletMesh);
 	bulletCollision->SetSphereRadius(40.f);
 	projectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Component"));

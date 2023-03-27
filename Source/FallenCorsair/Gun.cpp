@@ -59,10 +59,11 @@ void UGun::Shoot()
 
 		/// trace
 		GetWorld()->LineTraceSingleByChannel(outHit, start, end, ECC_Visibility);
-		/// spawn projectile here
+
 		FActorSpawnParameters SpawnParameters;
 		if(m_bullet)
 		{
+			/// spawn bullet, rotation base on camera rotation
 			//GetWorld()->SpawnActor(m_bullet, start, GetOwner()->GetActorRotation(), SpawnParameters);
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Shoot"));

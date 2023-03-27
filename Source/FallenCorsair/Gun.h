@@ -7,7 +7,7 @@
 #include "Gun.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class FALLENCORSAIR_API UGun : public UActorComponent
 {
 	GENERATED_BODY()
@@ -25,25 +25,49 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Gun", meta = (ClampMin = 0, UIMin = 0))
-	int m_gunCharge;
-	
-	UPROPERTY(EditAnywhere,  Category = "Gun", meta = (ClampMin = 1, UIMin = 1))
-	int m_maxGunCharge;
+	/**
+	 * This Is The Current Slot Of Ammo
+	 */
+	UPROPERTY(EditAnywhere, Category = "Gun", meta = (ClampMin = 0, UIMin = 0), meta = (displayName = "Slot de tir actuelle"))
+	int m_gunAmmo;
 
-	UPROPERTY(EditDefaultsOnly)
+	/**
+	 * This Is The Max Slot Of Ammo Available (base 3)
+	 */
+	UPROPERTY(EditAnywhere,  Category = "Gun", meta = (ClampMin = 1, UIMin = 1), meta = (displayName = "Slot de tir max"))
+	int m_maxGunAmmo;
+
+	/**
+	 * This Is The Cost Of A Simple Shot (base 1)
+	 */
+	UPROPERTY(EditAnywhere, Category = "Gun", meta = (ClampMin = 1, UIMin = 1), meta = (displayName = "Coût tir simple"))
+	int m_ammoCost;
+
+	/**
+	 * This Is The Cost Of A Super Shot (base 3)
+	 */
+	UPROPERTY(EditAnywhere, Category = "Gun", meta = (ClampMin = 1, UIMin = 1), meta = (displayName = "Coût tir puissant"))
+	int m_superAmmoCost;
+
+	UPROPERTY()
 	float m_distance;
 
+	UPROPERTY(EditAnywhere, Category = "Barrel", meta = (ClampMin = 1, UIMin = 1), meta = (displayName = "Coût tir puissant"))
+	int m_soulGauge;
+
+	UPROPERTY()
+	AActor* m_bullet;
+	
 public:
 	UFUNCTION()
-	int GetCharge();
+	int GetAmmo();
 
 	UFUNCTION()
-	void SetCharge(int newCharge);
+	void SetAmmo(int newAmmo);
+
+	UFUNCTION(BlueprintCallable)
+	void Shoot();
 
 	UFUNCTION()
-	void Fire();
-
-	UFUNCTION()
-	void SuperFire();
+	void SuperShoot();
 };

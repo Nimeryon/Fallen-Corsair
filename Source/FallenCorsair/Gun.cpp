@@ -10,8 +10,11 @@ UGun::UGun()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	m_maxGunCharge = 3;
-	m_gunCharge = m_maxGunCharge;
+	m_maxGunAmmo = 3;
+	m_gunAmmo = m_maxGunAmmo;
+	m_distance = 2000.f;
+	m_ammoCost = 1;
+	m_superAmmoCost = m_maxGunAmmo;
 	// ...
 }
 
@@ -21,8 +24,8 @@ void UGun::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(m_gunCharge > m_maxGunCharge)
-		m_gunCharge = m_maxGunCharge;
+	if(m_gunAmmo > m_maxGunAmmo)
+		m_gunAmmo = m_maxGunAmmo;
 	// ...
 	
 }
@@ -36,25 +39,18 @@ void UGun::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 	// ...
 }
 
-int UGun::GetCharge()
+int UGun::GetAmmo()
 {
-	return m_gunCharge;
+	return m_gunAmmo;
+}
+void UGun::SetAmmo(int newAmmo)
+{
+	m_gunAmmo = newAmmo;
 }
 
-void UGun::SetCharge(int newCharge)
+void UGun::Shoot()
 {
-	m_gunCharge = newCharge;
-}
-
-void UGun::Fire()
-{
-	if(m_gunCharge == m_maxGunCharge)
-	{
-		SuperFire();
-		m_gunCharge = 0;
-	}
-	
-	if(m_gunCharge > 0)
+	if(m_gunAmmo > 0)
 	{
 		FHitResult outHit;
 		/// change the owner by the owner camera
@@ -64,12 +60,17 @@ void UGun::Fire()
 		/// trace
 		GetWorld()->LineTraceSingleByChannel(outHit, start, end, ECC_Visibility);
 		/// spawn projectile here
-		
-		m_gunCharge--;
+		FActorSpawnParameters SpawnParameters;
+		if(m_bullet)
+		{
+			//GetWorld()->SpawnActor(m_bullet, start, GetOwner()->GetActorRotation(), SpawnParameters);
+		}
+		UE_LOG(LogTemp, Warning, TEXT("Shoot"));
+		m_gunAmmo -= m_ammoCost;
 	}
 }
 
-void UGun::SuperFire()
+void UGun::SuperShoot()
 {
 	/// special AOE attack
 }

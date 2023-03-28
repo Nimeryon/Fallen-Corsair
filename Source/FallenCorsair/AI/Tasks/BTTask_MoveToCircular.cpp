@@ -12,9 +12,3 @@ EBTNodeResult::Type UBTTask_MoveToCircular::PerformMoveTask(UBehaviorTreeCompone
 {
 	return Super::PerformMoveTask(OwnerComp, NodeMemory);
 }
-
-UAITask_MoveTo* UBTTask_MoveToCircular::PrepareMoveTask(UBehaviorTreeComponent& OwnerComp, UAITask_MoveTo* ExistingTask,
-	FAIMoveRequest& MoveRequest)
-{
-	return Super::PrepareMoveTask(OwnerComp, ExistingTask, MoveRequest);
-}

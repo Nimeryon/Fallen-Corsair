@@ -3,6 +3,8 @@
 
 #include "AlienBase.h"
 
+#include "GameFramework/CharacterMovementComponent.h"
+
 // Sets default values
 AAlienBase::AAlienBase()
 {
@@ -15,20 +17,19 @@ AAlienBase::AAlienBase()
 void AAlienBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	GetCharacterMovement()->MaxWalkSpeed = m_movementSpeed;
 }
 
 // Called every frame
 void AAlienBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
 void AAlienBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 

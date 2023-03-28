@@ -3,6 +3,9 @@
 
 #include "Gun.h"
 
+#include "FallenCorsairCharacter.h"
+#include "Camera/CameraComponent.h"
+
 // Sets default values for this component's properties
 UGun::UGun()
 {
@@ -26,6 +29,9 @@ void UGun::BeginPlay()
 
 	if(m_gunAmmo > m_maxGunAmmo)
 		m_gunAmmo = m_maxGunAmmo;
+
+	ownerRef = Cast<AFallenCorsairCharacter>(GetOwner());
+	
 	// ...
 	
 }
@@ -50,12 +56,14 @@ void UGun::SetAmmo(int newAmmo)
 
 void UGun::Shoot()
 {
-	if(m_gunAmmo > 0)
+	if(m_gunAmmo > 0 && ownerRef)
 	{
 		FHitResult outHit;
 		/// change the owner by the owner camera
-		FVector start = GetOwner()->GetActorLocation();
-		FVector end = GetOwner()->GetActorForwardVector() * m_distance + start;
+
+		/// Change start by the location of the socket gun mesh
+		FVector start = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * 100;
+		FVector end = ownerRef->GetFollowCamera()->GetForwardVector() * m_distance + start;
 
 		/// trace
 		GetWorld()->LineTraceSingleByChannel(outHit, start, end, ECC_Visibility);
@@ -64,7 +72,7 @@ void UGun::Shoot()
 		if(m_bullet)
 		{
 			/// spawn bullet, rotation base on camera rotation
-			GetWorld()->SpawnActor<AActor>(m_bullet, start, GetOwner()->GetActorRotation(), SpawnInfo);
+			GetWorld()->SpawnActor<AActor>(m_bullet, start, ownerRef->GetFollowCamera()->GetComponentRotation(), SpawnInfo);
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Shoot"));
 		m_gunAmmo -= m_ammoCost;

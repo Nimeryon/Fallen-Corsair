@@ -54,9 +54,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Gun", meta = (displayName = "Projectile"))
 	TSubclassOf<AActor> m_bullet;
-	
-	UPROPERTY(EditAnywhere, Category = "Barrel", meta = (ClampMin = 1, UIMin = 1), meta = (displayName = "Coût tir puissant"))
-    int m_soulGauge;
+
+	UPROPERTY()
+	class AFallenCorsairCharacter* ownerRef;
 	
 public:
 	UFUNCTION()

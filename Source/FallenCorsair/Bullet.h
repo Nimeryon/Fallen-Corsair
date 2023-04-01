@@ -20,6 +20,9 @@ class FALLENCORSAIR_API ABullet : public AActor
 	UPROPERTY(EditDefaultsOnly, Category = "Dammage Collision")
 	class USphereComponent* dammageCollision;
 	
+	UPROPERTY(EditDefaultsOnly)
+	class UProjectileMovementComponent* projectileMovement;
+	
 public:	
 	// Sets default values for this actor's properties
 	ABullet();
@@ -30,28 +33,28 @@ public:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly)
-	class UProjectileMovementComponent* projectileMovement;
+private:
+	UPROPERTY()
+	float m_dammageRadius = 5.f;
+
+	UPROPERTY()
+	int m_dammage = 1;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-    UPROPERTY(EditAnywhere, Category = "Bullet", meta = (ClampMin = 2000, UIMin = 2000))
-	float bulletSpeed;
-
-	UPROPERTY(EditAnywhere, Category = "Bullet", meta = (ClampMin = 3, UIMin = 3))
-	float dammageRadius;
-
-	UPROPERTY(EditAnywhere, Category = "Bullet")
-	int damage;
-
 	UFUNCTION()
 	void Explosion();
+
+	UFUNCTION()
+	void SetBulletSetting(float bulletSpeed, int dammage, float dammageRadius, int lifeSpan);
+	
 };
 
 

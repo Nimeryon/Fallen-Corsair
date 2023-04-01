@@ -52,11 +52,23 @@ private:
 	UPROPERTY()
 	float m_distance;
 
-	UPROPERTY(EditAnywhere, Category = "Gun", meta = (displayName = "Projectile"))
-	TSubclassOf<AActor> m_bullet;
+	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Projectile"))
+	TSubclassOf<class ABullet> m_bullet;
 
 	UPROPERTY()
-	class AFallenCorsairCharacter* ownerRef;
+	class AFallenCorsairCharacter* m_ownerRef;
+
+	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Vitesse du projectile"), meta = (ClampMin = 2000, UIMin = 2000, ClampMax = 20000, UIMax = 20000))
+	float m_bulletSpeed = 2000;
+
+	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Dégât du projectile"), meta = (ClampMin = 1, UIMin = 1))
+	int m_bulletDammage = 1;
+
+	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Portée de l'explosion du projectile"))
+	float m_bulletDammageRadius = 5.f;
+
+	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Durée de vie du projectile"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 10, UIMax = 10))
+	int m_bulletLifeSpan = 2;
 	
 public:
 	UFUNCTION()
@@ -70,4 +82,6 @@ public:
 
 	UFUNCTION()
 	void SuperShoot();
+
+	
 };

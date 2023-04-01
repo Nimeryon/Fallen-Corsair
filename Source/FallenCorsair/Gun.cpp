@@ -3,8 +3,10 @@
 
 #include "Gun.h"
 
+#include "Bullet.h"
 #include "FallenCorsairCharacter.h"
 #include "Camera/CameraComponent.h"
+
 
 // Sets default values for this component's properties
 UGun::UGun()
@@ -30,7 +32,7 @@ void UGun::BeginPlay()
 	if(m_gunAmmo > m_maxGunAmmo)
 		m_gunAmmo = m_maxGunAmmo;
 
-	ownerRef = Cast<AFallenCorsairCharacter>(GetOwner());
+	m_ownerRef = Cast<AFallenCorsairCharacter>(GetOwner());
 	
 	// ...
 	
@@ -56,14 +58,14 @@ void UGun::SetAmmo(int newAmmo)
 
 void UGun::Shoot()
 {
-	if(m_gunAmmo > 0 && ownerRef)
+	if(m_gunAmmo > 0 && m_ownerRef)
 	{
 		FHitResult outHit;
 		/// change the owner by the owner camera
 
 		/// Change start by the location of the socket gun mesh
 		FVector start = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * 100;
-		FVector end = ownerRef->GetFollowCamera()->GetForwardVector() * m_distance + start;
+		FVector end = m_ownerRef->GetFollowCamera()->GetForwardVector() * m_distance + start;
 
 		/// trace
 		GetWorld()->LineTraceSingleByChannel(outHit, start, end, ECC_Visibility);
@@ -72,7 +74,8 @@ void UGun::Shoot()
 		if(m_bullet)
 		{
 			/// spawn bullet, rotation base on camera rotation
-			GetWorld()->SpawnActor<AActor>(m_bullet, start, ownerRef->GetFollowCamera()->GetComponentRotation(), SpawnInfo);
+			GetWorld()->SpawnActor<ABullet>(m_bullet, start, m_ownerRef->GetFollowCamera()->GetComponentRotation(), SpawnInfo)
+			->SetBulletSetting(m_bulletSpeed,m_bulletDammage, m_bulletDammageRadius, m_bulletLifeSpan);
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Shoot"));
 		m_gunAmmo -= m_ammoCost;

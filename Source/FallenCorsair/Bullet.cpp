@@ -2,6 +2,8 @@
 
 
 #include "Bullet.h"
+
+#include "Gun.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
@@ -21,13 +23,9 @@ ABullet::ABullet()
 	dammageCollision = CreateDefaultSubobject<USphereComponent>("Dammage Collision");
 	dammageCollision->SetupAttachment(bulletCollision);
 	dammageCollision->SetSphereRadius(22.f);
-
-	bulletSpeed = 3000.f;
-	dammageRadius = 10.f;
 	
 	projectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Component"));
-	projectileMovement->InitialSpeed = bulletSpeed;
-	projectileMovement->MaxSpeed = bulletSpeed;
+	projectileMovement->MaxSpeed = 20000.f;
 	
 	bulletCollision->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
 	dammageCollision->OnComponentBeginOverlap.AddDynamic(this, &ABullet::ABullet::OnOverlapBegin);
@@ -50,24 +48,29 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABullet::Explosion, 2, false);
 }
 
 // Called every frame
 void ABullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ABullet::Explosion()
 {
 	projectileMovement->StopMovementImmediately();
 	bulletMesh->DestroyComponent();
-	dammageCollision->SetWorldScale3D(FVector(dammageRadius));
+	dammageCollision->SetWorldScale3D(FVector(m_dammageRadius));
 	SetLifeSpan(0.2f);
 }
 
+void ABullet::SetBulletSetting(float bulletSpeed, int dammage, float dammageRadius, int lifeSpan)
+{
+	m_dammage = dammage;
+	m_dammageRadius = dammageRadius;
+	projectileMovement->Velocity =  projectileMovement->Velocity * bulletSpeed;
+	
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABullet::Explosion, lifeSpan, false);
+}
 

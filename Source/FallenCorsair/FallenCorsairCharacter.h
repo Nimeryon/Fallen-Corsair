@@ -80,9 +80,9 @@ private:
 	UPROPERTY()
 	float m_alpha = 0.f;
 
-	//modify value and code to make transitionspeed per second
-	UPROPERTY(EditAnywhere, Category = "Camera", meta = (displayName = "Transition de visée"), meta = (ClampMin = 0.1f, UIMin = 0.1f, ClampMax = 10, UIMax = 10))
-	float m_transitionSpeed = 0.01f;
+	
+	UPROPERTY(EditAnywhere, Category = "Camera Option", meta = (displayName = "Transition de visée"), meta = (ClampMin = 0.01f, UIMin = 0.01f, ClampMax = 10, UIMax = 10))
+	float m_transitionSpeed = 0.2f;
 
 	UPROPERTY()
 	float m_direction = 0.f;
@@ -101,9 +101,6 @@ public:
 
 	UFUNCTION()
 	void Aim(const FInputActionValue& bIsZoom);
-
-	UFUNCTION()
-	void AimTransition();
 
 
 };

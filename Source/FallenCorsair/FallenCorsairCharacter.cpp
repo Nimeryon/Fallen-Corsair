@@ -87,6 +87,24 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		newRot.Yaw = GetCameraBoom()->GetTargetRotation().Yaw;
 		SetActorRotation(newRot);
 	}
+
+	
+	m_alpha = FMath::Clamp( m_alpha + (1 / m_transitionSpeed * m_direction) * DeltaTime, 0, 1);
+
+	if((m_alpha != 0) || (m_alpha != 1))
+	{
+		GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(400, 0, m_alpha, 2);
+
+		FVector A = FVector(0.f,0.f,0.f);
+		FVector B = FVector(-40.f, 30.f, 70.f);
+		FVector newLoc;
+		newLoc.X = FMath::InterpEaseIn(A.X, B.X, m_alpha, 2);
+		newLoc.Y = FMath::InterpEaseIn(A.Y, B.Y, m_alpha, 2);
+		newLoc.Z = FMath::InterpEaseIn(A.Z, B.Z, m_alpha, 2);
+		
+		GetCameraBoom()->SetRelativeLocation(newLoc);
+	}
+	
 }
 
 void AFallenCorsairCharacter::Shoot()
@@ -98,36 +116,12 @@ void AFallenCorsairCharacter::Shoot()
 void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 {
 	m_bIsFocus = bIsZoom.Get<bool>();
+	GetCameraBoom()->bEnableCameraLag = !m_bIsFocus;
+	
 	if(m_bIsFocus)
-		m_direction = 0.1f;
+		m_direction = 1.f;
 	else
-		m_direction = -0.1f;
-	
-	GetWorldTimerManager().SetTimer(m_timerHandle, this, &AFallenCorsairCharacter::AimTransition, 1 / m_transitionSpeed, true);
-	
-}
-
-void AFallenCorsairCharacter::AimTransition()
-{
-	//m_alpha = m_alpha + m_direction;
-	m_alpha = FMath::Clamp(m_alpha + m_direction, 0, 1);
-	if((m_alpha == 0) ^ (m_alpha == 1))
-	{
-		GetWorldTimerManager().ClearTimer(m_timerHandle);
-	}
-	else
-	{
-		GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(400, 0, m_alpha, 2);
-
-		FVector A = FVector(0.f,0.f,0.f);
-		FVector B = FVector(-40.f, 30.f, 70.f);
-		FVector newLoc;
-		newLoc.X = FMath::InterpEaseIn(A.X, B.X, m_alpha, 2);
-		newLoc.Y = FMath::InterpEaseIn(A.Y, B.Y, m_alpha, 2);
-		newLoc.Z = FMath::InterpEaseIn(A.Z, B.Z, m_alpha, 2);
-			
-		GetCameraBoom()->SetRelativeLocation(newLoc);
-	}
+		m_direction = -1.f;
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -32,8 +32,12 @@ ABullet::ABullet()
 void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Hit"));
-	Explosion();
+	if(!OtherActor->ActorHasTag("Character"))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Hit"));
+		Explosion();
+	}
+	
 }
 
 void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,

@@ -37,6 +37,12 @@ class AFallenCorsairCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ShootAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* AimAction;
+
 	
 
 public:
@@ -44,6 +50,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly)
 	class UBarrel* barrelComp;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UGun* gunComp;
 
 protected:
 
@@ -61,11 +70,40 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay();
 
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+private:
+	UPROPERTY()
+	bool m_bIsFocus = false;
+
+	UPROPERTY()
+	float m_alpha = 0.f;
+
+	//modify value and code to make transitionspeed per second
+	UPROPERTY(EditAnywhere, Category = "Camera", meta = (displayName = "Transition de visée"), meta = (ClampMin = 0.1f, UIMin = 0.1f, ClampMax = 10, UIMax = 10))
+	float m_transitionSpeed = 0.01f;
+
+	UPROPERTY()
+	float m_direction = 0.f;
+
+	UPROPERTY()
+	FTimerHandle m_timerHandle;
+	
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	UFUNCTION()
+	void Shoot();
+
+	UFUNCTION()
+	void Aim(const FInputActionValue& bIsZoom);
+
+	UFUNCTION()
+	void AimTransition();
 
 
 };

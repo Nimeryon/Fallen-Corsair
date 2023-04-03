@@ -40,7 +40,7 @@ private:
 	UPROPERTY()
 	float m_ennemyDropSoul = 0.05f;
 
-	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (ClampMin = 0.01, UIMin = 0.01), meta = (displayName = "Vitesse de chargement"))
+	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (ClampMin = 0.01, UIMin = 0.01), meta = (displayName = "Vitesse de chargement en seconde"))
 	float m_speedCharge = 0.01f;
 
 public:
@@ -52,5 +52,8 @@ public:
 
 	UFUNCTION()
 	int GetMaxSlot();
+
+	UFUNCTION()
+	void CollectSoul();
 		
 };

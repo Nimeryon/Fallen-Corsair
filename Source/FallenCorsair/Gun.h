@@ -41,17 +41,20 @@ private:
 	 * This Is The Cost Of A Simple Shot (base 1)
 	 */
 	UPROPERTY(EditAnywhere, Category = "Gun", meta = (ClampMin = 1, UIMin = 1), meta = (displayName = "Coût tir simple"))
-	int m_ammoCost;
+	int m_ammoCost = 1;
 
 	/**
 	 * This Is The Cost Of A Super Shot (base 3)
 	 */
 	UPROPERTY(EditAnywhere, Category = "Gun", meta = (ClampMin = 1, UIMin = 1), meta = (displayName = "Coût tir puissant"))
-	int m_superAmmoCost;
+	int m_superAmmoCost = 3;
 
 	UPROPERTY()
 	float m_distance;
 
+	/**
+	 * Place the BP_Bullet, Nothing else
+	 */
 	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Projectile"))
 	TSubclassOf<class ABullet> m_bullet;
 
@@ -74,7 +77,7 @@ private:
 	int m_bulletLifeSpan = 2;
 
 	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Taille du projectile"), meta = (ClampMin = 0.1, UIMin = 0.1, ClampMax = 2, UIMax = 2))
-	float m_bulletRadius = 20.f;
+	float m_bulletRadius = 0.5f;
 	
 public:
 	UFUNCTION()

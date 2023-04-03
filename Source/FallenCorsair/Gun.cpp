@@ -60,6 +60,7 @@ void UGun::SetAmmo(int newAmmo)
 
 void UGun::Shoot()
 {
+	m_gunAmmo = m_barrelRef->GetSlot();
 	if(m_gunAmmo > 0 && m_ownerRef)
 	{
 		FHitResult outHit;
@@ -81,6 +82,7 @@ void UGun::Shoot()
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Shoot"));
 		m_gunAmmo -= m_ammoCost;
+		m_barrelRef->SetSlot(m_gunAmmo);
 	}
 }
 

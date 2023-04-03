@@ -28,13 +28,13 @@ private:
 	/**
 	 * This Is The Current Slot Of Ammo
 	 */
-	UPROPERTY(EditAnywhere, Category = "Gun", meta = (ClampMin = 0, UIMin = 0), meta = (displayName = "Slot de tir actuelle"))
+	UPROPERTY()
 	int m_gunAmmo;
 
 	/**
 	 * This Is The Max Slot Of Ammo Available (base 3)
 	 */
-	UPROPERTY(EditAnywhere,  Category = "Gun", meta = (ClampMin = 1, UIMin = 1), meta = (displayName = "Slot de tir max"))
+	UPROPERTY()
 	int m_maxGunAmmo;
 
 	/**
@@ -58,6 +58,9 @@ private:
 	UPROPERTY()
 	class AFallenCorsairCharacter* m_ownerRef;
 
+	UPROPERTY()
+	class UBarrel* m_barrelRef;
+
 	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Vitesse du projectile"), meta = (ClampMin = 2000, UIMin = 2000, ClampMax = 20000, UIMax = 20000))
 	float m_bulletSpeed = 2000;
 
@@ -69,6 +72,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Durée de vie du projectile"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 10, UIMax = 10))
 	int m_bulletLifeSpan = 2;
+
+	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Taille du projectile"), meta = (ClampMin = 0.1, UIMin = 0.1, ClampMax = 2, UIMax = 2))
+	float m_bulletRadius = 20.f;
 	
 public:
 	UFUNCTION()

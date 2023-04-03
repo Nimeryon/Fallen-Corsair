@@ -3,6 +3,7 @@
 
 #include "Gun.h"
 
+#include "Barrel.h"
 #include "Bullet.h"
 #include "FallenCorsairCharacter.h"
 #include "Camera/CameraComponent.h"
@@ -13,13 +14,7 @@ UGun::UGun()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	m_maxGunAmmo = 3;
-	m_gunAmmo = m_maxGunAmmo;
-	m_distance = 2000.f;
-	m_ammoCost = 1;
-	m_superAmmoCost = m_maxGunAmmo;
+	PrimaryComponentTick.bCanEverTick = false;
 	// ...
 }
 
@@ -29,10 +24,17 @@ void UGun::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(m_gunAmmo > m_maxGunAmmo)
-		m_gunAmmo = m_maxGunAmmo;
+	//if(m_gunAmmo > m_maxGunAmmo)
+	//	m_gunAmmo = m_maxGunAmmo;
 
 	m_ownerRef = Cast<AFallenCorsairCharacter>(GetOwner());
+
+	m_barrelRef = m_ownerRef->barrelComp;
+
+	m_gunAmmo = m_barrelRef->GetSlot();
+	m_maxGunAmmo = m_barrelRef->GetMaxSlot();
+	
+	/// recup la ref du barrel et set les valeurs des ammos par rapport au slot du barrel
 	
 	// ...
 	
@@ -75,7 +77,7 @@ void UGun::Shoot()
 		{
 			/// spawn bullet, rotation base on camera rotation
 			GetWorld()->SpawnActor<ABullet>(m_bullet, start, m_ownerRef->GetFollowCamera()->GetComponentRotation(), SpawnInfo)
-			->SetBulletSetting(m_bulletSpeed,m_bulletDammage, m_bulletDammageRadius, m_bulletLifeSpan);
+			->SetBulletSetting(m_bulletSpeed,m_bulletDammage, m_bulletDammageRadius, m_bulletLifeSpan, m_bulletRadius);
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Shoot"));
 		m_gunAmmo -= m_ammoCost;

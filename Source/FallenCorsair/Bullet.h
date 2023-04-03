@@ -53,7 +53,7 @@ public:
 	void Explosion();
 
 	UFUNCTION()
-	void SetBulletSetting(float bulletSpeed, int dammage, float dammageRadius, int lifeSpan);
+	void SetBulletSetting(float bulletSpeed, int dammage, float dammageRadius, int lifeSpan, float bulletRadius);
 	
 };
 

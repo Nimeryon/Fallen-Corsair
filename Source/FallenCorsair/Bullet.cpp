@@ -15,14 +15,12 @@ ABullet::ABullet()
 	
 	bulletCollision = CreateDefaultSubobject<USphereComponent>("Bullet Collision");
 	bulletCollision->SetupAttachment(RootComponent);
-	bulletCollision->SetSphereRadius(20.f);
 
 	bulletMesh = CreateDefaultSubobject<UStaticMeshComponent>("Bullet Mesh");
 	bulletMesh->SetupAttachment(bulletCollision);
 
 	dammageCollision = CreateDefaultSubobject<USphereComponent>("Dammage Collision");
 	dammageCollision->SetupAttachment(bulletCollision);
-	dammageCollision->SetSphereRadius(22.f);
 	
 	projectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Component"));
 	projectileMovement->MaxSpeed = 20000.f;
@@ -64,11 +62,13 @@ void ABullet::Explosion()
 	SetLifeSpan(0.2f);
 }
 
-void ABullet::SetBulletSetting(float bulletSpeed, int dammage, float dammageRadius, int lifeSpan)
+void ABullet::SetBulletSetting(float bulletSpeed, int dammage, float dammageRadius, int lifeSpan, float bulletRadius)
 {
 	m_dammage = dammage;
 	m_dammageRadius = dammageRadius;
 	projectileMovement->Velocity =  projectileMovement->Velocity * bulletSpeed;
+
+	bulletCollision->SetWorldScale3D(FVector(bulletRadius));
 	
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABullet::Explosion, lifeSpan, false);

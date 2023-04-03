@@ -37,9 +37,13 @@ class AFallenCorsairCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
+	
+
 public:
 	AFallenCorsairCharacter();
 	
+	UPROPERTY(EditDefaultsOnly)
+	class UBarrel* barrelComp;
 
 protected:
 

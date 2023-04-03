@@ -76,3 +76,10 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Art related files
+*.ztl
+*.spp
+*.ma
+*.mb
+*.zpr

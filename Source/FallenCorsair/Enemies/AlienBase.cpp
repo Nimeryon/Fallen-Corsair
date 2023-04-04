@@ -38,6 +38,7 @@ float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	AActor* DamageCauser)
 {
 	m_currentHealth -= DamageAmount;
+	UE_LOG(LogTemp, Warning, TEXT("%d"), m_currentHealth);
 	if (m_currentHealth <= 0)
 		Destroy();
 	

@@ -42,10 +42,9 @@ void UMelee::BeginPlay()
 
 void UMelee::PerformAttack()
 {
-	if (!GetCurrentMelee().Anim)
+	if (!MeleeIsValid())
 		return;
 
-	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_BoolToString(bCanAttack));
 
 	if (bCanAttack)
 	{
@@ -53,7 +52,8 @@ void UMelee::PerformAttack()
 		FreezeRotation(true);
 		EnableWalk(false);
 		AttackSequence();
-	} else {
+	}
+	else {
 		bExecuteNextAttack = bCanExecuteNextAttack;
 	}
 }
@@ -68,30 +68,33 @@ void UMelee::SetTypeAttack(EAttackType at)
 
 void UMelee::StartAttack(bool start)
 {
-	if (bInputReleased)
+	bAttackStarted = start;
+	if (start && indexCurrentAttack == 0)
 	{
-		bAttackStarted = start;
-		
-		if (indexCurrentAttack == 0)
-		{
-			PerformAttack();
-			SetReleased(false);
-		}
+		PerformAttack();
 	}
 }
 
-void UMelee::UpdateTypeAttack(float eslapsedSeconds)
+void UMelee::UpdateTypeAttack(float& eslapsedSeconds)
 {
 	if (!AttackIsStarted())
 	{
-		if (eslapsedSeconds < delayInputDepth)
+		if (eslapsedSeconds <= delayInputDepthMeleeHeavy)
 		{
 			SetTypeAttack(EAttackType::Soft);
 		}
 		else {
+			eslapsedSeconds = 0;
 			SetTypeAttack(EAttackType::Heavy);
+			SetReleased(true);
+			StartAttack(true);
 		}
 	}
+}
+
+bool UMelee::IsReleased() const
+{
+	return bInputReleased;
 }
 
 void UMelee::SetReleased(bool released)
@@ -131,6 +134,8 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	}
 	else if (NotifyName == "Recovery")
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_BoolToString(IsLastCombo()));
+
 		if (IsLastCombo())
 		{
 			StartAttack(false);
@@ -140,7 +145,8 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 			{
 				bExecuteNextAttack = false;
 				IncrementCurrentAttack();
-				AttackSequence();
+				GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_IntToString(indexCurrentAttack));
+				AttackSequence(); // Execute next attack
 			}
 		}
 	}
@@ -177,10 +183,10 @@ void UMelee::TriggerHit()
 	QueryParams.AddIgnoredActor(GetOwner());
 
 	bool bHitSomething = GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, Orientation.Quaternion(), UEngineTypes::ConvertToTraceType(ECC_Visibility), BoxShape, QueryParams);
-	
+
 	if (Debug)
 		DrawDebugBox(GetWorld(), Start, GetCurrentMelee().BoxSize, FColor::Purple, false, 1, 0, 1);
-	
+
 	if (bHitSomething)
 	{
 		for (auto It = OutHits.CreateIterator(); It; It++)
@@ -188,6 +194,7 @@ void UMelee::TriggerHit()
 			ACharacter* character = Cast<ACharacter>((*It).GetActor());
 			if (character)
 			{
+				// Propulse ennemie
 				GetCurrentMelee().PropulsionDirectionEnnemie.Normalize();
 				FVector End = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * GetCurrentMelee().PropulsionDirectionEnnemie.X + GetOwner()->GetActorRightVector() * GetCurrentMelee().PropulsionDirectionEnnemie.Y + GetOwner()->GetActorUpVector() * GetCurrentMelee().PropulsionDirectionEnnemie.Z;
 				FVector Dir = End - GetOwner()->GetActorLocation();
@@ -252,7 +259,7 @@ void UMelee::AttackSequence()
 
 	bool bPlayedSuccessfully = false;
 	UAnimMontage* MontageToPlay = GetCurrentMelee().Anim;
-	
+
 	if (ownerCharacter->GetMesh())
 	{
 		if (UAnimInstance* AnimInstance = ownerCharacter->GetMesh()->GetAnimInstance())
@@ -298,25 +305,25 @@ void UMelee::PropulseOwner()
 
 	ownerCharacter->GetCharacterMovement()->AddImpulse(Force, true);
 }
-	
+
 
 void UMelee::ResetVelocity()
 {
 	ownerCharacter->GetCharacterMovement()->Velocity = FVector(0, 0, 0);
 }
 
-FAttackData &UMelee::GetCurrentMelee()
+FAttackData& UMelee::GetCurrentMelee()
 {
 	switch (attackType)
 	{
-		case EAttackType::Soft:
-			return Melees.Soft[indexCurrentAttack];
-			break;
-		case EAttackType::Heavy:
-			return Melees.Heavy[indexCurrentAttack];
-			break;
-		default:
-			return Melees.Soft[indexCurrentAttack];
+	case EAttackType::Soft:
+		return Melees.Soft[indexCurrentAttack];
+		break;
+	case EAttackType::Heavy:
+		return Melees.Heavy[indexCurrentAttack];
+		break;
+	default:
+		return Melees.Soft[indexCurrentAttack];
 	}
 }
 
@@ -326,11 +333,13 @@ void UMelee::ResetCombo()
 	bCanAttack = true;
 }
 
+// Reset all component
 void UMelee::ResetState()
 {
 	ResetCombo();
 	FreezeRotation(false);
 	EnableWalk(true);
+	StartAttack(false);
 }
 
 void UMelee::IncrementCurrentAttack()
@@ -346,6 +355,21 @@ void UMelee::IncrementCurrentAttack()
 		break;
 	default:
 		indexCurrentAttack %= Melees.Soft.Num();
+	}
+}
+
+bool UMelee::MeleeIsValid()
+{
+	switch (attackType)
+	{
+	case EAttackType::Soft:
+		return Melees.Soft.Num() > 0;
+		break;
+	case EAttackType::Heavy:
+		return Melees.Heavy.Num() > 0;
+		break;
+	default:
+		return Melees.Soft.Num() > 0;
 	}
 }
 
@@ -366,6 +390,3 @@ bool UMelee::IsLastCombo()
 
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-

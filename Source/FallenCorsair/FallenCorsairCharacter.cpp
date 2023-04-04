@@ -22,7 +22,7 @@ AFallenCorsairCharacter::AFallenCorsairCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-		
+
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -93,7 +93,7 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 {
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
+
 
 		//Jumping
 		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
@@ -104,7 +104,7 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::Look);
-		
+
 		//Melee
 		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::MeleeTriggered);
 		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::MeleeStarted);
@@ -126,7 +126,7 @@ void AFallenCorsairCharacter::Move(const FInputActionValue& Value)
 
 		// get forward vector
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	
+
 		// get right vector 
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
@@ -156,8 +156,14 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
 {
-	Melee_IsTrigerred = true;
-	MeleeComponent->UpdateTypeAttack(Melee_TriggeredSeconds);
+	if (!MeleeComponent->IsReleased())
+	{
+		if (!MeleeComponent->AttackIsStarted()) {
+			Melee_IsTrigerred = true;
+			MeleeComponent->UpdateTypeAttack(Melee_TriggeredSeconds);
+		}
+	}
+	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_FloatToString(Melee_TriggeredSeconds));
 }
 
 void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
@@ -165,17 +171,20 @@ void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 	if (MeleeComponent->AttackIsStarted()) {
 		MeleeComponent->PerformAttack();
 	}
+	MeleeComponent->SetReleased(false);
 }
 
 void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 {
 	Melee_IsTrigerred = false;
 	Melee_TriggeredSeconds = 0;
-	MeleeComponent->StartAttack(true);
-	MeleeComponent->SetReleased(true);
+
+	if (!MeleeComponent->IsReleased())
+	{
+		MeleeComponent->StartAttack(true);
+	}
 }
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-

@@ -14,34 +14,34 @@ struct FAttackData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	float PropulsionForceOwner = 0;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	FVector PropulsionDirectionOwner = FVector(0, 0, 0);
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+		float PropulsionForceOwner = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	float PropulsionForceEnnemie = 0;	
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	FVector PropulsionDirectionEnnemie = FVector(0, 0, 0);
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	FVector BoxOffset = FVector(0, 0, 0);
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	FVector BoxSize = FVector(100, 100, 100);
+		FVector PropulsionDirectionOwner = FVector(0, 0, 0);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	float RecoveryTime = 1; // Seconde
+		float PropulsionForceEnnemie = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	float Dammage = 0;
-	
+		FVector PropulsionDirectionEnnemie = FVector(0, 0, 0);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	UAnimMontage *Anim;	
-	
-	
+		FVector BoxOffset = FVector(0, 0, 0);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+		FVector BoxSize = FVector(100, 100, 100);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+		float RecoveryTime = 1; // Seconde
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+		float Dammage = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+		UAnimMontage* Anim;
+
+
 };
 
 USTRUCT(BlueprintType)
@@ -49,11 +49,11 @@ struct FMelees
 {
 	GENERATED_BODY()
 
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FAttackData> Soft;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FAttackData> Soft;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FAttackData> Heavy;
+		TArray<FAttackData> Heavy;
 
 
 };
@@ -66,29 +66,34 @@ enum class EAttackType
 };
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class FALLENCORSAIR_API UMelee : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
 	UMelee();
 
 	// Vars
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	FMelees Melees;
-	
+		FMelees Melees;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	bool Debug = false;
+		float delayInputDepthMeleeHeavy = 1;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+		bool Debug = false;
 
 	// Functions
 	//UFUNCTION(BlueprintCallable, Category = Properties)
 	virtual void PerformAttack();
 	virtual void SetTypeAttack(EAttackType at);
 	virtual void StartAttack(bool start);
-	virtual void UpdateTypeAttack(float eslapsedSeconds);
+	virtual void UpdateTypeAttack(float& eslapsedSeconds);
 	virtual bool AttackIsStarted();
+	virtual bool IsReleased() const;
 	virtual void SetReleased(bool released);
 	virtual void CancelAttack();
 
@@ -96,15 +101,15 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	
+
 	UFUNCTION()
-	virtual void OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
-	
+		virtual void OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
+
 	UFUNCTION()
-	virtual void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-	
+		virtual void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
 	virtual void TriggerHit();
-	
+
 private:
 
 	// Functions
@@ -122,8 +127,9 @@ private:
 	virtual void ResetCombo();
 	virtual void ResetState();
 	virtual void IncrementCurrentAttack();
+	virtual bool MeleeIsValid();
 	virtual bool IsLastCombo();
-	virtual FAttackData &GetCurrentMelee();
+	virtual FAttackData& GetCurrentMelee();
 
 
 	// Vars
@@ -132,8 +138,7 @@ private:
 
 	EAttackType attackType = EAttackType::Soft;
 
-	int indexCurrentAttack = 0; 
-	float delayInputDepth = 1;
+	int indexCurrentAttack = 0;
 
 	bool bCanAttack = true;
 	bool bCanExecuteNextAttack = false;
@@ -141,7 +146,6 @@ private:
 	bool bAttackStarted = false;
 	bool bInputReleased = false;
 	bool bIsDeleguate = false;
-
 
 	FVector rotation = FVector(0, 0, 0);
 

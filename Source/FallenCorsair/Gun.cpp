@@ -7,6 +7,7 @@
 #include "Bullet.h"
 #include "FallenCorsairCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 
 // Sets default values for this component's properties
@@ -28,7 +29,7 @@ void UGun::BeginPlay()
 	//	m_gunAmmo = m_maxGunAmmo;
 
 	m_ownerRef = Cast<AFallenCorsairCharacter>(GetOwner());
-
+	
 	m_barrelRef = m_ownerRef->barrelComp;
 
 	m_gunAmmo = m_barrelRef->GetSlot();

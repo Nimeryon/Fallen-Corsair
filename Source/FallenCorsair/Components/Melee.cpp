@@ -134,7 +134,7 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	}
 	else if (NotifyName == "Recovery")
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_BoolToString(IsLastCombo()));
+		//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_BoolToString(IsLastCombo()));
 
 		if (IsLastCombo())
 		{
@@ -145,7 +145,7 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 			{
 				bExecuteNextAttack = false;
 				IncrementCurrentAttack();
-				GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_IntToString(indexCurrentAttack));
+				//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_IntToString(indexCurrentAttack));
 				AttackSequence(); // Execute next attack
 			}
 		}

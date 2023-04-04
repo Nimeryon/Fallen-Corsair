@@ -1,6 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "FallenCorsairCharacter.h"
+
+#include "Barrel.h"
+#include "Gun.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -9,6 +12,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "FrameTypes.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -39,7 +44,7 @@ AFallenCorsairCharacter::AFallenCorsairCharacter()
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = m_distanceFromPlayer_S; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
@@ -47,8 +52,16 @@ AFallenCorsairCharacter::AFallenCorsairCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	barrelComp = CreateDefaultSubobject<UBarrel>(TEXT("BarrelComponnent"));
+	gunComp = CreateDefaultSubobject<UGun>(TEXT("GunComponnent"));
+
+	GetCameraBoom()->SetRelativeLocation(FVector(0,m_CameraOffset_S.X,m_CameraOffset_S.Y));
+	
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	
 }
 
 void AFallenCorsairCharacter::BeginPlay()
@@ -56,13 +69,77 @@ void AFallenCorsairCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	/// I place the camera lag here because it doesn't work inthje constructor dunno why **confuse smiley**
+	GetCameraBoom()->CameraLagSpeed = m_cameraLag;
+	
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	CameraManager= PlayerController->PlayerCameraManager;
+	CameraManager->ViewPitchMin = m_pitchMin_S;
+	CameraManager->ViewPitchMax = m_pitchMax_S;
+	GetFollowCamera()->SetRelativeRotation(FRotator(m_pitchAngle,0,0));
+	
 	//Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (PlayerController)
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
+	}
+}
+
+void AFallenCorsairCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	float transition;
+	if(m_bIsFocus)
+		transition = m_transitionSpeedZoom;
+	else
+		transition = m_transitionSpeedDezoom;
+	
+	m_alpha = FMath::Clamp( m_alpha + (1 / transition * m_direction) * DeltaTime, 0, 1);
+
+	if((m_alpha != 0) || (m_alpha != 1))
+	{
+		FVector2D newLoc = FMath::InterpEaseIn(m_CameraOffset_S, m_CameraOffset_A, m_alpha, 2);
+		
+		GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_S, m_distanceFromPlayer_A, m_alpha, 2);
+		GetCameraBoom()->SetRelativeLocation(FVector(0,newLoc.X,newLoc.Y));
+		GetFollowCamera()->SetFieldOfView(FMath::InterpEaseIn(m_fieldOfView_S, m_fieldOfView_A, m_alpha, 2));
+		CameraManager->ViewPitchMin = FMath::InterpEaseIn(m_pitchMin_S, m_pitchMin_A, m_alpha, 2);
+		CameraManager->ViewPitchMax = FMath::InterpEaseIn(m_pitchMax_S, m_pitchMax_A, m_alpha, 2);
+
+		if(m_bIsFocus)
+		{
+			FRotator newRot;
+			newRot.Roll = GetActorRotation().Roll;
+			newRot.Pitch = GetActorRotation().Pitch;
+			newRot.Yaw = GetCameraBoom()->GetTargetRotation().Yaw;
+			SetActorRotation(newRot);
+		}
+	}
+	
+}
+
+void AFallenCorsairCharacter::Shoot()
+{
+	if(m_bIsFocus)
+		gunComp->Shoot();
+}
+
+void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
+{
+	m_bIsFocus = bIsZoom.Get<bool>();
+	GetCameraBoom()->bEnableCameraLag = !m_bIsFocus;
+	
+	if(m_bIsFocus)
+	{
+		m_direction = 1.f;
+	}
+	else
+	{
+		m_direction = -1.f;
 	}
 }
 
@@ -85,6 +162,11 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::Look);
 
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::Shoot);
+
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::Aim);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::Aim);
+		
 	}
 
 }
@@ -120,8 +202,25 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 	if (Controller != nullptr)
 	{
 		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
+		
+		float yawSensibility;
+		float pitchSensibility;
+		
+		if(m_bIsFocus)
+		{
+			yawSensibility = m_mouseYawSensitivity_A;
+			pitchSensibility = m_mousePitchSensitivity_A;
+		}
+		else
+		{
+			yawSensibility = m_mouseYawSensitivity_S;
+			pitchSensibility = m_mousePitchSensitivity_S;
+		}
+		if(m_cameraCurve)
+		{
+			AddControllerYawInput(m_cameraCurve->GetFloatValue(LookAxisVector.X) * yawSensibility);
+			AddControllerPitchInput(m_cameraCurve->GetFloatValue(LookAxisVector.Y) * pitchSensibility);
+		}
 	}
 }
 

@@ -79,16 +79,64 @@ private:
 
 	UPROPERTY()
 	float m_alpha = 0.f;
-
 	
-	UPROPERTY(EditAnywhere, Category = "Camera Option", meta = (displayName = "Transition de visée"), meta = (ClampMin = 0.01f, UIMin = 0.01f, ClampMax = 10, UIMax = 10))
-	float m_transitionSpeed = 0.2f;
-
 	UPROPERTY()
 	float m_direction = 0.f;
 
 	UPROPERTY()
-	FTimerHandle m_timerHandle;
+	APlayerCameraManager* CameraManager;
+	
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Default", meta = (displayName = "Camera Pitch"), meta = (ClampMin = -90, UIMin = -90, ClampMax = 90, UIMax = 90))
+	float m_pitchAngle = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Default", meta = (displayName = "Camera lag"), meta = (ClampMin = 1, UIMin = 1))
+	float m_cameraLag = 15.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Transition", meta = (displayName = "Transition de visée en zoom"), meta = (ClampMin = 0.01f, UIMin = 0.01f, ClampMax = 10, UIMax = 10))
+	float m_transitionSpeedZoom = 0.2f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Transition", meta = (displayName = "Transition de visée en dezoom"), meta = (ClampMin = 0.01f, UIMin = 0.01f, ClampMax = 10, UIMax = 10))
+	float m_transitionSpeedDezoom = 0.2f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Field of view", meta = (displayName = "Field of view standard"), meta = (ClampMin = 30.f, UIMin = 30.f, ClampMax = 170.f, UIMax = 170.f))
+	float m_fieldOfView_S = 90.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Field of view", meta = (displayName = "Field of view Aim"), meta = (ClampMin = 10.f, UIMin = 10.f, ClampMax = 170.f, UIMax = 170.f))
+	float m_fieldOfView_A = 90.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Distance", meta = (displayName = "Distance de la camera standard"), meta = (ClampMin = 100.f, UIMin = 100.f, ClampMax = 2000.f, UIMax = 2000.f))
+	float m_distanceFromPlayer_S = 400.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Distance", meta = (displayName = "Distance de la camera Aim"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 2000.f, UIMax = 2000.f))
+	float m_distanceFromPlayer_A = 0;
+
+	/**
+	 * X IS Horizontal And Y Is Vertical
+	 */
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Offset", meta = (displayName = "Camera Offset standard"))
+	FVector2D m_CameraOffset_S = FVector2D(0,0);
+
+	/**
+	 * X IS Horizontal And Y Is Vertical
+	 */
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Offset", meta = (displayName = "Camera Offset Aim"))
+	FVector2D m_CameraOffset_A = FVector2D(0,0);
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Standard", meta = (displayName = "Camera bottom limit standard"), meta = (ClampMin = -90, UIMin = -90, ClampMax = -1, UIMax = -1))
+	float m_pitchMin_S = -90.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Standard", meta = (displayName = "Camera top limit standard"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 90, UIMax = 90))
+	float m_pitchMax_S = 90.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Aim", meta = (displayName = "Camera bottom limit Aim"), meta = (ClampMin = -90, UIMin = -90, ClampMax = -1, UIMax = -1))
+	float m_pitchMin_A = -90.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Aim", meta = (displayName = "Camera top limit Aim"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 90, UIMax = 90))
+	float m_pitchMax_A = 90.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Mouse", meta = (displayName = "Sensibilité de la souris"), meta = (ClampMin = 0.2, UIMin = 0.2, ClampMax = 3, UIMax = 3))
+	float m_mouseSensitivity_S = 1.f;
+
 	
 public:
 	/** Returns CameraBoom subobject **/

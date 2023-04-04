@@ -44,6 +44,11 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	/// Add damage to the actor overlap (Ennemy)
+	if(OtherActor->ActorHasTag("ennemy"))
+	{
+		/// impulse alien ? or call directly function in alien class ?
+		//OtherActor->Destroy();
+	}
 }
 
 // Called when the game starts or when spawned

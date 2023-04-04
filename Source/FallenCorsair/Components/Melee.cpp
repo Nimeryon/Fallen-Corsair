@@ -10,6 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Math/Quat.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UMelee::UMelee()
@@ -86,9 +87,52 @@ void UMelee::UpdateTypeAttack(float& eslapsedSeconds)
 		else {
 			eslapsedSeconds = 0;
 			SetTypeAttack(EAttackType::Heavy);
+			if (!MeleeIsValid())
+			{
+				SetTypeAttack(EAttackType::Soft);
+			}
+
 			SetReleased(true);
 			StartAttack(true);
 		}
+	}
+}
+bool UMelee::MeleeIsValid()
+{
+	switch (attackType)
+	{
+	case EAttackType::Soft:
+		if (Melees.Soft.Num() > 0)
+		{
+			if (Melees.Soft[0].Anim)
+			{
+				return true;
+			}
+			return false;
+		}
+		return false;
+		break;
+	case EAttackType::Heavy:
+		if (Melees.Heavy.Num() > 0)
+		{
+			if (Melees.Heavy[0].Anim)
+			{
+				return true;
+			}
+			return false;
+		}
+		return false;
+		break;
+	default:
+		if (Melees.Soft.Num() > 0)
+		{
+			if (Melees.Soft[0].Anim)
+			{
+				return true;
+			}
+			return false;
+		}
+		return false;
 	}
 }
 
@@ -155,12 +199,16 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 		ResetState();
 	}
 	// Sound
-	else if (NotifyName == "Hit_Soft")
+	else if (NotifyName == "Sound")
 	{
-
-	}
-	else if (NotifyName == "Hit_Heavy")
-	{
+		if (GetCurrentMelee().PlayerVoiceSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), GetCurrentMelee().PlayerVoiceSound, 1, 1, 0);
+		}
+		if (GetCurrentMelee().AttackSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), GetCurrentMelee().AttackSound, 1, 1, 0);
+		}
 	}
 }
 
@@ -306,7 +354,6 @@ void UMelee::PropulseOwner()
 	ownerCharacter->GetCharacterMovement()->AddImpulse(Force, true);
 }
 
-
 void UMelee::ResetVelocity()
 {
 	ownerCharacter->GetCharacterMovement()->Velocity = FVector(0, 0, 0);
@@ -355,21 +402,6 @@ void UMelee::IncrementCurrentAttack()
 		break;
 	default:
 		indexCurrentAttack %= Melees.Soft.Num();
-	}
-}
-
-bool UMelee::MeleeIsValid()
-{
-	switch (attackType)
-	{
-	case EAttackType::Soft:
-		return Melees.Soft.Num() > 0;
-		break;
-	case EAttackType::Heavy:
-		return Melees.Heavy.Num() > 0;
-		break;
-	default:
-		return Melees.Soft.Num() > 0;
 	}
 }
 

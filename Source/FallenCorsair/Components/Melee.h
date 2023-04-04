@@ -32,8 +32,8 @@ struct FAttackData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 		FVector BoxSize = FVector(100, 100, 100);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-		float RecoveryTime = 1; // Seconde
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	//	float RecoveryTime = 1; // Seconde
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 		float Dammage = 0;
@@ -41,6 +41,11 @@ struct FAttackData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 		UAnimMontage* Anim;
 
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+		class USoundBase* PlayerVoiceSound;	
+	
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+		class USoundBase* AttackSound;
 
 };
 
@@ -92,10 +97,12 @@ public:
 	virtual void SetTypeAttack(EAttackType at);
 	virtual void StartAttack(bool start);
 	virtual void UpdateTypeAttack(float& eslapsedSeconds);
-	virtual bool AttackIsStarted();
-	virtual bool IsReleased() const;
 	virtual void SetReleased(bool released);
 	virtual void CancelAttack();
+	virtual bool MeleeIsValid();
+	virtual bool AttackIsStarted();
+	virtual bool IsReleased() const;
+
 
 
 protected:
@@ -127,7 +134,6 @@ private:
 	virtual void ResetCombo();
 	virtual void ResetState();
 	virtual void IncrementCurrentAttack();
-	virtual bool MeleeIsValid();
 	virtual bool IsLastCombo();
 	virtual FAttackData& GetCurrentMelee();
 

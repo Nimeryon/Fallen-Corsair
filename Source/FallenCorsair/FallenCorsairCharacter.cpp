@@ -78,9 +78,6 @@ void AFallenCorsairCharacter::BeginPlay()
 	CameraManager->ViewPitchMax = m_pitchMax_S;
 	GetFollowCamera()->SetRelativeRotation(FRotator(m_pitchAngle,0,0));
 	
-	
-	
-	
 	//Add Input Mapping Context
 	if (PlayerController)
 	{
@@ -205,8 +202,25 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 	if (Controller != nullptr)
 	{
 		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X * m_mouseSensitivity_S);
-		AddControllerPitchInput(LookAxisVector.Y * m_mouseSensitivity_S);
+		
+		float yawSensibility;
+		float pitchSensibility;
+		
+		if(m_bIsFocus)
+		{
+			yawSensibility = m_mouseYawSensitivity_A;
+			pitchSensibility = m_mousePitchSensitivity_A;
+		}
+		else
+		{
+			yawSensibility = m_mouseYawSensitivity_S;
+			pitchSensibility = m_mousePitchSensitivity_S;
+		}
+		if(m_cameraCurve)
+		{
+			AddControllerYawInput(m_cameraCurve->GetFloatValue(LookAxisVector.X) * yawSensibility);
+			AddControllerPitchInput(m_cameraCurve->GetFloatValue(LookAxisVector.Y) * pitchSensibility);
+		}
 	}
 }
 

@@ -108,7 +108,7 @@ private:
 	float m_distanceFromPlayer_S = 400.f;
 
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Distance", meta = (displayName = "Distance de la camera Aim"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 2000.f, UIMax = 2000.f))
-	float m_distanceFromPlayer_A = 0;
+	float m_distanceFromPlayer_A = 40.f;
 
 	/**
 	 * X IS Horizontal And Y Is Vertical
@@ -120,22 +120,34 @@ private:
 	 * X IS Horizontal And Y Is Vertical
 	 */
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Offset", meta = (displayName = "Camera Offset Aim"))
-	FVector2D m_CameraOffset_A = FVector2D(0,0);
+	FVector2D m_CameraOffset_A = FVector2D(30.f,70.f);
 
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Standard", meta = (displayName = "Camera bottom limit standard"), meta = (ClampMin = -90, UIMin = -90, ClampMax = -1, UIMax = -1))
-	float m_pitchMin_S = -90.f;
+	float m_pitchMin_S = -70.f;
 
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Standard", meta = (displayName = "Camera top limit standard"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 90, UIMax = 90))
-	float m_pitchMax_S = 90.f;
+	float m_pitchMax_S = 70.f;
 
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Aim", meta = (displayName = "Camera bottom limit Aim"), meta = (ClampMin = -90, UIMin = -90, ClampMax = -1, UIMax = -1))
-	float m_pitchMin_A = -90.f;
+	float m_pitchMin_A = -45.f;
 
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Aim", meta = (displayName = "Camera top limit Aim"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 90, UIMax = 90))
-	float m_pitchMax_A = 90.f;
+	float m_pitchMax_A = 45.f;
 
-	UPROPERTY(EditAnywhere, Category = "Camera Option|Mouse", meta = (displayName = "Sensibilité de la souris"), meta = (ClampMin = 0.2, UIMin = 0.2, ClampMax = 3, UIMax = 3))
-	float m_mouseSensitivity_S = 1.f;
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Mouse|Standard", meta = (displayName = "Sensibilité de la souris vertical standard"), meta = (ClampMin = 0.1, UIMin = 0.1, ClampMax = 5, UIMax = 5))
+	float m_mousePitchSensitivity_S = 1.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Mouse|Standard", meta = (displayName = "Sensibilité de la souris horizontal standard"), meta = (ClampMin = 0.1, UIMin = 0.1, ClampMax = 5, UIMax = 5))
+	float m_mouseYawSensitivity_S = 1.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Mouse|Aim", meta = (displayName = "Sensibilité de la souris vertical Aim"), meta = (ClampMin = 0.1, UIMin = 0.1, ClampMax = 5, UIMax = 5))
+	float m_mousePitchSensitivity_A = 1.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Mouse|Aim", meta = (displayName = "Sensibilité de la souris horizontal Aim"), meta = (ClampMin = 0.1, UIMin = 0.1, ClampMax = 5, UIMax = 5))
+	float m_mouseYawSensitivity_A = 1.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Default", meta = (displayName = "Camera Curve"))
+	UCurveFloat* m_cameraCurve;
 
 	
 public:

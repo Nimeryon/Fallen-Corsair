@@ -7,7 +7,6 @@
 #include "InputActionValue.h"
 #include "FallenCorsairCharacter.generated.h"
 
-
 UCLASS(config=Game)
 class AFallenCorsairCharacter : public ACharacter
 {
@@ -20,6 +19,10 @@ class AFallenCorsairCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	/** Melee Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UMelee* MeleeComponent;
 	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -35,7 +38,11 @@ class AFallenCorsairCharacter : public ACharacter
 
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
+	class UInputAction* LookAction;	
+	
+	/** Melee Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* MeleeAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ShootAction;
@@ -61,6 +68,11 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	// Called for melee input
+	void MeleeTriggered(const FInputActionValue& Value);
+	void MeleeStarted(const FInputActionValue& Value);
+	void MeleeCompleted(const FInputActionValue& Value);
 			
 
 protected:
@@ -162,6 +174,10 @@ public:
 	UFUNCTION()
 	void Aim(const FInputActionValue& bIsZoom);
 
+private:
 
+	// Chrono for melee input
+	float Melee_TriggeredSeconds = 0;
+	bool Melee_IsTrigerred = false;
 };
 

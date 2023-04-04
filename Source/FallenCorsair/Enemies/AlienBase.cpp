@@ -19,6 +19,7 @@ void AAlienBase::BeginPlay()
 	Super::BeginPlay();
 
 	GetCharacterMovement()->MaxWalkSpeed = m_movementSpeed;
+	m_currentHealth = m_health;
 }
 
 // Called every frame
@@ -33,3 +34,13 @@ void AAlienBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	m_currentHealth -= DamageAmount;
+	UE_LOG(LogTemp, Warning, TEXT("%d"), m_currentHealth);
+	if (m_currentHealth <= 0)
+		Destroy();
+	
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}

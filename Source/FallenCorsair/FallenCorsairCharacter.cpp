@@ -17,7 +17,6 @@
 #include "FrameTypes.h"
 #include "Kismet/KismetMathLibrary.h"
 
-
 //////////////////////////////////////////////////////////////////////////
 // AFallenCorsairCharacter
 
@@ -162,8 +161,8 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 		
 
 		//Jumping
-		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		//Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::Move);
@@ -180,9 +179,7 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::Aim);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::Aim);
-		
 	}
-
 }
 
 void AFallenCorsairCharacter::Move(const FInputActionValue& Value)
@@ -256,8 +253,10 @@ void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 {
-	if (MeleeComponent->AttackIsStarted()) {
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, TEXT("melee"));
+
 		MeleeComponent->PerformAttack();
+	if (MeleeComponent->AttackIsStarted()) {
 	}
 	MeleeComponent->SetReleased(false);
 }

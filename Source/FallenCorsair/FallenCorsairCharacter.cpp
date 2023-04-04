@@ -78,31 +78,27 @@ void AFallenCorsairCharacter::BeginPlay()
 void AFallenCorsairCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if(m_bIsFocus)
-	{
-		FRotator newRot;
-		newRot.Roll = GetActorRotation().Roll;
-		newRot.Pitch = GetActorRotation().Pitch;
-		newRot.Yaw = GetCameraBoom()->GetTargetRotation().Yaw;
-		SetActorRotation(newRot);
-	}
-
 	
 	m_alpha = FMath::Clamp( m_alpha + (1 / m_transitionSpeed * m_direction) * DeltaTime, 0, 1);
 
 	if((m_alpha != 0) || (m_alpha != 1))
 	{
-		GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(400, 0, m_alpha, 2);
-
 		FVector A = FVector(0.f,0.f,0.f);
 		FVector B = FVector(-40.f, 30.f, 70.f);
-		FVector newLoc;
-		newLoc.X = FMath::InterpEaseIn(A.X, B.X, m_alpha, 2);
-		newLoc.Y = FMath::InterpEaseIn(A.Y, B.Y, m_alpha, 2);
-		newLoc.Z = FMath::InterpEaseIn(A.Z, B.Z, m_alpha, 2);
+		FVector newLoc = FMath::InterpEaseIn(A, B, m_alpha, 2);
 		
+		GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(400, 0, m_alpha, 2);
 		GetCameraBoom()->SetRelativeLocation(newLoc);
+
+		if(m_bIsFocus)
+		{
+			FRotator newRot;
+			newRot.Roll = GetActorRotation().Roll;
+			newRot.Pitch = GetActorRotation().Pitch;
+			newRot.Yaw = GetCameraBoom()->GetTargetRotation().Yaw;
+			SetActorRotation(newRot);
+			//Mesh->SetWorldRotation(newRot);
+		}
 	}
 	
 }

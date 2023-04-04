@@ -98,6 +98,10 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
+	// Chrono for melee input
+	if (Melee_IsTrigerred)
+		Melee_TriggeredSeconds += DeltaTime;
+	
 	float transition;
 	if(m_bIsFocus)
 		transition = m_transitionSpeedZoom;
@@ -148,12 +152,6 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 		m_direction = -1.f;
 	}
 }
-
-	// Chrono for melee input
-	if (Melee_IsTrigerred)
-		Melee_TriggeredSeconds += DeltaTime;
-}
-
 
 //////////////////////////////////////////////////////////////////////////
 // Input

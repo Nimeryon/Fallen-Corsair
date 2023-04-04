@@ -31,7 +31,7 @@ void UBarrel::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 
 	if(m_slot < m_maxSlot)
 	{
-		m_currentSoul = m_currentSoul + (1 / m_speedCharge) * DeltaTime;
+		m_currentSoul = m_currentSoul + (60 / m_speedCharge) * DeltaTime;
 		if(m_currentSoul >= m_maxSoul)
 		{
 			m_currentSoul = 0;

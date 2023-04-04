@@ -3,7 +3,6 @@
 #include "FallenCorsairGameMode.h"
 #include "FallenCorsairCharacter.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Waves/WaveTracker.h"
 
 AFallenCorsairGameMode::AFallenCorsairGameMode()
 {
@@ -13,6 +12,4 @@ AFallenCorsairGameMode::AFallenCorsairGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
-
-	CreateDefaultSubobject<UWaveTracker>(TEXT("WaveTracker"));
 }

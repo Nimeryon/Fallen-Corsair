@@ -5,6 +5,7 @@
 
 #include "Gun.h"
 #include "Components/SphereComponent.h"
+#include "Engine/DamageEvents.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
@@ -48,6 +49,8 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 	{
 		/// impulse alien ? or call directly function in alien class ?
 		//OtherActor->Destroy();
+		FDamageEvent DamageEvent;
+		OtherActor->TakeDamage(1, DamageEvent, nullptr, this);
 	}
 }
 

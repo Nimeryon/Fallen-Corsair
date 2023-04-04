@@ -4,6 +4,7 @@
 #include "WaveSpawner.h"
 
 #include "WaveTracker.h"
+#include "WaveZone.h"
 #include "FallenCorsair/Enemies/GroundAlien.h"
 #include "FallenCorsair/FallenCorsairGameMode.h"
 
@@ -36,6 +37,8 @@ void UWaveSpawner::BeginPlay()
 	}
 	
 	UE_LOG(LogTemp, Warning, TEXT("WaveSpawner begin"));
+
+	m_location = GetOwner()->GetActorLocation();
 }
 
 
@@ -47,7 +50,7 @@ void UWaveSpawner::SpawnEnemy()
 		SpawnParams.Instigator = Cast<APawn>(GetOwner());
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParams.bNoFail = true;
-		AActor* spawnedActor = GetWorld()->SpawnActor<AActor>(m_enemyToSpawn, GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation(), SpawnParams);
+		AActor* spawnedActor = GetWorld()->SpawnActor<AActor>(m_enemyToSpawn, m_location, FRotator::ZeroRotator, SpawnParams);
 	}
 }
 
@@ -62,6 +65,9 @@ void UWaveSpawner::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		m_spawnTime += DeltaTime;
 	}
 	
+	// cast to wave zone
+	const AWaveZone* waveZone = Cast<AWaveZone>(m_waveZoneOwner);
+	
 	// Check if we should spawn
 	if(
 		m_bIsActive
@@ -71,6 +77,7 @@ void UWaveSpawner::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		&& (m_bSpawnIndefinitely || m_numberOfSpawns < m_maxSpawn)
 		&& m_timeActive > m_timeToFirstSpawn
 		&& m_timeActive < m_timeToLastSpawn
+		&& m_distanceFromPlayer > FVector::Dist(m_location, GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation()) 
 	)
 	{
 		m_spawnTime = 0.0f;
@@ -89,6 +96,7 @@ void UWaveSpawner::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		for (int i = 0; i < MinSpawn; ++i)
 		{
 			SpawnEnemy();
+			m_waveTracker->m_enemiesAlive++;
 		}
 		m_bShouldSpawn = (m_waveTracker->m_maxEnemies > m_waveTracker->m_enemiesAlive);
 		if(!m_bSpawnIndefinitely)
@@ -102,8 +110,6 @@ void UWaveSpawner::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 
 void UWaveSpawner::OnWaveOver()
 {
-	// @todo Check player zone
-
 	m_bShouldSpawn = true;
 }
 

@@ -4,11 +4,11 @@
 #include "Melee.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "../FallenCorsairCharacter.h"
+#include "Engine/DamageEvents.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Math/Vector2D.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetStringLibrary.h"
-#include "EnhancedInputComponent.h"
 #include "Math/Quat.h"
 
 // Sets default values for this component's properties
@@ -34,10 +34,6 @@ void UMelee::BeginPlay()
 
 	if (character)
 		ownerCharacter = character;
-	
-
-	//ownerCharacter->InputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &UMelee::Move);
-
 }
 
 
@@ -46,7 +42,7 @@ void UMelee::BeginPlay()
 
 void UMelee::PerformAttack()
 {
-	if (!MeleesSoft.Num())
+	if (!GetCurrentMelee().Anim)
 		return;
 
 	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_BoolToString(bCanAttack));
@@ -143,8 +139,7 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 			if (bExecuteNextAttack)
 			{
 				bExecuteNextAttack = false;
-				indexCurrentAttack++;
-				indexCurrentAttack %= MeleesSoft.Num();
+				IncrementCurrentAttack();
 				AttackSequence();
 			}
 		}
@@ -153,6 +148,7 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	{
 		ResetState();
 	}
+	// Sound
 	else if (NotifyName == "Hit_Soft")
 	{
 
@@ -187,14 +183,21 @@ void UMelee::TriggerHit()
 	
 	if (bHitSomething)
 	{
-
 		for (auto It = OutHits.CreateIterator(); It; It++)
 		{
 			ACharacter* character = Cast<ACharacter>((*It).GetActor());
 			if (character)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, (*It).GetActor()->GetName());
-				character->GetCharacterMovement();
+				GetCurrentMelee().PropulsionDirectionEnnemie.Normalize();
+				FVector End = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * GetCurrentMelee().PropulsionDirectionEnnemie.X + GetOwner()->GetActorRightVector() * GetCurrentMelee().PropulsionDirectionEnnemie.Y + GetOwner()->GetActorUpVector() * GetCurrentMelee().PropulsionDirectionEnnemie.Z;
+				FVector Dir = End - GetOwner()->GetActorLocation();
+				Dir.Normalize();
+				FVector Force = Dir * GetCurrentMelee().PropulsionForceEnnemie;
+				character->GetCharacterMovement()->AddImpulse(Force, true);
+
+				// Damage Target
+				FDamageEvent eventDamage;
+				character->TakeDamage(GetCurrentMelee().Dammage, eventDamage, nullptr, GetOwner());
 			}
 		}
 	}
@@ -283,9 +286,19 @@ void UMelee::AttackSequence()
 
 void UMelee::PropulseOwner()
 {
-	FVector force = ownerCharacter->GetActorForwardVector() * GetCurrentMelee().PropulsionForceOwner;
-	ownerCharacter->GetCharacterMovement()->AddImpulse(force, true);
+	GetCurrentMelee().PropulsionDirectionOwner.Normalize();
+
+	FVector Start = GetOwner()->GetActorLocation();
+	FVector End = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * GetCurrentMelee().PropulsionDirectionOwner.X + GetOwner()->GetActorRightVector() * GetCurrentMelee().PropulsionDirectionOwner.Y + GetOwner()->GetActorUpVector() * GetCurrentMelee().PropulsionDirectionOwner.Z;
+	FVector Dir = End - Start;
+
+	Dir.Normalize();
+
+	FVector Force = Dir * GetCurrentMelee().PropulsionForceOwner;
+
+	ownerCharacter->GetCharacterMovement()->AddImpulse(Force, true);
 }
+	
 
 void UMelee::ResetVelocity()
 {
@@ -294,7 +307,17 @@ void UMelee::ResetVelocity()
 
 FAttackData &UMelee::GetCurrentMelee()
 {
-	return MeleesSoft[indexCurrentAttack];
+	switch (attackType)
+	{
+		case EAttackType::Soft:
+			return Melees.Soft[indexCurrentAttack];
+			break;
+		case EAttackType::Heavy:
+			return Melees.Heavy[indexCurrentAttack];
+			break;
+		default:
+			return Melees.Soft[indexCurrentAttack];
+	}
 }
 
 void UMelee::ResetCombo()
@@ -310,9 +333,35 @@ void UMelee::ResetState()
 	EnableWalk(true);
 }
 
+void UMelee::IncrementCurrentAttack()
+{
+	indexCurrentAttack++;
+	switch (attackType)
+	{
+	case EAttackType::Soft:
+		indexCurrentAttack %= Melees.Soft.Num();
+		break;
+	case EAttackType::Heavy:
+		indexCurrentAttack %= Melees.Heavy.Num();
+		break;
+	default:
+		indexCurrentAttack %= Melees.Soft.Num();
+	}
+}
+
 bool UMelee::IsLastCombo()
 {
-	return indexCurrentAttack == MeleesSoft.Num() - 1;
+	switch (attackType)
+	{
+	case EAttackType::Soft:
+		return indexCurrentAttack == Melees.Soft.Num() - 1;
+		break;
+	case EAttackType::Heavy:
+		return indexCurrentAttack == Melees.Heavy.Num() - 1;
+		break;
+	default:
+		return indexCurrentAttack == Melees.Soft.Num() - 1;
+	}
 }
 
 //

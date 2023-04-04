@@ -16,26 +16,46 @@ struct FAttackData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	float PropulsionForceOwner = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	FVector PropulsionDirectionOwner = FVector(0, 0, 0);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	float PropulsionForceForwardEnnemie = 0;
-
+	float PropulsionForceEnnemie = 0;	
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	float PropulsionForceUpEnnemie = 0;	
+	FVector PropulsionDirectionEnnemie = FVector(0, 0, 0);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	FVector BoxOffset = FVector(0, 0, 0);
-
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	FVector BoxSize = FVector(100, 100, 100);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	float RecoveryTime = 1; // Seconde
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	float Dammage = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	UAnimMontage *Anim;
+	UAnimMontage *Anim;	
 	
+	
+};
+
+USTRUCT(BlueprintType)
+struct FMelees
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FAttackData> Soft;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FAttackData> Heavy;
+
+
 };
 
 UENUM()
@@ -46,14 +66,10 @@ enum class EAttackType
 };
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class FALLENCORSAIR_API UMelee : public UActorComponent
 {
 	GENERATED_BODY()
-
-	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* MoveAction;
 
 public:	
 	// Sets default values for this component's properties
@@ -61,16 +77,14 @@ public:
 
 	// Vars
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	TArray<FAttackData> MeleesSoft;
+	FMelees Melees;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	bool Debug = false;
 
-
 	// Functions
-	UFUNCTION(BlueprintCallable, Category = Properties)
+	//UFUNCTION(BlueprintCallable, Category = Properties)
 	virtual void PerformAttack();
-	
 	virtual void SetTypeAttack(EAttackType at);
 	virtual void StartAttack(bool start);
 	virtual void UpdateTypeAttack(float eslapsedSeconds);
@@ -107,6 +121,7 @@ private:
 	virtual void ResetVelocity();
 	virtual void ResetCombo();
 	virtual void ResetState();
+	virtual void IncrementCurrentAttack();
 	virtual bool IsLastCombo();
 	virtual FAttackData &GetCurrentMelee();
 

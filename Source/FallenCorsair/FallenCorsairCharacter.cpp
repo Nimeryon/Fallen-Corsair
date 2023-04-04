@@ -3,6 +3,7 @@
 #include "FallenCorsairCharacter.h"
 
 #include "Barrel.h"
+#include "Components/Melee.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -11,6 +12,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Kismet/KismetStringLibrary.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -49,7 +51,11 @@ AFallenCorsairCharacter::AFallenCorsairCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	// Create Barrel Component
 	barrelComp = CreateDefaultSubobject<UBarrel>(TEXT("BarrelComponnent"));
+
+	// Create Melee Component
+	MeleeComponent = CreateDefaultSubobject<UMelee>(TEXT("MeleeComponnent"));
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -70,6 +76,16 @@ void AFallenCorsairCharacter::BeginPlay()
 	}
 }
 
+void AFallenCorsairCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// Chrono for melee input
+	if (Melee_IsTrigerred)
+		Melee_TriggeredSeconds += DeltaTime;
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -88,7 +104,11 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::Look);
-
+		
+		//Melee
+		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::MeleeTriggered);
+		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::MeleeStarted);
+		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::MeleeCompleted);
 	}
 
 }
@@ -129,6 +149,33 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Melee
 
+void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
+{
+	Melee_IsTrigerred = true;
+	MeleeComponent->UpdateTypeAttack(Melee_TriggeredSeconds);
+}
 
+void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
+{
+	if (MeleeComponent->AttackIsStarted()) {
+		MeleeComponent->PerformAttack();
+	}
+}
+
+void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
+{
+	Melee_IsTrigerred = false;
+	Melee_TriggeredSeconds = 0;
+	MeleeComponent->StartAttack(true);
+	MeleeComponent->SetReleased(true);
+}
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 

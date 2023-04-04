@@ -7,7 +7,6 @@
 #include "InputActionValue.h"
 #include "FallenCorsairCharacter.generated.h"
 
-
 UCLASS(config=Game)
 class AFallenCorsairCharacter : public ACharacter
 {
@@ -20,6 +19,10 @@ class AFallenCorsairCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	/** Melee Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UMelee* MeleeComponent;
 	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -35,7 +38,11 @@ class AFallenCorsairCharacter : public ACharacter
 
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
+	class UInputAction* LookAction;	
+	
+	/** Melee Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* MeleeAction;
 
 	
 
@@ -52,6 +59,11 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	// Called for melee input
+	void MeleeTriggered(const FInputActionValue& Value);
+	void MeleeStarted(const FInputActionValue& Value);
+	void MeleeCompleted(const FInputActionValue& Value);
 			
 
 protected:
@@ -61,12 +73,19 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay();
 
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+private:
 
+	// Chrono for melee input
+	float Melee_TriggeredSeconds = 0;
+	bool Melee_IsTrigerred = false;
 };
 

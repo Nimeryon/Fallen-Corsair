@@ -245,8 +245,13 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
 {
-	Melee_IsTrigerred = true;
-	MeleeComponent->UpdateTypeAttack(Melee_TriggeredSeconds);
+	if (!MeleeComponent->IsReleased())
+	{
+		if (!MeleeComponent->AttackIsStarted()) {
+			Melee_IsTrigerred = true;
+			MeleeComponent->UpdateTypeAttack(Melee_TriggeredSeconds);
+		}
+	}
 }
 
 void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
@@ -256,14 +261,18 @@ void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 		MeleeComponent->PerformAttack();
 	if (MeleeComponent->AttackIsStarted()) {
 	}
+	MeleeComponent->SetReleased(false);
 }
 
 void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 {
 	Melee_IsTrigerred = false;
 	Melee_TriggeredSeconds = 0;
-	MeleeComponent->StartAttack(true);
-	MeleeComponent->SetReleased(true);
+
+	if (!MeleeComponent->IsReleased())
+	{
+		MeleeComponent->StartAttack(true);
+	}
 }
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////

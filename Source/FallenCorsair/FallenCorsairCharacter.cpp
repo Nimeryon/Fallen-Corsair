@@ -251,8 +251,10 @@ void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 {
-	if (MeleeComponent->AttackIsStarted()) {
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, TEXT("melee"));
+
 		MeleeComponent->PerformAttack();
+	if (MeleeComponent->AttackIsStarted()) {
 	}
 }
 

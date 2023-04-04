@@ -45,6 +45,7 @@ void UMelee::PerformAttack()
 	if (!MeleeIsValid())
 		return;
 
+
 	if (bCanAttack)
 	{
 		bCanAttack = false;

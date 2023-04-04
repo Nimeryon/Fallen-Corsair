@@ -80,10 +80,6 @@ public:
 	FMelees Melees;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	float delayInputDepthMeleeHeavy = 1;
-
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	bool Debug = false;
 
 	// Functions
@@ -91,9 +87,8 @@ public:
 	virtual void PerformAttack();
 	virtual void SetTypeAttack(EAttackType at);
 	virtual void StartAttack(bool start);
-	virtual void UpdateTypeAttack(float &eslapsedSeconds);
+	virtual void UpdateTypeAttack(float eslapsedSeconds);
 	virtual bool AttackIsStarted();
-	virtual bool IsReleased() const;
 	virtual void SetReleased(bool released);
 	virtual void CancelAttack();
 
@@ -127,7 +122,6 @@ private:
 	virtual void ResetCombo();
 	virtual void ResetState();
 	virtual void IncrementCurrentAttack();
-	virtual bool MeleeIsValid();
 	virtual bool IsLastCombo();
 	virtual FAttackData &GetCurrentMelee();
 
@@ -139,6 +133,7 @@ private:
 	EAttackType attackType = EAttackType::Soft;
 
 	int indexCurrentAttack = 0; 
+	float delayInputDepth = 1;
 
 	bool bCanAttack = true;
 	bool bCanExecuteNextAttack = false;
@@ -146,6 +141,7 @@ private:
 	bool bAttackStarted = false;
 	bool bInputReleased = false;
 	bool bIsDeleguate = false;
+
 
 	FVector rotation = FVector(0, 0, 0);
 

@@ -56,5 +56,3 @@ public:
 	void SetBulletSetting(float bulletSpeed, int dammage, float dammageRadius, int lifeSpan, float bulletRadius);
 	
 };
-
-

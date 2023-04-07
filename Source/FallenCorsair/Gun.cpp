@@ -69,6 +69,7 @@ void UGun::Shoot()
 
 		/// Change start by the location of the socket gun mesh
 		FVector start = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * 100;
+		//m_ownerRef->GetMesh()->GetSocketLocation(""); 
 		FVector end = m_ownerRef->GetFollowCamera()->GetForwardVector() * m_distance + start;
 
 		/// trace

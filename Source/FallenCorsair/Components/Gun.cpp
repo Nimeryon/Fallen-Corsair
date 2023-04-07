@@ -5,10 +5,9 @@
 
 #include "Barrel.h"
 #include "Bullet.h"
-#include "FallenCorsairCharacter.h"
+#include "../FallenCorsairCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-
 
 // Sets default values for this component's properties
 UGun::UGun()
@@ -18,7 +17,6 @@ UGun::UGun()
 	PrimaryComponentTick.bCanEverTick = false;
 	// ...
 }
-
 
 // Called when the game starts
 void UGun::BeginPlay()

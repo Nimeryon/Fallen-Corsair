@@ -2,10 +2,9 @@
 
 
 #include "Bullet.h"
-
 #include "Components/SphereComponent.h"
-//#include "Enemies/AlienBase.h"
 #include "Engine/DamageEvents.h"
+#include "FallenCorsair/Enemies/AlienBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
@@ -44,13 +43,13 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// AAlienBase* alien = Cast<AAlienBase>(OtherActor);
-	//
-	// if(alien)
-	// {
-	// 	FDamageEvent DamageEvent;
-	// 	OtherActor->TakeDamage(1, DamageEvent, nullptr, this);
-	// }
+	AAlienBase* alien = Cast<AAlienBase>(OtherActor);
+	
+	if(alien)
+	{
+		FDamageEvent DamageEvent;
+		OtherActor->TakeDamage(1, DamageEvent, nullptr, this);
+	}
 	
 	/// NON
 	/// Add damage to the actor overlap (Ennemy)

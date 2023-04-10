@@ -78,6 +78,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Taille du projectile"), meta = (ClampMin = 0.1, UIMin = 0.1, ClampMax = 2, UIMax = 2))
 	float m_bulletRadius = 0.5f;
+
+	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Socket spawn location"))
+	FName m_socketLoc;
 	
 public:
 	UFUNCTION()

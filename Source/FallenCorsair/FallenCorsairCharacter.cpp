@@ -170,7 +170,7 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::MeleeCompleted);
 
 		// Shoot
-		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::Shoot);
+		//EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::MeleeStarted);
 
 		// Aim
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::Aim);
@@ -241,43 +241,58 @@ void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_BoolToString(MeleeComponent->MeleeIsValid()));
 
-	if (!MeleeComponent->MeleeIsValid())
-		return;
-
-	if (!MeleeComponent->IsReleased())
+	if(!m_bIsFocus)
 	{
-		if (!MeleeComponent->AttackIsStarted()) {
-			Melee_IsTrigerred = true;
-			MeleeComponent->UpdateTypeAttack(Melee_TriggeredSeconds);
+		if (!MeleeComponent->MeleeIsValid())
+			return;
+
+		if (!MeleeComponent->IsReleased())
+		{
+			if (!MeleeComponent->AttackIsStarted()) {
+				Melee_IsTrigerred = true;
+				MeleeComponent->UpdateTypeAttack(Melee_TriggeredSeconds);
+			}
 		}
+		//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_FloatToString(Melee_TriggeredSeconds));
 	}
-	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_FloatToString(Melee_TriggeredSeconds));
+	
 }
 
 void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 {
-	if (!MeleeComponent->MeleeIsValid())
-		return;
 
-	if (MeleeComponent->AttackIsStarted()) {
-		MeleeComponent->PerformAttack();
+	if(m_bIsFocus)
+		gunComp->Shoot();
+	else
+	{
+		if (!MeleeComponent->MeleeIsValid())
+			return;
+
+		if (MeleeComponent->AttackIsStarted()) {
+			MeleeComponent->PerformAttack();
+		}
+
+		MeleeComponent->SetReleased(false);
 	}
-
-	MeleeComponent->SetReleased(false);
+	
 }
 
 void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 {
-	if (!MeleeComponent->MeleeIsValid())
-		return;
-
-	Melee_IsTrigerred = false;
-	Melee_TriggeredSeconds = 0;
-
-	if (!MeleeComponent->IsReleased())
+	if(!m_bIsFocus)
 	{
-		MeleeComponent->StartAttack(true);
+		if (!MeleeComponent->MeleeIsValid())
+			return;
+
+		Melee_IsTrigerred = false;
+		Melee_TriggeredSeconds = 0;
+
+		if (!MeleeComponent->IsReleased())
+		{
+			MeleeComponent->StartAttack(true);
+		}
 	}
+	
 }
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////

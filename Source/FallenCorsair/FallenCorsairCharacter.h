@@ -20,6 +20,11 @@ class AFallenCorsairCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Movement)
+	class UBrutosMovementComponent* BrutosMovementComponent;
+	
+private:
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
@@ -65,7 +70,7 @@ class AFallenCorsairCharacter : public ACharacter
 	class UInputAction*	ChargeAction;
 
 public:
-	AFallenCorsairCharacter();
+	AFallenCorsairCharacter(const FObjectInitializer& ObjectInitializer);
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UBarrel* barrelComp;
@@ -75,6 +80,8 @@ public:
 
 protected:
 
+	
+	
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 

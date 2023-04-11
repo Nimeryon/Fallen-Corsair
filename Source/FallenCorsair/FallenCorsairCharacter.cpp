@@ -13,13 +13,18 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Player/BrutosMovementComponent.h"
 
 
 //////////////////////////////////////////////////////////////////////////
 // AFallenCorsairCharacter
 
-AFallenCorsairCharacter::AFallenCorsairCharacter()
+AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& ObjectInitializer)
+: Super(ObjectInitializer.SetDefaultSubobjectClass<UBrutosMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
+
+	BrutosMovementComponent = Cast<UBrutosMovementComponent>(GetCharacterMovement());
+	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -151,7 +156,13 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 
 void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 {
-	
+	if(BrutosMovementComponent)
+	{
+		if(value.Get<bool>())
+			BrutosMovementComponent->SprintPressed();
+		else
+			BrutosMovementComponent->SprintReleased();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

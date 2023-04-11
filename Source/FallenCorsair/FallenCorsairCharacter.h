@@ -7,6 +7,8 @@
 #include "InputActionValue.h"
 #include "FallenCorsairCharacter.generated.h"
 
+// Event dispatcher OnPlayerSpawn
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerSpawn);
 
 UCLASS(config=Game)
 class AFallenCorsairCharacter : public ACharacter
@@ -91,6 +93,9 @@ private:
 	FTimerHandle m_timerHandle;
 	
 public:
+	UPROPERTY(BlueprintAssignable)
+	FOnPlayerSpawn OnPlayerSpawn;
+	
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/

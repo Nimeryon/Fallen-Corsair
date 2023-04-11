@@ -32,8 +32,8 @@ public:
 	virtual void OnWaveOver();
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
-	TSubclassOf<class AGroundAlien> m_enemyToSpawn;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	// TSubclassOf<class AGroundAlien> m_enemyToSpawn;
 	
 	UPROPERTY(EditInstanceOnly, Category = "Spawn")
 	AWaveZone* m_waveZoneOwner;

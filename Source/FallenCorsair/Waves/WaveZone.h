@@ -7,6 +7,18 @@
 #include "GameFramework/Actor.h"
 #include "WaveZone.generated.h"
 
+USTRUCT()
+struct FEnemies
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, Category = "Enemy")
+	TSubclassOf<class AGroundAlien> Enemy;
+	
+	UPROPERTY(EditAnywhere, Category = "Enemy", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float Ratio;
+};
+
 UCLASS()
 class FALLENCORSAIR_API AWaveZone : public AActor
 {
@@ -33,13 +45,24 @@ public:
 	UFUNCTION()
 	bool IsPlayerInZone() const;
 
+	UFUNCTION()
+	void OnPlayerSpawn();
+
+	UFUNCTION()
+	TSubclassOf<class AGroundAlien> GetAlienToSpawn() const;
+
 protected:
+	UPROPERTY()
+	AActor* m_player;
+	
 	UPROPERTY()
 	bool m_bIsPlayerInZone;
 
 	UPROPERTY(BlueprintReadWrite)
 	UBoxComponent* m_collisionBox= CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 
+	UPROPERTY(EditAnywhere)
+	TArray<FEnemies> m_enemies;
 public:
 	
 };

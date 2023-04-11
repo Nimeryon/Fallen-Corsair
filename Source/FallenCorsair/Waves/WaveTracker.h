@@ -9,7 +9,7 @@
 // Event dispatcher OnWaveOver
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWaveOver);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Wave), meta=(BlueprintSpawnableComponent) )
 class FALLENCORSAIR_API UWaveTracker : public UActorComponent
 {
 	GENERATED_BODY()

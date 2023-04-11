@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WaveZone.h"
 #include "Components/ActorComponent.h"
 #include "WaveSpawner.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Wave), meta=(BlueprintSpawnableComponent) )
 class FALLENCORSAIR_API UWaveSpawner : public UActorComponent
 {
 	GENERATED_BODY()
@@ -33,6 +34,9 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	TSubclassOf<class AGroundAlien> m_enemyToSpawn;
+	
+	UPROPERTY(EditInstanceOnly, Category = "Spawn")
+	AWaveZone* m_waveZoneOwner;
 	
 	UPROPERTY()
 	class UWaveTracker* m_waveTracker;
@@ -98,4 +102,12 @@ protected:
 	// The time to wait before the spawner stops spawning
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")
 	float m_timeToLastSpawn = 180.0f;
+
+	// The distance the player needs to be from the spawner to spawn enemies
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	float m_distanceFromPlayer = 1000.0f;
+
+	// The world location of the spawner
+	UPROPERTY()
+	FVector3d m_location;
 };

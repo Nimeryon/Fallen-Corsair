@@ -14,7 +14,7 @@ ABullet::ABullet()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	bulletCollision = CreateDefaultSubobject<USphereComponent>("Bullet Collision");
-	bulletCollision->SetupAttachment(RootComponent);
+	RootComponent = bulletCollision;
 
 	bulletMesh = CreateDefaultSubobject<UStaticMeshComponent>("Bullet Mesh");
 	bulletMesh->SetupAttachment(bulletCollision);
@@ -32,12 +32,8 @@ ABullet::ABullet()
 void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
-	if(!OtherActor->ActorHasTag("Character"))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Hit"));
-		Explosion();
-	}
-	
+	UE_LOG(LogTemp, Warning, TEXT("Hit"));
+	Explosion();
 }
 
 void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,

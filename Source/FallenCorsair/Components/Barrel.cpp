@@ -20,6 +20,7 @@ void UBarrel::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
+	m_maxSoul = 100 * m_maxSlot;
 	
 }
 
@@ -31,14 +32,18 @@ void UBarrel::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 
 	if(m_slot < m_maxSlot)
 	{
-		m_currentSoul = m_currentSoul + (1 / m_speedCharge) * DeltaTime;
-		if(m_currentSoul >= m_maxSoul)
+		m_currentSoul = m_currentSoul + ((m_speedCharge / 100)  * m_maxSoul * DeltaTime);
+
+		if(m_currentSoul >= (m_slot + 1) * 100)
 		{
-			m_currentSoul = 0;
 			m_slot++;
 		}
+		
+		if(m_currentSoul >= m_maxSoul)
+		{
+			m_currentSoul = m_maxSoul;
+		}
 	}
-	
 }
 
 int UBarrel::GetSlot()
@@ -48,8 +53,8 @@ int UBarrel::GetSlot()
 void UBarrel::SetSlot(int newSlot)
 {
 	m_slot = newSlot;
+	m_currentSoul = newSlot * 100;
 }
-
 int UBarrel::GetMaxSlot()
 {
 	return m_maxSlot;
@@ -57,5 +62,19 @@ int UBarrel::GetMaxSlot()
 
 void UBarrel::CollectSoul()
 {
-	m_currentSoul = m_currentSoul + m_ennemyDropSoul;
+	//float soul = m_maxSlot * 100;
+	
+	
+	
+	int slotToAdd = 0;
+	for(int i = 0; i < slotToAdd; i++)
+	{
+		if(m_ennemyDropSoul >= 100)
+		{
+			m_ennemyDropSoul = m_ennemyDropSoul - 100;
+			slotToAdd++;
+		}
+	}
+	m_slot = FMath::Clamp(m_slot + slotToAdd,0,m_maxSlot);
+	m_currentSoul = m_currentSoul + (m_ennemyDropSoul / 100);
 }

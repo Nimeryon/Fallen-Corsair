@@ -13,13 +13,18 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Player/BrutosMovementComponent.h"
 
 
 //////////////////////////////////////////////////////////////////////////
 // AFallenCorsairCharacter
 
-AFallenCorsairCharacter::AFallenCorsairCharacter()
+AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& ObjectInitializer)
+: Super(ObjectInitializer.SetDefaultSubobjectClass<UBrutosMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
+
+	BrutosMovementComponent = Cast<UBrutosMovementComponent>(GetCharacterMovement());
+	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -60,6 +65,8 @@ AFallenCorsairCharacter::AFallenCorsairCharacter()
 
 	// Create Melee Component
 	MeleeComponent = CreateDefaultSubobject<UMelee>(TEXT("MeleeComponnent"));
+
+
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -146,6 +153,18 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 		m_direction = -1.f;
 	}
 }
+
+void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
+{
+	if(BrutosMovementComponent)
+	{
+		if(value.Get<bool>())
+			BrutosMovementComponent->SprintPressed();
+		else
+			BrutosMovementComponent->SprintReleased();
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -175,6 +194,9 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 		// Aim
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::Aim);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::Aim);
+
+		EnhancedInputComponent->BindAction(ChargeAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::Charge);
+		EnhancedInputComponent->BindAction(ChargeAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::Charge);
 	}
 
 }

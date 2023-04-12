@@ -24,24 +24,28 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	
+	
 private:
-	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (ClampMin = 0, UIMin = 0), meta = (displayName = "Nombre de slot actuelle"))
-	int m_slot = 3;
+	
 
 	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (ClampMin = 3, UIMin = 3), meta = (displayName = "Nombre max de slot"))
 	int m_maxSlot = 3;
 
-	UPROPERTY()
-	float m_currentSoul = 0.f;
+	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (ClampMin = 0, UIMin = 0), meta = (displayName = "Nombre de slot actuelle"))
+	int m_slot = 3;
 
 	UPROPERTY()
-	float m_maxSoul = 1.f;
+	float m_maxSoul = 1;
 
 	UPROPERTY()
-	float m_ennemyDropSoul = 0.05f;
+	float m_currentSoul = 0;
 
-	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (ClampMin = 0.01, UIMin = 0.01), meta = (displayName = "Vitesse de chargement en seconde"))
-	float m_speedCharge = 0.01f;
+	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (ClampMin = 0.01, UIMin = 0.01, ClampMax = 100, UIMax = 100), meta = (displayName = "pourcentage d'âme drop "))
+	float m_ennemyDropSoul = 0.03f;
+
+	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (ClampMin = 0.01, UIMin = 0.01), meta = (displayName = "Vitesse de chargement en pourcentage"))
+	float m_speedCharge = 100.f;
 
 public:
 	UFUNCTION()

@@ -7,11 +7,24 @@
 #include "InputActionValue.h"
 #include "FallenCorsairCharacter.generated.h"
 
+UENUM()
+enum class ECustomMovementMode
+{
+	Default,
+	Dash,
+};
+
+
 UCLASS(config=Game)
 class AFallenCorsairCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Movement)
+	class UBrutosMovementComponent* BrutosMovementComponent;
+	
+private:
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
@@ -52,10 +65,14 @@ class AFallenCorsairCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* AimAction;
 
+	// Charge Input Action
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction*	ChargeAction;
+
 public:
-	AFallenCorsairCharacter();
+	AFallenCorsairCharacter(const FObjectInitializer& ObjectInitializer);
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UBarrel* barrelComp;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -63,6 +80,8 @@ public:
 
 protected:
 
+	
+	
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
@@ -96,6 +115,9 @@ public:
 
 	UFUNCTION()
 	void Aim(const FInputActionValue& bIsZoom);
+
+	UFUNCTION()
+	void Charge(const FInputActionValue& value);
 
 private:
 
@@ -179,6 +201,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Default", meta = (displayName = "Camera Curve"))
 	UCurveFloat* m_cameraCurve;
 
-#pragma endregion 
+#pragma endregion
+
+	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Vie du joueur"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 1000, UIMax = 1000))
+	float m_health = 50.f;
+
+	
 };
 

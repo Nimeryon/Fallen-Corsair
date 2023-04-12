@@ -61,7 +61,7 @@ AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& Objec
 	// Create Gun Component
 	gunComp = CreateDefaultSubobject<UGun>(TEXT("GunComponnent"));
 
-	GetCameraBoom()->SetRelativeLocation(FVector(0,m_CameraOffset_S.X,m_CameraOffset_S.Y));
+	GetFollowCamera()->SetRelativeLocation(FVector(0,m_CameraOffset_S.X,m_CameraOffset_S.Y));
 
 	// Create Melee Component
 	MeleeComponent = CreateDefaultSubobject<UMelee>(TEXT("MeleeComponnent"));
@@ -104,6 +104,8 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 	if (Melee_IsTrigerred)
 		Melee_TriggeredSeconds += DeltaTime;
 
+
+#pragma region Camera Zoom
 	float transition;
 	if(m_bIsFocus)
 		transition = m_transitionSpeedZoom;
@@ -131,16 +133,24 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 			SetActorRotation(newRot);
 		}
 	}
+#pragma endregion
+
+
+	//GetCameraBoom()->TargetArmLength = FMath::Clamp( GetCameraBoom()->TargetArmLength, m_distanceFromPlayer_S / 4, m_distanceFromPlayer_S);
 }
 
-void AFallenCorsairCharacter::Shoot()
+void AFallenCorsairCharacter::Landed(const FHitResult& Hit)
 {
-	if(m_bIsFocus)
-		gunComp->Shoot();
+	Super::Landed(Hit);
+	
+	// BrutosMovementComponent->AirControl = 0.35f;
+	// BrutosMovementComponent->DashPressed();
+	
 }
 
 void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 {
+	OnAim.Broadcast();
 	m_bIsFocus = bIsZoom.Get<bool>();
 	GetCameraBoom()->bEnableCameraLag = !m_bIsFocus;
 	
@@ -156,13 +166,14 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 
 void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 {
-	if(BrutosMovementComponent)
-	{
-		if(value.Get<bool>())
-			BrutosMovementComponent->SprintPressed();
-		else
-			BrutosMovementComponent->SprintReleased();
-	}
+	// if(GetVelocity().Z == 0)
+	// {
+	// 	BrutosMovementComponent->StopMovementImmediately();
+	// 	Jump();
+	// 	BrutosMovementComponent->AirControl = 0.f;
+	// }
+
+	
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -196,7 +207,7 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::Aim);
 
 		EnhancedInputComponent->BindAction(ChargeAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::Charge);
-		EnhancedInputComponent->BindAction(ChargeAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::Charge);
+		//EnhancedInputComponent->BindAction(ChargeAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::Charge);
 	}
 
 }
@@ -284,7 +295,10 @@ void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 {
 
 	if(m_bIsFocus)
+	{
 		gunComp->Shoot();
+		OnShoot.Broadcast();
+	}
 	else
 	{
 		if (!MeleeComponent->MeleeIsValid())

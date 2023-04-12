@@ -7,12 +7,8 @@
 #include "InputActionValue.h"
 #include "FallenCorsairCharacter.generated.h"
 
-UENUM()
-enum class ECustomMovementMode
-{
-	Default,
-	Dash,
-};
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnShoot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAim);
 
 
 UCLASS(config=Game)
@@ -57,10 +53,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* MeleeAction;
 
-	// Shoot Input Action
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* ShootAction;
-
 	// Aim Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* AimAction;
@@ -104,6 +96,8 @@ protected:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void Landed(const FHitResult& Hit) override;
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -111,13 +105,16 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	UFUNCTION()
-	void Shoot();
-
-	UFUNCTION()
 	void Aim(const FInputActionValue& bIsZoom);
 
 	UFUNCTION()
 	void Charge(const FInputActionValue& value);
+
+	UPROPERTY()
+	FOnShoot OnShoot;
+
+	UPROPERTY()
+	FOnAim OnAim;
 
 private:
 

@@ -218,54 +218,53 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	{
 		TriggerHit();
 	}	
-	else if (NotifyName == "CanCombo")
-	{
+	// else if (NotifyName == "CanCombo")
+	// {
+	// 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1); // Reset to normal time dilation
 
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1); // Reset to normal time dilation
-
-		if (IsLastCombo())
-		{
-			StartAttack(false);
-		}
-		else
-		{
-			IncrementCurrentAttack();
-			if (bExecuteNextAttack)
-			{
-				bExecuteNextAttack = false;
-				// Execute next attack
-				AttackSequence();
-			}
-			else
-			{
-				bCanAttack = true;
-			}
-		}
-	}
-	else if (NotifyName == "CanMove")
-	{
-		FreezeRotation(false);
-		EnableWalk(true);
-	}	
-	else if (NotifyName == "Recovery")
-	{
-		ResetCombo();
-		StartAttack(false);
-	}
-	else if (NotifyName == "HitSound")
-	{
-		if (GetCurrentMelee().AttackSound)
-		{
-			UGameplayStatics::PlaySound2D(GetWorld(), GetCurrentMelee().AttackSound, 1, 1, 0);
-		}
-	}
-	else if (NotifyName == "VoiceSound")
-	{
-		if (GetCurrentMelee().PlayerVoiceSound)
-		{
-			UGameplayStatics::PlaySound2D(GetWorld(), GetCurrentMelee().PlayerVoiceSound, 1, 1, 0);
-		}
-	}
+	// 	if (IsLastCombo())
+	// 	{
+	// 		StartAttack(false);
+	// 	}
+	// 	else
+	// 	{
+	// 		IncrementCurrentAttack();
+	// 		if (bExecuteNextAttack)
+	// 		{
+	// 			bExecuteNextAttack = false;
+	// 			// Execute next attack
+	// 			AttackSequence();
+	// 		}
+	// 		else
+	// 		{
+	// 			bCanAttack = true;
+	// 		}
+	// 	}
+	// }
+	// else if (NotifyName == "CanMove")
+	// {
+	// 	FreezeRotation(false);
+	// 	EnableWalk(true);
+	// }	
+	// else if (NotifyName == "Recovery")
+	// {
+	// 	ResetCombo();
+	// 	StartAttack(false);
+	// }
+	// else if (NotifyName == "HitSound")
+	// {
+	// 	if (GetCurrentMelee().AttackSound)
+	// 	{
+	// 		UGameplayStatics::PlaySound2D(GetWorld(), GetCurrentMelee().AttackSound, 1, 1, 0);
+	// 	}
+	// }
+	// else if (NotifyName == "VoiceSound")
+	// {
+	// 	if (GetCurrentMelee().PlayerVoiceSound)
+	// 	{
+	// 		UGameplayStatics::PlaySound2D(GetWorld(), GetCurrentMelee().PlayerVoiceSound, 1, 1, 0);
+	// 	}
+	// }
 }
 
 void UMelee::TriggerHit()

@@ -104,7 +104,6 @@ TArray<AActor*> UMeleeTargeting::GetAllTargetagbleOnScreenAndOnOwnerVision()
 	TArray<AActor*> Characters;
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, UKismetStringLibrary::Conv_IntToString(CharactersTargetable.Num()));
 
-
 	for (ACharacter* Character : CharactersTargetable)
 	{
 		if (ActorIsOnScreen(*Character) && IsOnOwnerVision(*Character))
@@ -200,7 +199,7 @@ bool UMeleeTargeting::IsOnOwnerVision(AActor &Actor)
 	FVector DirOwnerToActor = Actor.GetActorLocation() - GetOwner()->GetActorLocation();
 	DirOwnerToActor.Normalize();
 	float dot = UKismetMathLibrary::Dot_VectorVector(DirOwnerToActor, GetOwner()->GetActorForwardVector());
-	return acos(dot) < ChampVision;
+	return acos(dot) <= ChampVision;
 }
 
 bool UMeleeTargeting::TurnOnLeft(float CurrentDegree, float DegreeToReach, float fMin, float fMax)

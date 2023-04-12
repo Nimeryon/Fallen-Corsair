@@ -35,7 +35,7 @@ protected:
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	// TSubclassOf<class AGroundAlien> m_enemyToSpawn;
 	
-	UPROPERTY(EditInstanceOnly, Category = "Spawn")
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Spawn")
 	AWaveZone* m_waveZoneOwner;
 	
 	UPROPERTY()
@@ -80,11 +80,11 @@ protected:
 	bool m_bSpawnIndefinitely = true;
 
 	// Track the number of waves spawned
-	UPROPERTY(VisibleAnywhere, Category = "Spawn", meta = (EditCondition="m_bSpawnIndefinitely"))
+	UPROPERTY(VisibleAnywhere, Category = "Spawn", meta = (EditCondition="!m_bSpawnIndefinitely"))
 	int m_numberOfSpawns;
 
 	// The maximum number of waves to spawn
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn", meta = (EditCondition="m_bSpawnIndefinitely"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn", meta = (EditCondition="!m_bSpawnIndefinitely"))
 	int m_maxSpawn = 0;
 
 	// Number of enemies spawned per wave

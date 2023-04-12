@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS(Config=Game)
+UCLASS()
 class FALLENCORSAIR_API UBTTask_GetAngledRandomTo : public UBTTaskNode
 {
 	GENERATED_BODY()
@@ -17,16 +17,20 @@ class FALLENCORSAIR_API UBTTask_GetAngledRandomTo : public UBTTaskNode
 	UBTTask_GetAngledRandomTo(const FObjectInitializer& ObjectInitializer);
 
 	/** Max angle range for random direction towards target */
-	UPROPERTY(config, Category = Node, EditAnywhere, meta=(ClampMin = "0.0", UIMin="0.0", ClampMax = "180.0", UIMax="180.0"))
+	UPROPERTY(Category = Node, EditAnywhere, meta=(ClampMin = "0.0", UIMin="0.0", ClampMax = "90.0", UIMax="90.0"))
 	float AngleRange = 15;
 
 	/** Min segment length to the next point towards target */
-	UPROPERTY(config, Category = Node, EditAnywhere, meta=(ClampMin = "10.0", UIMin="10.0"))
+	UPROPERTY(Category = Node, EditAnywhere, meta=(ClampMin = "10.0", UIMin="10.0"))
 	float MinSegmentLength = 1000;
 	
 	/** Max segment length to the next point towards target */
-	UPROPERTY(config, Category = Node, EditAnywhere, meta=(ClampMin = "10.0", UIMin="10.0"))
+	UPROPERTY(Category = Node, EditAnywhere, meta=(ClampMin = "10.0", UIMin="10.0"))
 	float MaxSegmentLength = 2000;
+
+	/** Draw debug point */
+	UPROPERTY(Category = Node, EditAnywhere)
+	bool DrawDebugPoint = true;
 
 protected:
 	/** Target Blackboard Key */

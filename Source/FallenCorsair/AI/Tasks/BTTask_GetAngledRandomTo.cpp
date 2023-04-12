@@ -5,7 +5,7 @@
 #include "NavigationSystem.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
+#include "AIController.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -16,7 +16,7 @@ UBTTask_GetAngledRandomTo::UBTTask_GetAngledRandomTo(const FObjectInitializer& O
 
 	bCreateNodeInstance = true;
 
-	// Only actors and vectors for Target
+	// Only actors for Target
 	BBKTarget.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UBTTask_GetAngledRandomTo, BBKTarget), AActor::StaticClass());
 
 	// Only vectors for TargetPosition
@@ -49,7 +49,7 @@ EBTNodeResult::Type UBTTask_GetAngledRandomTo::ExecuteTask(UBehaviorTreeComponen
 	}
 
 	// Get Next Target Position
-	const FVector Position = GetNextRandomPosition(OwnerComp.GetOwner(), TargetPosition);
+	const FVector Position = GetNextRandomPosition(OwnerComp.GetAIOwner()->GetPawn(), TargetPosition);
 	BlackBoard->SetValueAsVector(BBKTargetPosition.SelectedKeyName, Position);
 
 	return EBTNodeResult::Succeeded;
@@ -57,26 +57,27 @@ EBTNodeResult::Type UBTTask_GetAngledRandomTo::ExecuteTask(UBehaviorTreeComponen
 
 FVector UBTTask_GetAngledRandomTo::GetNextRandomPosition(const AActor* Actor, const FVector& TargetPosition)
 {
-	const float DistanceToPoint = FVector::Distance(Actor->GetActorLocation(), TargetPosition);
-	
+	/*const float DistanceToPoint = FVector::Distance(Actor->GetActorLocation(), TargetPosition);
 	if (DistanceToPoint < MaxSegmentLength)
 	{
 		return TargetPosition;
-	}
+	}*/
 
-	const FVector Direction = TargetPosition - Actor->GetActorLocation();
-	const float RandomAngle = AngleRange * (UKismetMathLibrary::RandomFloat() * 2.f - 1.f);
-	const FVector RandomAngledDirection = Direction.RotateAngleAxis(RandomAngle, FVector::UpVector).GetSafeNormal2D();
-	
-	const float Length = MinSegmentLength + (MaxSegmentLength - MinSegmentLength) * UKismetMathLibrary::RandomFloat();
+	const FVector Direction = (TargetPosition - Actor->GetActorLocation()).GetSafeNormal2D();
+	const float RandomAngle = UKismetMathLibrary::RandomFloatInRange(-AngleRange, AngleRange);
+	const FVector RandomAngledDirection = Direction.RotateAngleAxis(RandomAngle, FVector::UpVector);
+	const float Length = UKismetMathLibrary::RandomFloatInRange(MinSegmentLength, MaxSegmentLength);
 
 	const FVector Position = Actor->GetActorLocation() + RandomAngledDirection * Length;
 
 	FNavLocation NavPosition;
 	UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
 	NavSys->ProjectPointToNavigation(Position, NavPosition, FVector::ZeroVector);
-	
-	UKismetSystemLibrary::DrawDebugPoint(GetWorld(), NavPosition.Location, 8, FLinearColor::Red, 10);
+
+	if (DrawDebugPoint)
+	{
+		UKismetSystemLibrary::DrawDebugPoint(GetWorld(), NavPosition.Location, 8, FLinearColor::Red, 2);
+	}
 	
 	return NavPosition.Location;
 }

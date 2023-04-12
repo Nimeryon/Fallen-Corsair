@@ -10,6 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Math/Quat.h"
+#include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
@@ -210,7 +211,7 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	{
 		PropulseOwner();
 	}	
-	if (NotifyName == "StopPropulsion")
+	else if (NotifyName == "StopPropulsion")
 	{
 		ResetVelocity();
 	}
@@ -218,53 +219,52 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	{
 		TriggerHit();
 	}	
-	// else if (NotifyName == "CanCombo")
-	// {
-	// 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1); // Reset to normal time dilation
-
-	// 	if (IsLastCombo())
-	// 	{
-	// 		StartAttack(false);
-	// 	}
-	// 	else
-	// 	{
-	// 		IncrementCurrentAttack();
-	// 		if (bExecuteNextAttack)
-	// 		{
-	// 			bExecuteNextAttack = false;
-	// 			// Execute next attack
-	// 			AttackSequence();
-	// 		}
-	// 		else
-	// 		{
-	// 			bCanAttack = true;
-	// 		}
-	// 	}
-	// }
-	// else if (NotifyName == "CanMove")
-	// {
-	// 	FreezeRotation(false);
-	// 	EnableWalk(true);
-	// }	
-	// else if (NotifyName == "Recovery")
-	// {
-	// 	ResetCombo();
-	// 	StartAttack(false);
-	// }
-	// else if (NotifyName == "HitSound")
-	// {
-	// 	if (GetCurrentMelee().AttackSound)
-	// 	{
-	// 		UGameplayStatics::PlaySound2D(GetWorld(), GetCurrentMelee().AttackSound, 1, 1, 0);
-	// 	}
-	// }
-	// else if (NotifyName == "VoiceSound")
-	// {
-	// 	if (GetCurrentMelee().PlayerVoiceSound)
-	// 	{
-	// 		UGameplayStatics::PlaySound2D(GetWorld(), GetCurrentMelee().PlayerVoiceSound, 1, 1, 0);
-	// 	}
-	// }
+	else if (NotifyName == "CanCombo")
+	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1); // Reset to normal time dilation
+		if (IsLastCombo())
+		{
+			StartAttack(false);
+		}
+		else
+		{
+			IncrementCurrentAttack();
+			if (bExecuteNextAttack)
+			{
+				bExecuteNextAttack = false;
+				// Execute next attack
+				AttackSequence();
+			}
+			else
+			{
+				bCanAttack = true;
+			}
+		}
+	}
+	else if (NotifyName == "CanMove")
+	{
+		FreezeRotation(false);
+		EnableWalk(true);
+	}	
+	else if (NotifyName == "Recovery")
+	{
+		ResetCombo();
+		StartAttack(false);
+	}
+	else if (NotifyName == "HitSound")
+	{
+		if (GetCurrentMelee().AttackSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), GetCurrentMelee().AttackSound, 1, 1, 0);
+		}
+	}
+	else if (NotifyName == "VoiceSound")
+	{
+		if (GetCurrentMelee().PlayerVoiceSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), GetCurrentMelee().PlayerVoiceSound, 1, 1, 0);
+		}
+	}
 }
 
 void UMelee::TriggerHit()
@@ -429,7 +429,7 @@ void UMelee::AttackSequence()
 	{
 		if (UAnimInstance* AnimInstance = ownerCharacter->GetMesh()->GetAnimInstance())
 		{
-			const float MontageLength = AnimInstance->Montage_Play(MontageToPlay, 2);
+			const float MontageLength = AnimInstance->Montage_Play(MontageToPlay, 1);
 			bPlayedSuccessfully = (MontageLength > 0.f);
 
 			if (bPlayedSuccessfully)

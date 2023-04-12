@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Animation/AnimMontage.h"
-#include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "Melee.generated.h"
 
@@ -171,7 +170,7 @@ private:
 
 	// Vars
 
-	ACharacter* ownerCharacter;
+	class ACharacter* ownerCharacter;
 
 	// To disabled Character walk
 	float MaxWalkSpeed;

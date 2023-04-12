@@ -14,6 +14,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Kismet/KismetStringLibrary.h"
 #include "Player/BrutosMovementComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -30,11 +31,14 @@ AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& Objec
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw =  false;
 	bUseControllerRotationRoll = false;
 
+
 	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
+
+	GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...
+
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
@@ -117,33 +121,33 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		MeleeComponent->StartAttack(true);
 	}
 	
-	float transition;
-	if(m_bIsFocus)
-		transition = m_transitionSpeedZoom;
-	else
-		transition = m_transitionSpeedDezoom;
+	// float transition;
+	// if(m_bIsFocus)
+	// 	transition = m_transitionSpeedZoom;
+	// else
+	// 	transition = m_transitionSpeedDezoom;
 	
-	m_alpha = FMath::Clamp( m_alpha + (1 / transition * m_direction) * DeltaTime, 0, 1);
+	// m_alpha = FMath::Clamp( m_alpha + (1 / transition * m_direction) * DeltaTime, 0, 1);
 
-	if((m_alpha != 0) || (m_alpha != 1))
-	{
-		FVector2D newLoc = FMath::InterpEaseIn(m_CameraOffset_S, m_CameraOffset_A, m_alpha, 2);
+	// if((m_alpha != 0) || (m_alpha != 1))
+	// {
+	// 	FVector2D newLoc = FMath::InterpEaseIn(m_CameraOffset_S, m_CameraOffset_A, m_alpha, 2);
 		
-		GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_S, m_distanceFromPlayer_A, m_alpha, 2);
-		GetCameraBoom()->SetRelativeLocation(FVector(0,newLoc.X,newLoc.Y));
-		GetFollowCamera()->SetFieldOfView(FMath::InterpEaseIn(m_fieldOfView_S, m_fieldOfView_A, m_alpha, 2));
-		m_cameraManager->ViewPitchMin = FMath::InterpEaseIn(m_pitchMin_S, m_pitchMin_A, m_alpha, 2);
-		m_cameraManager->ViewPitchMax = FMath::InterpEaseIn(m_pitchMax_S, m_pitchMax_A, m_alpha, 2);
+	// 	GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_S, m_distanceFromPlayer_A, m_alpha, 2);
+	// 	GetCameraBoom()->SetRelativeLocation(FVector(0,newLoc.X,newLoc.Y));
+	// 	GetFollowCamera()->SetFieldOfView(FMath::InterpEaseIn(m_fieldOfView_S, m_fieldOfView_A, m_alpha, 2));
+	// 	m_cameraManager->ViewPitchMin = FMath::InterpEaseIn(m_pitchMin_S, m_pitchMin_A, m_alpha, 2);
+	// 	m_cameraManager->ViewPitchMax = FMath::InterpEaseIn(m_pitchMax_S, m_pitchMax_A, m_alpha, 2);
 
-		if(m_bIsFocus)
-		{
-			FRotator newRot;
-			newRot.Roll = GetActorRotation().Roll;
-			newRot.Pitch = GetActorRotation().Pitch;
-			newRot.Yaw = GetCameraBoom()->GetTargetRotation().Yaw;
-			SetActorRotation(newRot);
-		}
-	}
+	// 	if(m_bIsFocus)
+	// 	{
+	// 		FRotator newRot;
+	// 		newRot.Roll = GetActorRotation().Roll;
+	// 		newRot.Pitch = GetActorRotation().Pitch;
+	// 		newRot.Yaw = GetCameraBoom()->GetTargetRotation().Yaw;
+	// 		SetActorRotation(newRot);
+	// 	}
+	// }
 }
 
 void AFallenCorsairCharacter::Shoot()
@@ -238,6 +242,7 @@ void AFallenCorsairCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
+
 void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -275,24 +280,22 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
 {
+	if (m_bIsFocus)
+		return;
+
 	if (MeleeTargetingComponent->IsMovingToActorTarget)
 		return;
 
-	if(!m_bIsFocus)
-	{
-		if (!MeleeComponent->MeleeIsValid())
-			return;
+	if (!MeleeComponent->MeleeIsValid())
+		return;
 
-		if (!MeleeComponent->IsReleased())
-		{
-			if (!MeleeComponent->AttackIsStarted()) {
-				Melee_IsTrigerred = true;
-				MeleeComponent->UpdateTypeAttack(Melee_TriggeredSeconds);
-			}
+	if (!MeleeComponent->IsReleased())
+	{
+		if (!MeleeComponent->AttackIsStarted()) {
+			Melee_IsTrigerred = true;
+			MeleeComponent->UpdateTypeAttack(Melee_TriggeredSeconds);
 		}
-		//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_FloatToString(Melee_TriggeredSeconds));
 	}
-	
 }
 
 void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
@@ -330,8 +333,6 @@ void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 	Melee_IsTrigerred = false;
 	Melee_TriggeredSeconds = 0;
 
-
-
 	if (!MeleeComponent->IsReleased())
 	{
 		if (MeleeComponent->IsFirstCombo())
@@ -346,7 +347,6 @@ void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 			}
 		}
 	}
-	
 }
 
 

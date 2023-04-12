@@ -102,7 +102,7 @@ TArray<AActor*> UMeleeTargeting::GetAllTargetagbleOnScreenAndOnOwnerVision()
 {
 	TArray<ACharacter*> CharactersTargetable = GetAllCharactersTargetable();
 	TArray<AActor*> Characters;
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, UKismetStringLibrary::Conv_IntToString(CharactersTargetable.Num()));
+	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, UKismetStringLibrary::Conv_IntToString(CharactersTargetable.Num()));
 
 	for (ACharacter* Character : CharactersTargetable)
 	{
@@ -116,7 +116,7 @@ TArray<AActor*> UMeleeTargeting::GetAllTargetagbleOnScreenAndOnOwnerVision()
 		}
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_IntToString(Characters.Num()));
+	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_IntToString(Characters.Num()));
 
 
 	return Characters;

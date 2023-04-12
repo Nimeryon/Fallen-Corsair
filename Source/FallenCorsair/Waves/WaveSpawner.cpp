@@ -44,13 +44,21 @@ void UWaveSpawner::BeginPlay()
 
 void UWaveSpawner::SpawnEnemy()
 {
-	if(m_waveTracker && m_waveTracker->m_enemiesAlive < m_waveTracker->m_maxEnemies)
+	if(m_waveTracker && m_waveTracker->m_enemiesAlive < m_waveTracker->m_maxEnemies && m_waveZoneOwner)
 	{
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Instigator = Cast<APawn>(GetOwner());
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParams.bNoFail = true;
-		AActor* spawnedActor = GetWorld()->SpawnActor<AActor>(m_enemyToSpawn, m_location, FRotator::ZeroRotator, SpawnParams);
+		AActor* spawnedActor = GetWorld()->SpawnActor<AActor>(m_waveZoneOwner->GetAlienToSpawn(), m_location, FRotator::ZeroRotator, SpawnParams);
+	}
+	else if (!m_waveZoneOwner)
+	{
+		UE_LOG(LogTemp, Error, TEXT("WaveZoneOwner not found"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("WaveTracker not found"));
 	}
 }
 
@@ -65,9 +73,6 @@ void UWaveSpawner::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		m_spawnTime += DeltaTime;
 	}
 	
-	// cast to wave zone
-	const AWaveZone* waveZone = Cast<AWaveZone>(m_waveZoneOwner);
-	
 	// Check if we should spawn
 	if(
 		m_bIsActive
@@ -77,7 +82,8 @@ void UWaveSpawner::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		&& (m_bSpawnIndefinitely || m_numberOfSpawns < m_maxSpawn)
 		&& m_timeActive > m_timeToFirstSpawn
 		&& m_timeActive < m_timeToLastSpawn
-		&& m_distanceFromPlayer > FVector::Dist(m_location, GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation()) 
+		&& m_distanceFromPlayer > FVector::Dist(m_location, GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation())
+		&& (!m_waveZoneOwner || m_waveZoneOwner->IsPlayerInZone())
 	)
 	{
 		m_spawnTime = 0.0f;

@@ -94,6 +94,8 @@ void AFallenCorsairCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+	
+	OnPlayerSpawn.Broadcast();
 }
 
 void AFallenCorsairCharacter::Tick(float DeltaTime)

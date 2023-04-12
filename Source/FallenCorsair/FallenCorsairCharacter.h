@@ -14,6 +14,8 @@ enum class ECustomMovementMode
 	Dash,
 };
 
+// Event dispatcher OnPlayerSpawn
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerSpawn);
 
 UCLASS(config=Game)
 class AFallenCorsairCharacter : public ACharacter
@@ -105,6 +107,9 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 public:
+	UPROPERTY(BlueprintAssignable)
+	FOnPlayerSpawn OnPlayerSpawn;
+	
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/

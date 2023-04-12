@@ -9,43 +9,74 @@
 #include "InputActionValue.h"
 #include "Melee.generated.h"
 
+
+UENUM()
+enum class EMeleeCollisionShape
+{
+	Box,
+	Sphere,
+	Capsule
+};
+
+
 USTRUCT(BlueprintType)
 struct FAttackData
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-		float PropulsionForceOwner = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	float PropulsionForceOwner = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-		FVector PropulsionDirectionOwner = FVector(0, 0, 0);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	FVector PropulsionDirectionOwner = FVector(0, 0, 0);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-		float PropulsionForceEnnemie = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	float PropulsionForceEnnemie = 0;	
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-		FVector PropulsionDirectionEnnemie = FVector(0, 0, 0);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	FVector PropulsionDirectionEnnemie = FVector(0, 0, 0);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-		FVector BoxOffset = FVector(0, 0, 0);
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-		FVector BoxSize = FVector(100, 100, 100);
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	//	float RecoveryTime = 1; // Seconde
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-		float Dammage = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-		UAnimMontage* Anim;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-		class USoundBase* PlayerVoiceSound;	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	bool PropulsionEnnemieDirectionFromOwner = false;	
 	
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-		class USoundBase* AttackSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	bool PropulsionEnnemieDirectionFromOwnerNormalize2D = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CollisionShape")
+	EMeleeCollisionShape CollisionShape = EMeleeCollisionShape::Box;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CollisionShape")
+	FVector CollisionShapeOffset = FVector(0, 0, 0);	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CollisionShape")
+	FRotator CollisionShapeRotation = FRotator(0, 0, 0);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CollisionShapeBox")
+	FVector BoxSize = FVector(100, 100, 100);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CollisionShapeSphere")
+	float SphereRadius = 100;	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CollisionShapeCapsule")
+	float CapsuleHalfHeight = 100;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CollisionShapeCapsule")
+	float CapsuleRadius = 100;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	float Dammage = 0;	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	float TimeDilationOnHit = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	UAnimMontage* Anim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	class USoundBase* PlayerVoiceSound;	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	class USoundBase* AttackSound;
 
 };
 
@@ -54,13 +85,11 @@ struct FMelees
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<FAttackData> Soft;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FAttackData> Soft;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<FAttackData> Heavy;
-
-
+	TArray<FAttackData> Heavy;
 };
 
 UENUM()
@@ -69,6 +98,7 @@ enum class EAttackType
 	Soft,
 	Heavy,
 };
+
 
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -82,14 +112,13 @@ public:
 
 	// Vars
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-		FMelees Melees;
+	FMelees Melees;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-		float delayInputDepthMeleeHeavy = 1;
-
+	float delayInputDepthMeleeHeavy = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-		bool Debug = false;
+	bool Debug = false;
 
 	// Functions
 	//UFUNCTION(BlueprintCallable, Category = Properties)
@@ -98,10 +127,15 @@ public:
 	virtual void StartAttack(bool start);
 	virtual void UpdateTypeAttack(float& eslapsedSeconds);
 	virtual void SetReleased(bool released);
+	virtual void SetOwnerModeAttack(bool ModeAttack);
 	virtual void CancelAttack();
 	virtual bool MeleeIsValid();
 	virtual bool AttackIsStarted();
 	virtual bool IsReleased() const;
+	virtual void CalculRotation(FVector _rot);
+	virtual void ResetRotation();
+	virtual bool IsFirstCombo();
+	virtual bool IsLastCombo();
 
 
 
@@ -109,11 +143,11 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
-		virtual void OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-		virtual void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	virtual void OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 
 	virtual void TriggerHit();
 
@@ -123,7 +157,6 @@ private:
 
 	// Character
 	virtual void SetRotation();
-	virtual void CalculRotation(FVector _rot);
 	virtual void FreezeRotation(bool freeze);
 	virtual void EnableWalk(bool enable);
 
@@ -132,15 +165,17 @@ private:
 	virtual void PropulseOwner();
 	virtual void ResetVelocity();
 	virtual void ResetCombo();
-	virtual void ResetState();
 	virtual void IncrementCurrentAttack();
-	virtual bool IsLastCombo();
 	virtual FAttackData& GetCurrentMelee();
 
 
 	// Vars
+
 	ACharacter* ownerCharacter;
-	float maxWalkSpeed;
+
+	// To disabled Character walk
+	float MaxWalkSpeed;
+	float MinWalkSpeed;
 
 	EAttackType attackType = EAttackType::Soft;
 
@@ -152,8 +187,6 @@ private:
 	bool bAttackStarted = false;
 	bool bInputReleased = false;
 	bool bIsDeleguate = false;
+	FRotator RotatorWhileAttackStarted;
 
-	FVector rotation = FVector(0, 0, 0);
-
-	UAnimInstance* AnimDeleguate;
 };

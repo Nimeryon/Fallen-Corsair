@@ -4,6 +4,7 @@
 
 #include "Barrel.h"
 #include "Components/Melee.h"
+#include "Components/MeleeTargeting.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -13,7 +14,6 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/KismetStringLibrary.h"
-
 
 //////////////////////////////////////////////////////////////////////////
 // AFallenCorsairCharacter
@@ -56,6 +56,7 @@ AFallenCorsairCharacter::AFallenCorsairCharacter()
 
 	// Create Melee Component
 	MeleeComponent = CreateDefaultSubobject<UMelee>(TEXT("MeleeComponnent"));
+	MeleeTargetingComponent =  CreateDefaultSubobject<UMeleeTargeting>(TEXT("MeleeTargetingComponnent"));
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -83,6 +84,16 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 	// Chrono for melee input
 	if (Melee_IsTrigerred)
 		Melee_TriggeredSeconds += DeltaTime;
+
+
+	if (MeleeTargetingComponent->TargetReached)
+	{
+		MeleeTargetingComponent->TargetReached = false;
+		
+		// Perform the first attack combo
+		MeleeComponent->ResetRotation();
+		MeleeComponent->StartAttack(true);
+	}
 }
 
 
@@ -109,8 +120,9 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::MeleeTriggered);
 		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::MeleeStarted);
 		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::MeleeCompleted);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::MeleeSetRotation);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::MeleeResetRotation);
 	}
-
 }
 
 void AFallenCorsairCharacter::Move(const FInputActionValue& Value)
@@ -156,7 +168,8 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_BoolToString(MeleeComponent->MeleeIsValid()));
+	if (MeleeTargetingComponent->IsMovingToActorTarget)
+		return;
 
 	if (!MeleeComponent->MeleeIsValid())
 		return;
@@ -168,11 +181,13 @@ void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
 			MeleeComponent->UpdateTypeAttack(Melee_TriggeredSeconds);
 		}
 	}
-	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_FloatToString(Melee_TriggeredSeconds));
 }
 
 void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 {
+	if (MeleeTargetingComponent->IsMovingToActorTarget)
+		return;
+
 	if (!MeleeComponent->MeleeIsValid())
 		return;
 
@@ -185,17 +200,48 @@ void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 {
+	if (MeleeTargetingComponent->IsMovingToActorTarget)
+		return;
+
 	if (!MeleeComponent->MeleeIsValid())
 		return;
 
 	Melee_IsTrigerred = false;
 	Melee_TriggeredSeconds = 0;
 
+
+
 	if (!MeleeComponent->IsReleased())
 	{
-		MeleeComponent->StartAttack(true);
+		if (MeleeComponent->IsFirstCombo())
+		{
+			if (!MeleeTargetingComponent->GetTarget())
+			{
+				MeleeComponent->StartAttack(true);
+			}
+			else 
+			{
+				MeleeComponent->SetOwnerModeAttack(true);
+			}
+		}
 	}
 }
+
+
+void AFallenCorsairCharacter::MeleeSetRotation(const FInputActionValue& Value)
+{
+	// input is a Vector2D
+	FVector2D MovementVector = Value.Get<FVector2D>();
+	FVector MovementVector3D = FVector(MovementVector.Y, MovementVector.X, 0);
+	MeleeComponent->CalculRotation(MovementVector3D);
+	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_Vector2dToString(MovementVector));
+}
+
+void AFallenCorsairCharacter::MeleeResetRotation(const FInputActionValue& Value)
+{
+	MeleeComponent->ResetRotation();
+}
+
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////

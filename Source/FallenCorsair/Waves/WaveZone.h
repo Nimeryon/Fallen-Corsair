@@ -1,0 +1,68 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Components/BoxComponent.h"
+#include "GameFramework/Actor.h"
+#include "WaveZone.generated.h"
+
+USTRUCT()
+struct FEnemies
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, Category = "Enemy")
+	TSubclassOf<class AGroundAlien> Enemy;
+	
+	UPROPERTY(EditAnywhere, Category = "Enemy", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float Ratio;
+};
+
+UCLASS()
+class FALLENCORSAIR_API AWaveZone : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AWaveZone();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+	bool IsPlayerInZone() const;
+
+	UFUNCTION()
+	void OnPlayerSpawn();
+
+	UFUNCTION()
+	TSubclassOf<class AGroundAlien> GetAlienToSpawn() const;
+
+protected:
+	UPROPERTY()
+	AActor* m_player;
+	
+	UPROPERTY()
+	bool m_bIsPlayerInZone;
+
+	UPROPERTY(BlueprintReadWrite)
+	UBoxComponent* m_collisionBox= CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
+
+	UPROPERTY(EditAnywhere)
+	TArray<FEnemies> m_enemies;
+public:
+	
+};

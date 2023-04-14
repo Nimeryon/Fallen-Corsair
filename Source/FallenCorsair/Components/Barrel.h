@@ -25,10 +25,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	
-	
 private:
-	
-
 	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (ClampMin = 3, UIMin = 3), meta = (displayName = "Nombre max de slot"))
 	int m_maxSlot = 3;
 
@@ -42,7 +39,7 @@ private:
 	float m_currentSoul = 0;
 
 	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (ClampMin = 0.01, UIMin = 0.01, ClampMax = 100, UIMax = 100), meta = (displayName = "pourcentage d'âme drop "))
-	float m_ennemyDropSoul = 0.03f;
+	float m_ennemyDropSoul = 1.f;
 
 	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (ClampMin = 0.01, UIMin = 0.01), meta = (displayName = "Vitesse de chargement en pourcentage"))
 	float m_speedCharge = 100.f;

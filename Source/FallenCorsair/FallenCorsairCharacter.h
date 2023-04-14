@@ -200,9 +200,21 @@ private:
 
 #pragma endregion
 
+#pragma region Health Variables
+	
 	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Vie du joueur"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 1000, UIMax = 1000))
-	float m_health = 50.f;
+	float m_maxHealth = 50.f;
 
+	UPROPERTY()
+	float m_currentHealth = 50.f;
+
+	/**
+	 * Define The Percentage Of Health That The Player Will Recover Each Second
+	 */
+	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Pourcentage de récupétation"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 100, UIMax = 100))
+	float m_recovery = 50.f;
+
+#pragma endregion 
 	
 };
 

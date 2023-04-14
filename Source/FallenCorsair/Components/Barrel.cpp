@@ -62,19 +62,5 @@ int UBarrel::GetMaxSlot()
 
 void UBarrel::CollectSoul()
 {
-	//float soul = m_maxSlot * 100;
-	
-	
-	
-	int slotToAdd = 0;
-	for(int i = 0; i < slotToAdd; i++)
-	{
-		if(m_ennemyDropSoul >= 100)
-		{
-			m_ennemyDropSoul = m_ennemyDropSoul - 100;
-			slotToAdd++;
-		}
-	}
-	m_slot = FMath::Clamp(m_slot + slotToAdd,0,m_maxSlot);
-	m_currentSoul = m_currentSoul + (m_ennemyDropSoul / 100);
+	m_currentSoul = FMath::Clamp(m_currentSoul + ((m_ennemyDropSoul / 100)  * m_maxSoul), m_currentSoul, m_maxSoul);
 }

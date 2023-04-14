@@ -104,6 +104,16 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 	if (Melee_IsTrigerred)
 		Melee_TriggeredSeconds += DeltaTime;
 
+#pragma region Health Recovery
+	if(m_currentHealth < m_maxHealth)
+	{
+		m_currentHealth = m_currentHealth + ((m_recovery / 100)  * m_maxHealth * DeltaTime);
+	}
+	if(m_currentHealth >= m_maxHealth)
+	{
+	m_currentHealth = m_maxHealth;
+	}
+#pragma endregion 
 
 #pragma region Camera Zoom
 	float transition;

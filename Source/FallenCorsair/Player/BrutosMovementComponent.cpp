@@ -14,10 +14,10 @@ void UBrutosMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVect
 
 	if(MovementMode == MOVE_Walking)
 	{
-		if(m_bIsSprint)
-			MaxWalkSpeed = m_sprintSpeed;
-		else
-			MaxWalkSpeed = m_walkSpeed;
+		// if(m_bIsSprint)
+		// 	MaxWalkSpeed = m_sprintSpeed;
+		// else
+		// 	MaxWalkSpeed = m_walkSpeed;
 	}
 }
 

@@ -57,7 +57,8 @@ AActor* UMeleeTargeting::GetTarget()
 {
 	TArray<AActor*> Actors = GetAllTargetagbleOnScreenAndOnOwnerVision();
 
-	AActor* Actor = GetActorDistanceLowestFromOwner(Actors);
+	// AActor* Actor = GetActorDistanceLowestFromOwner(Actors);
+	AActor* Actor = GetActorMostOnOwnerMiddleVision(Actors);
 
 	ActorTarget = Actor;
 
@@ -102,6 +103,7 @@ TArray<AActor*> UMeleeTargeting::GetAllTargetagbleOnScreenAndOnOwnerVision()
 {
 	TArray<ACharacter*> CharactersTargetable = GetAllCharactersTargetable();
 	TArray<AActor*> Characters;
+
 	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, UKismetStringLibrary::Conv_IntToString(CharactersTargetable.Num()));
 
 	for (ACharacter* Character : CharactersTargetable)
@@ -141,6 +143,32 @@ AActor* UMeleeTargeting::GetActorDistanceLowestFromOwner(TArray<AActor*> Actors)
 		if (Distance < LowestDistance)
 		{
 			LowestDistance = Distance;
+			Actor = Actorr;
+		}
+	}
+
+	return Actor;
+}
+
+AActor* UMeleeTargeting::GetActorMostOnOwnerMiddleVision(TArray<AActor*> Actors)
+{
+	AActor *Actor = nullptr;
+	
+	if (!Actors.Num())
+		return Actor;
+
+	float Lowest;
+
+	float Vision = GetLocationVisionFromOwner(*Actors[0]);
+	Lowest = Vision;
+	Actor = Actors[0];
+
+	for (AActor *Actorr : Actors)
+	{
+		Vision = GetLocationVisionFromOwner(*Actorr);
+		if (Vision < Lowest)
+		{
+			Lowest = Vision;
 			Actor = Actorr;
 		}
 	}
@@ -194,12 +222,17 @@ bool UMeleeTargeting::ActorIsOnScreen(AActor &Actor, float Tolerance)
 	return false;
 }
 
-bool UMeleeTargeting::IsOnOwnerVision(AActor &Actor)
+float UMeleeTargeting::GetLocationVisionFromOwner(class AActor &Actor)
 {
 	FVector DirOwnerToActor = Actor.GetActorLocation() - GetOwner()->GetActorLocation();
 	DirOwnerToActor.Normalize();
 	float dot = UKismetMathLibrary::Dot_VectorVector(DirOwnerToActor, GetOwner()->GetActorForwardVector());
-	return acos(dot) <= ChampVision;
+	return FMath::RadiansToDegrees(acos(dot));
+}
+
+bool UMeleeTargeting::IsOnOwnerVision(AActor &Actor)
+{
+	return GetLocationVisionFromOwner(Actor) <= ChampVision;
 }
 
 bool UMeleeTargeting::TurnOnLeft(float CurrentDegree, float DegreeToReach, float fMin, float fMax)

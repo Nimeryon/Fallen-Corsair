@@ -61,10 +61,12 @@ private:
 	TArray<class ACharacter*> GetAllCharactersTargetable();
 	TArray<class AActor*> GetAllTargetagbleOnScreenAndOnOwnerVision();
 	class AActor* GetActorDistanceLowestFromOwner(TArray<class AActor*> Actors);
+	class AActor* GetActorMostOnOwnerMiddleVision(TArray<class AActor*> Actors);
 
 	FVector GetActorWorldScreenLocation(class AActor &Actor);
 	bool ActorIsOnScreen(class AActor &Actor, float Tolerance = 0);
 	bool IsOnOwnerVision(class AActor &Actor);
+	float GetLocationVisionFromOwner(class AActor &Actor);
 
 	float ConvDegreeTo360(float Degree);
 	bool TurnOnLeft(float CurrentDegree, float DegreeToReach, float fMin, float fMax);

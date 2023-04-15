@@ -38,6 +38,7 @@ void UMelee::BeginPlay()
 	{
 		ownerCharacter = character;
 		MaxWalkSpeed = ownerCharacter->GetCharacterMovement()->MaxWalkSpeed;
+		MinWalkSpeed = ownerCharacter->GetCharacterMovement()->MinAnalogWalkSpeed;
 	}
 }
 
@@ -77,6 +78,9 @@ void UMelee::SetTypeAttack(EAttackType at)
 
 void UMelee::SetOwnerModeAttack(bool ModeAttack)
 {
+	if (!MeleeIsValid())
+		return;
+
 	if (ModeAttack)
 	{
 		FreezeRotation(true);
@@ -84,7 +88,7 @@ void UMelee::SetOwnerModeAttack(bool ModeAttack)
 	}
 	else {
 		FreezeRotation(false);
-		EnableWalk(false);
+		EnableWalk(true);
 		ResetCombo();
 		StartAttack(false);
 	}
@@ -207,6 +211,7 @@ void UMelee::CalculRotation(FVector _rot)
 
 void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
 {
+
 	if (NotifyName == "Propulsion")
 	{
 		PropulseOwner();
@@ -217,8 +222,9 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	}
 	else if (NotifyName == "Hit")
 	{
-		TriggerHit();
-	}	
+		if (!GetCurrentMelee().CollisionWithSockets)
+			TriggerHitWithCollisionShape();
+	}	 
 	else if (NotifyName == "CanCombo")
 	{
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1); // Reset to normal time dilation
@@ -267,7 +273,59 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	}
 }
 
-void UMelee::TriggerHit()
+void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
+{
+	for (auto It = OutHits.CreateIterator(); It; It++)
+	{
+		ACharacter* CharacterHited = Cast<ACharacter>((*It).GetActor());
+
+		if (CharacterHited)
+		{
+			if (CharactersHited.Contains(CharacterHited))
+			{
+				continue;
+			}
+			
+			CharactersHited.Add(CharacterHited);
+
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), GetCurrentMelee().TimeDilationOnHit);
+
+			// Propulse ennemie
+			GetCurrentMelee().PropulsionDirectionEnnemie.Normalize();
+
+			FVector End, Dir;
+
+			if (GetCurrentMelee().PropulsionEnnemieDirectionFromOwner)
+			{
+				Dir = CharacterHited->GetActorLocation() -  GetOwner()->GetActorLocation();
+				if (GetCurrentMelee().PropulsionEnnemieDirectionFromOwnerNormalize2D)
+				{
+					Dir = FVector(Dir.X, Dir.Y, 0);
+				}
+			}
+			else {
+				End = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * GetCurrentMelee().PropulsionDirectionEnnemie.X + GetOwner()->GetActorRightVector() * GetCurrentMelee().PropulsionDirectionEnnemie.Y + GetOwner()->GetActorUpVector() * GetCurrentMelee().PropulsionDirectionEnnemie.Z;
+				Dir = End - GetOwner()->GetActorLocation();
+			}
+
+			Dir.Normalize();
+			FVector Force = Dir * GetCurrentMelee().PropulsionForceEnnemie;
+			CharacterHited->GetCharacterMovement()->AddImpulse(Force, true);
+
+			// Damage Target
+			FDamageEvent eventDamage;
+			CharacterHited->TakeDamage(GetCurrentMelee().Dammage, eventDamage, nullptr, GetOwner());
+		}
+	}
+}
+
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Private
+
+void UMelee::TriggerHitWithCollisionShape()
 {
 	FVector OffsetPos = GetOwner()->GetActorForwardVector() * GetCurrentMelee().CollisionShapeOffset.X + GetOwner()->GetActorRightVector() * GetCurrentMelee().CollisionShapeOffset.Y + GetOwner()->GetActorUpVector() * GetCurrentMelee().CollisionShapeOffset.Z;
 	FVector Start = GetOwner()->GetActorLocation() + OffsetPos;
@@ -282,94 +340,79 @@ void UMelee::TriggerHit()
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(GetOwner());
 
-	bool bHitSomething = false;
-	
 	switch (GetCurrentMelee().CollisionShape)
 	{
 		case EMeleeCollisionShape::Box:
-			bHitSomething = GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, Orientation.Quaternion(), UEngineTypes::ConvertToTraceType(ECC_Visibility), BoxShape, QueryParams);
-			if (Debug)
-				DrawDebugBox(GetWorld(), Start, GetCurrentMelee().BoxSize, Orientation.Quaternion(), FColor::Red, false, 1, 0, 1);
+			GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, Orientation.Quaternion(), UEngineTypes::ConvertToTraceType(ECC_Visibility), BoxShape, QueryParams);
 			break;
 		case EMeleeCollisionShape::Sphere:
-			bHitSomething = GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, Orientation.Quaternion(), UEngineTypes::ConvertToTraceType(ECC_Visibility), SphereShape, QueryParams);
-			if (Debug)
-				DrawDebugSphere(GetWorld(), Start, GetCurrentMelee().SphereRadius, 10, FColor::Red, false, 1, 0, 1);
+			GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, Orientation.Quaternion(), UEngineTypes::ConvertToTraceType(ECC_Visibility), SphereShape, QueryParams);
 			break;
 		case EMeleeCollisionShape::Capsule:
-			bHitSomething = GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, Orientation.Quaternion(), UEngineTypes::ConvertToTraceType(ECC_Visibility), CapsuleShape, QueryParams);
-			if (Debug)
-				DrawDebugCapsule(GetWorld(), Start, GetCurrentMelee().CapsuleHalfHeight, GetCurrentMelee().CapsuleRadius, Orientation.Quaternion(), FColor::Red, false, 1, 0, 1);
+			GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, Orientation.Quaternion(), UEngineTypes::ConvertToTraceType(ECC_Visibility), CapsuleShape, QueryParams);
 			break;
 		default:
-			bHitSomething = GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, Orientation.Quaternion(), UEngineTypes::ConvertToTraceType(ECC_Visibility), BoxShape, QueryParams);
-			if (Debug)
-				DrawDebugBox(GetWorld(), Start, GetCurrentMelee().BoxSize, Orientation.Quaternion(), FColor::Red, false, 1, 0, 1);
+			GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, Orientation.Quaternion(), UEngineTypes::ConvertToTraceType(ECC_Visibility), BoxShape, QueryParams);
 	}
-	
-	if (bHitSomething)
+
+	if (Debug)
 	{
-		for (auto It = OutHits.CreateIterator(); It; It++)
+		FColor Color = FColor::Red;
+		if (OutHits.Num())
+			Color = FColor::Green;
+		switch (GetCurrentMelee().CollisionShape)
 		{
-			ACharacter* CharacterHited = Cast<ACharacter>((*It).GetActor());
-
-			if (CharacterHited)
-			{
-				UGameplayStatics::SetGlobalTimeDilation(GetWorld(), GetCurrentMelee().TimeDilationOnHit);
-
-				if (Debug)
-				{
-					switch (GetCurrentMelee().CollisionShape)
-					{
-						case EMeleeCollisionShape::Box:
-							DrawDebugBox(GetWorld(), Start, GetCurrentMelee().BoxSize, Orientation.Quaternion(), FColor::Green, false, 1, 0, 1);
-							break;
-						case EMeleeCollisionShape::Sphere:
-							DrawDebugSphere(GetWorld(), Start, GetCurrentMelee().SphereRadius, 10, FColor::Green, false, 1, 0, 1);
-							break;
-						case EMeleeCollisionShape::Capsule:
-							DrawDebugCapsule(GetWorld(), Start, GetCurrentMelee().CapsuleHalfHeight, GetCurrentMelee().CapsuleRadius, Orientation.Quaternion(), FColor::Green, false, 1, 0, 1);
-							break;
-						default:
-							DrawDebugBox(GetWorld(), Start, GetCurrentMelee().BoxSize, Orientation.Quaternion(), FColor::Green, false, 1, 0, 1);
-					}
-				}
-
-				// Propulse ennemie
-				GetCurrentMelee().PropulsionDirectionEnnemie.Normalize();
-
-				FVector End, Dir;
-
-				if (GetCurrentMelee().PropulsionEnnemieDirectionFromOwner)
-				{
-					Dir = CharacterHited->GetActorLocation() -  GetOwner()->GetActorLocation();
-					if (GetCurrentMelee().PropulsionEnnemieDirectionFromOwnerNormalize2D)
-					{
-						Dir = FVector(Dir.X, Dir.Y, 0);
-					}
-				}
-				else {
-					End = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * GetCurrentMelee().PropulsionDirectionEnnemie.X + GetOwner()->GetActorRightVector() * GetCurrentMelee().PropulsionDirectionEnnemie.Y + GetOwner()->GetActorUpVector() * GetCurrentMelee().PropulsionDirectionEnnemie.Z;
-					Dir = End - GetOwner()->GetActorLocation();
-				}
-
-				Dir.Normalize();
-				FVector Force = Dir * GetCurrentMelee().PropulsionForceEnnemie;
-				CharacterHited->GetCharacterMovement()->AddImpulse(Force, true);
-
-				// Damage Target
-				FDamageEvent eventDamage;
-				CharacterHited->TakeDamage(GetCurrentMelee().Dammage, eventDamage, nullptr, GetOwner());
-			}
+			case EMeleeCollisionShape::Box:
+				DrawDebugBox(GetWorld(), Start, GetCurrentMelee().BoxSize, Orientation.Quaternion(), Color, false, 1, 0, 1);
+				break;
+			case EMeleeCollisionShape::Sphere:
+				DrawDebugSphere(GetWorld(), Start, GetCurrentMelee().SphereRadius, 10, Color, false, 1, 0, 1);
+				break;
+			case EMeleeCollisionShape::Capsule:
+				DrawDebugCapsule(GetWorld(), Start, GetCurrentMelee().CapsuleHalfHeight, GetCurrentMelee().CapsuleRadius, Orientation.Quaternion(), Color, false, 1, 0, 1);
+				break;
+			default:
+				DrawDebugBox(GetWorld(), Start, GetCurrentMelee().BoxSize, Orientation.Quaternion(), Color, false, 1, 0, 1);
 		}
 	}
+
+	DammageOnHits(OutHits);
 }
 
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void UMelee::TriggerHitWithSockets()
+{
+	TArray<FHitResult> OutHits;
+	
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(GetOwner());
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Private
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(GetOwner());
+
+	FVector StartLocation = ownerCharacter->GetMesh()->GetSocketLocation(GetCurrentMelee().SocketStart);;
+	FVector EndLocation = ownerCharacter->GetMesh()->GetSocketLocation(GetCurrentMelee().SocketEnd);
+	float SphereRadius = GetCurrentMelee().SocketSphereRadius; // The radius of the sphere you want to trace
+	FCollisionShape SphereShape = FCollisionShape::MakeSphere(SphereRadius);
+
+	// Perform the multi-sphere trace operation
+	GetWorld()->SweepMultiByObjectType(OutHits, StartLocation, EndLocation, FQuat::Identity, UEngineTypes::ConvertToTraceType(ECC_Visibility), SphereShape, QueryParams);
+
+	if (Debug)
+	{
+		FColor Color = FColor::Red;
+
+		if (OutHits.Num())
+			Color = FColor::Green;
+
+		DrawDebugSphere(GetWorld(), StartLocation, SphereRadius, 10, Color, false, 1.f, 0, 1.f);
+		DrawDebugSphere(GetWorld(), EndLocation, SphereRadius, 10, Color, false, 1.f, 0, 1.f );
+		DrawDebugLine(GetWorld(), StartLocation, EndLocation, Color, false, 5, 0, 1);
+	}
+
+
+	DammageOnHits(OutHits);
+}
+
 
 // Character
 
@@ -389,9 +432,12 @@ void UMelee::EnableWalk(bool enable)
 	if (enable)
 	{
 		ownerCharacter->GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+		ownerCharacter->GetCharacterMovement()->MinAnalogWalkSpeed = MinWalkSpeed;
 	}
 	else {
 		ownerCharacter->GetCharacterMovement()->MaxWalkSpeed = 0;
+		ownerCharacter->GetCharacterMovement()->MinAnalogWalkSpeed = 0;
+
 	}
 }
 
@@ -420,6 +466,7 @@ void UMelee::PropulseOwner()
 void UMelee::AttackSequence()
 {
 	SetRotation();
+	CharactersHited.Reset();
 
 	bool bPlayedSuccessfully = false;
 	UAnimMontage* MontageToPlay = GetCurrentMelee().Anim;

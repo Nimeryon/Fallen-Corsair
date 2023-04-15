@@ -39,7 +39,7 @@ AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& Objec
 
 	GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...
 
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
+	// GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
@@ -267,8 +267,10 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 		}
 		if(m_cameraCurve)
 		{
-			AddControllerYawInput(m_cameraCurve->GetFloatValue(LookAxisVector.X) * yawSensibility);
-			AddControllerPitchInput(m_cameraCurve->GetFloatValue(LookAxisVector.Y) * pitchSensibility);
+			AddControllerYawInput(LookAxisVector.X * yawSensibility);
+			AddControllerPitchInput(LookAxisVector.Y * pitchSensibility);
+			// AddControllerYawInput(m_cameraCurve->GetFloatValue(LookAxisVector.X) * yawSensibility);
+			// AddControllerPitchInput(m_cameraCurve->GetFloatValue(LookAxisVector.Y) * pitchSensibility);
 		}
 	}
 }
@@ -337,13 +339,13 @@ void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 	{
 		if (MeleeComponent->IsFirstCombo())
 		{
-			if (!MeleeTargetingComponent->GetTarget())
+			if (MeleeTargetingComponent->GetTarget())
 			{
-				MeleeComponent->StartAttack(true);
+				MeleeComponent->SetOwnerModeAttack(true);
 			}
 			else 
 			{
-				MeleeComponent->SetOwnerModeAttack(true);
+				MeleeComponent->StartAttack(true);
 			}
 		}
 	}

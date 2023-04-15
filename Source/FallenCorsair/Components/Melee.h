@@ -23,6 +23,7 @@ struct FAttackData
 {
 	GENERATED_BODY()
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
 	float PropulsionForceOwner = 0;
 
@@ -63,6 +64,18 @@ struct FAttackData
 	float CapsuleRadius = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	bool CollisionWithSockets = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	FName SocketStart = "";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	FName SocketEnd = "";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CollisionShapeSphere")
+	float SocketSphereRadius = 30;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	float Dammage = 0;	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
@@ -97,8 +110,6 @@ enum class EAttackType
 	Soft,
 	Heavy,
 };
-
-
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class FALLENCORSAIR_API UMelee : public UActorComponent
@@ -136,6 +147,9 @@ public:
 	virtual bool IsFirstCombo();
 	virtual bool IsLastCombo();
 
+	UFUNCTION(BlueprintCallable, Category = Properties)
+	void TriggerHitWithSockets();
+
 
 
 protected:
@@ -148,11 +162,13 @@ protected:
 	UFUNCTION()
 	virtual void OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 
-	virtual void TriggerHit();
+	// Reaction to elements hited
+	virtual void DammageOnHits(TArray<FHitResult> OutHits);
 
 private:
 
 	// Functions
+	void TriggerHitWithCollisionShape();
 
 	// Character
 	virtual void SetRotation();
@@ -171,6 +187,9 @@ private:
 	// Vars
 
 	class ACharacter* ownerCharacter;
+
+	// To avoid multiple hit while TriggerWithSokect
+	class TArray<ACharacter*> CharactersHited;
 
 	// To disabled Character walk
 	float MaxWalkSpeed;

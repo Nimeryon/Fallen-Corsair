@@ -23,7 +23,6 @@ struct FAttackData
 {
 	GENERATED_BODY()
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
 	float PropulsionForceOwner = 0;
 
@@ -111,6 +110,8 @@ enum class EAttackType
 	Heavy,
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDeleguateMelee);
+
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class FALLENCORSAIR_API UMelee : public UActorComponent
 {
@@ -119,6 +120,12 @@ class FALLENCORSAIR_API UMelee : public UActorComponent
 public:
 	// Sets default values for this component's properties
 	UMelee();
+
+	UFUNCTION()
+	void OnMyDelegateTriggered();
+
+	UPROPERTY(BlueprintAssignable, Category = "MyDelegate")
+	FDeleguateMelee DeleguateMelee;
 
 	// Vars
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
@@ -144,8 +151,10 @@ public:
 	virtual bool IsReleased() const;
 	virtual void CalculRotation(FVector _rot);
 	virtual void ResetRotation();
+	virtual void ResetCombo();
 	virtual bool IsFirstCombo();
 	virtual bool IsLastCombo();
+
 
 	UFUNCTION(BlueprintCallable, Category = Properties)
 	void TriggerHitWithSockets();
@@ -179,7 +188,6 @@ private:
 	virtual void AttackSequence();
 	virtual void PropulseOwner();
 	virtual void ResetVelocity();
-	virtual void ResetCombo();
 	virtual void IncrementCurrentAttack();
 	virtual FAttackData& GetCurrentMelee();
 

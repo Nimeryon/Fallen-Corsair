@@ -22,10 +22,13 @@ UMelee::UMelee()
 
 	ownerCharacter = CreateDefaultSubobject<ACharacter>(TEXT("ownerCharacter"));
 
-
-	// ...
+	DeleguateMelee.AddDynamic(this, &UMelee::OnMyDelegateTriggered);
 }
 
+void UMelee::OnMyDelegateTriggered()
+{
+	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, TEXT("Deleguate Melee triggered"));
+}
 
 // Called when the game starts
 void UMelee::BeginPlay()
@@ -40,6 +43,7 @@ void UMelee::BeginPlay()
 		MaxWalkSpeed = ownerCharacter->GetCharacterMovement()->MaxWalkSpeed;
 		MinWalkSpeed = ownerCharacter->GetCharacterMovement()->MinAnalogWalkSpeed;
 	}
+
 }
 
 void UMelee::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -406,7 +410,7 @@ void UMelee::TriggerHitWithSockets()
 
 		DrawDebugSphere(GetWorld(), StartLocation, SphereRadius, 10, Color, false, 1.f, 0, 1.f);
 		DrawDebugSphere(GetWorld(), EndLocation, SphereRadius, 10, Color, false, 1.f, 0, 1.f );
-		DrawDebugLine(GetWorld(), StartLocation, EndLocation, Color, false, 5, 0, 1);
+		DrawDebugLine(GetWorld(), StartLocation, EndLocation, Color, false, 1, 0, 1);
 	}
 
 
@@ -467,6 +471,7 @@ void UMelee::AttackSequence()
 {
 	SetRotation();
 	CharactersHited.Reset();
+	EnableWalk(false);
 
 	bool bPlayedSuccessfully = false;
 	UAnimMontage* MontageToPlay = GetCurrentMelee().Anim;
@@ -495,6 +500,10 @@ void UMelee::AttackSequence()
 				AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &UMelee::OnNotifyBeginReceived);
 				bIsDeleguate = true;
 
+				if (DeleguateMelee.IsBound())
+				{
+					DeleguateMelee.Broadcast();
+				}
 			}
 		}
 	}

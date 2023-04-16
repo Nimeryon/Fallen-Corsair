@@ -36,11 +36,10 @@ private:
 		class UCameraComponent* FollowCamera;
 
 	/** Melee Component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Melee, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = Melee, meta = (AllowPrivateAccess = "true"))
 	class UMelee* MeleeComponent;
 
-	/** Melee Component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Melee, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = Melee, meta = (AllowPrivateAccess = "true"))
 	class UMeleeTargeting* MeleeTargetingComponent;
 
 	/** MappingContext */

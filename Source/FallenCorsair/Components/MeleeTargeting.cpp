@@ -37,6 +37,37 @@ void UMeleeTargeting::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (Debug)
+	{
+		// Location of the cone's base
+		FVector Location = GetOwner()->GetActorLocation();
+
+		// Direction of the cone's apex
+		FVector Direction = GetOwner()->GetActorForwardVector();
+
+		// Cone's radius
+		float Radius = 100.f;
+
+		// Color of the cone
+		FColor Color(255, 0, 0); // Red color
+
+		// Draw the cone
+		DrawDebugCone(
+			GetWorld(),
+			Location , // cone origin
+			Direction , // cone direction
+			TargetMaxDistanceFromOwner, // cone length
+			FMath::DegreesToRadians(ChampVision), // cone radius
+			FMath::DegreesToRadians(0), // cone radius
+			10, // Num Sides
+			FColor::Red, // cone color
+			false, // bPersistentLines
+			-1.f, // life time
+			0, // depth priority
+			1.f // thickness
+		);
+	}
+
 	if (!ActorTarget)
 		return;
 	
@@ -51,6 +82,7 @@ void UMeleeTargeting::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////
 // Public
 
 AActor* UMeleeTargeting::GetTarget()
@@ -72,6 +104,14 @@ AActor* UMeleeTargeting::GetTarget()
 	return Actor;
 }
 
+bool UMeleeTargeting::IsMeleeTargeting()
+{
+return  IsMovingToActorTarget;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////////////////
 // Private
 
 TArray<ACharacter*> UMeleeTargeting::GetAllCharactersTargetable()

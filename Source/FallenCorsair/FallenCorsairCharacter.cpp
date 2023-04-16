@@ -69,7 +69,7 @@ AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& Objec
 
 	// Create Melee Component
 	MeleeComponent = CreateDefaultSubobject<UMelee>(TEXT("MeleeComponnent"));
-	MeleeTargetingComponent =  CreateDefaultSubobject<UMeleeTargeting>(TEXT("MeleeTargetingComponnent"));
+	MeleeTargetingComponent = CreateDefaultSubobject<UMeleeTargeting>(TEXT("MeleeTargetingComponnent"));
 
 
 
@@ -109,7 +109,10 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 
 	// Chrono for melee input
 	if (Melee_IsTrigerred)
+	{
+		MeleeComponent->SetOwnerModeAttack(true);
 		Melee_TriggeredSeconds += DeltaTime;
+	}
 
 
 	if (MeleeTargetingComponent->TargetReached)
@@ -285,7 +288,7 @@ void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
 	if (m_bIsFocus)
 		return;
 
-	if (MeleeTargetingComponent->IsMovingToActorTarget)
+	if (MeleeTargetingComponent->IsMeleeTargeting())
 		return;
 
 	if (!MeleeComponent->MeleeIsValid())
@@ -308,7 +311,7 @@ void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 		return;
 	}
 
-	if (MeleeTargetingComponent->IsMovingToActorTarget)
+	if (MeleeTargetingComponent->IsMeleeTargeting())
 		return;
 
 	if (!MeleeComponent->MeleeIsValid())
@@ -326,7 +329,7 @@ void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 	if (m_bIsFocus)
 		return;
 
-	if (MeleeTargetingComponent->IsMovingToActorTarget)
+	if (MeleeTargetingComponent->IsMeleeTargeting())
 		return;
 
 	if (!MeleeComponent->MeleeIsValid())

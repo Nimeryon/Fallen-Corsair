@@ -31,8 +31,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	float SpeedRotation = 500;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "")
-	bool IsMovingToActorTarget = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	bool Debug = false;
 
 protected:
 	// Called when the game starts
@@ -42,14 +42,16 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
+	UFUNCTION(BlueprintCallable, Category = Properties)
 	class AActor* GetTarget();
+
+	UFUNCTION(BlueprintCallable, Category = Properties)
+	bool IsMeleeTargeting();
 
 	void MoveToActorTarget(float DeltaTime);
 	void OrientOwnerToTarget(float DeltaTime);
 
 	class AActor *ActorTarget;
-
-	
 
 	bool MovingToTargetEnded = false;
 	bool RotationToTargetEnded = false;
@@ -70,4 +72,6 @@ private:
 
 	float ConvDegreeTo360(float Degree);
 	bool TurnOnLeft(float CurrentDegree, float DegreeToReach, float fMin, float fMax);
+	bool IsMovingToActorTarget = false;
+
 };

@@ -20,10 +20,10 @@ public:
 	float ChampVision = 90;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	float SpeedMoveToActor = 500;
+	float SpeedMoveToActor = 1000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	float TargetMaxDistanceFromOwner = 500;
+	float TargetMaxDistanceFromOwner = 350;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	float DistanceSecurity = 200;

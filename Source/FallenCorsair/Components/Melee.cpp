@@ -72,6 +72,53 @@ void UMelee::PerformAttack()
 	}
 }
 
+void UMelee::PlayAnimationChargingMeleeHeavy()
+{
+	if (!AnimWhileChargingMeleeHeavy || indexCurrentAttack > 0)
+		return;
+
+	// Play Animation
+	if (ownerCharacter->GetMesh())
+	{
+
+		if (UAnimInstance* AnimInstance = ownerCharacter->GetMesh()->GetAnimInstance())
+		{
+			//AnimInstance->StopAllMontages(0.0f);
+
+			const int32 NumLoops = 2;
+
+			// Jouez l'animation Montage en boucle
+			for (int32 i = 0; i < NumLoops; i++)
+			{
+				FOnMontageEnded EndDelegate;
+				AnimInstance->Montage_Play(AnimWhileChargingMeleeHeavy, 1.0f, EMontagePlayReturnType::Duration, 0, false);
+				AnimInstance->Montage_SetEndDelegate(EndDelegate, AnimWhileChargingMeleeHeavy);
+			}
+			
+		}
+		
+	}
+}
+
+void UMelee::StopAnimationChargingMeleeHeavy()
+{
+	if (!AnimWhileChargingMeleeHeavy)
+		return;
+
+	// Stop Animation
+	if (ownerCharacter->GetMesh())
+	{
+
+		if (UAnimInstance* AnimInstance = ownerCharacter->GetMesh()->GetAnimInstance())
+		{
+			if (AnimInstance->Montage_IsPlaying(AnimWhileChargingMeleeHeavy))
+			{
+				AnimInstance->StopAllMontages(0.0f);
+			}
+		}
+	}
+}
+
 void UMelee::SetTypeAttack(EAttackType at)
 {
 	if (!AttackIsStarted())
@@ -215,6 +262,7 @@ void UMelee::CalculRotation(FVector _rot)
 
 void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_NameToString(NotifyName));
 
 	if (NotifyName == "Propulsion")
 	{
@@ -255,6 +303,13 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	{
 		FreezeRotation(false);
 		EnableWalk(true);
+
+		if (IsLastCombo())
+		{
+			ResetCombo();
+			StartAttack(false);
+			SetReleased(true);
+		}
 	}	
 	else if (NotifyName == "Recovery")
 	{
@@ -473,20 +528,27 @@ void UMelee::AttackSequence()
 	CharactersHited.Reset();
 	EnableWalk(false);
 
-	bool bPlayedSuccessfully = false;
-	UAnimMontage* MontageToPlay = GetCurrentMelee().Anim;
+	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_IntToString(indexCurrentAttack));
+
 
 	// Play Animation
 	if (ownerCharacter->GetMesh())
 	{
-		if (UAnimInstance* AnimInstance = ownerCharacter->GetMesh()->GetAnimInstance())
+		UAnimInstance* AnimInstance = ownerCharacter->GetMesh()->GetAnimInstance();
+		AnimInstance->StopAllMontages(0.0f);
+		
+		if (AnimInstance)
 		{
-			const float MontageLength = AnimInstance->Montage_Play(MontageToPlay, 1);
+			bool bPlayedSuccessfully = false;
+			UAnimMontage* MontageToPlay = GetCurrentMelee().Anim;
+			const float MontageLength = AnimInstance->Montage_Play(MontageToPlay, 1, EMontagePlayReturnType::Duration, 0, true);
+			
 			bPlayedSuccessfully = (MontageLength > 0.f);
 
 			if (bPlayedSuccessfully)
 			{
 				UAnimInstance* AnimInstancePtr = AnimInstance;
+				
 				if (FAnimMontageInstance* MontageInstance = AnimInstance->GetActiveInstanceForMontage(MontageToPlay))
 				{
 					int MontageInstanceID = MontageInstance->GetInstanceID();

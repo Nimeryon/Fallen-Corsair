@@ -110,7 +110,6 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 	// Chrono for melee input
 	if (Melee_IsTrigerred)
 	{
-		MeleeComponent->SetOwnerModeAttack(true);
 		Melee_TriggeredSeconds += DeltaTime;
 	}
 
@@ -296,8 +295,11 @@ void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
 
 	if (!MeleeComponent->IsReleased())
 	{
+
 		if (!MeleeComponent->AttackIsStarted()) {
 			Melee_IsTrigerred = true;
+			MeleeComponent->PlayAnimationChargingMeleeHeavy();
+			MeleeComponent->SetOwnerModeAttack(true);
 			MeleeComponent->UpdateTypeAttack(Melee_TriggeredSeconds);
 		}
 	}
@@ -342,8 +344,10 @@ void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 	{
 		if (MeleeComponent->IsFirstCombo())
 		{
+			// Start the melee targeting if GetTarget() got a valid ennemie to go
 			if (MeleeTargetingComponent->GetTarget())
 			{
+				MeleeComponent->StopAnimationChargingMeleeHeavy();
 				MeleeComponent->SetOwnerModeAttack(true);
 			}
 			else 
@@ -352,6 +356,8 @@ void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 			}
 		}
 	}
+
+	MeleeComponent->SetReleased(true);
 }
 
 

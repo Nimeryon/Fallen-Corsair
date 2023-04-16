@@ -132,6 +132,9 @@ public:
 	FMelees Melees;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	UAnimMontage* AnimWhileChargingMeleeHeavy;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	float delayInputDepthMeleeHeavy = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
@@ -140,6 +143,8 @@ public:
 	// Functions
 	//UFUNCTION(BlueprintCallable, Category = Properties)
 	virtual void PerformAttack();
+	virtual void PlayAnimationChargingMeleeHeavy();
+	virtual void StopAnimationChargingMeleeHeavy();
 	virtual void SetTypeAttack(EAttackType at);
 	virtual void StartAttack(bool start);
 	virtual void UpdateTypeAttack(float& eslapsedSeconds);

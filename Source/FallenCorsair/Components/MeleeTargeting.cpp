@@ -74,6 +74,9 @@ void UMeleeTargeting::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	OrientOwnerToTarget(DeltaTime);
 	MoveToActorTarget(DeltaTime);
 
+	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_BoolToString(MovingToTargetEnded));
+	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, UKismetStringLibrary::Conv_BoolToString(RotationToTargetEnded));
+
 	if (MovingToTargetEnded && RotationToTargetEnded)
 	{
 		TargetReached = true;

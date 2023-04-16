@@ -62,6 +62,7 @@ void ADropSoul::Tick(float DeltaTime)
 
 void ADropSoul::ResetLifeSpan()
 {
-	SetLifeSpan(m_lifeSpan);
+	if(m_bHaveLifeSpan)
+		SetLifeSpan(m_lifeSpan);
 }
 

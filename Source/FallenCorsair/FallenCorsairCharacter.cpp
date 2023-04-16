@@ -13,6 +13,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Materials/MaterialParameterCollection.h"
 #include "Player/BrutosMovementComponent.h"
 
 
@@ -103,6 +104,8 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 	// Chrono for melee input
 	if (Melee_IsTrigerred)
 		Melee_TriggeredSeconds += DeltaTime;
+
+	
 
 #pragma region Health Recovery
 	if(m_currentHealth < m_maxHealth)

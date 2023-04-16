@@ -37,6 +37,10 @@ private:
 
 	UPROPERTY()
 	class AFallenCorsairCharacter* m_playerRef;
+
+
+	UPROPERTY(EditAnywhere, Category = "Soul", meta = (displayName = "Auto destuction"))
+	bool m_bHaveLifeSpan = true;
 	
 	UPROPERTY(EditAnywhere, Category = "Soul", meta = (ClampMin = 1, UIMin = 1, ClampMax = 2000, UIMax = 2000), meta = (displayName = "Distance d'attraction"))
 	float m_distance = 500.f;

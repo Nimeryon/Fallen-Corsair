@@ -29,31 +29,32 @@ private:
 
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
+		class UCameraComponent* FollowCamera;
 
-	/** Melee Component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UMelee* MeleeComponent;
-	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputMappingContext* DefaultMappingContext;
+		class UInputMappingContext* DefaultMappingContext;
 
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* JumpAction;
+		class UInputAction* JumpAction;
 
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* MoveAction;
+		class UInputAction* MoveAction;
 
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;	
-	
+		class UInputAction* LookAction;
+
 	/** Melee Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* MeleeAction;
+		class UInputAction* MeleeAction;
+
+	/** Melee Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* MeleeCancelAction;
+
 
 	// Aim Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -65,6 +66,14 @@ private:
 
 public:
 	AFallenCorsairCharacter(const FObjectInitializer& ObjectInitializer);
+
+	/** Melee Component */
+	UPROPERTY(EditAnywhere, Category = Melee, meta = (AllowPrivateAccess = "true"))
+		class UMelee* MeleeComponent;
+
+	UPROPERTY(EditAnywhere, Category = MeleeTargeting, meta = (AllowPrivateAccess = "true"))
+		class UMeleeTargeting* MeleeTargetingComponent;
+
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UBarrel* barrelComp;
@@ -86,12 +95,14 @@ protected:
 	void MeleeTriggered(const FInputActionValue& Value);
 	void MeleeStarted(const FInputActionValue& Value);
 	void MeleeCompleted(const FInputActionValue& Value);
-			
+	void MeleeSetRotation(const FInputActionValue& Value);
+	void MeleeResetRotation(const FInputActionValue& Value);
+
 
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
+
 	// To add mapping context
 	virtual void BeginPlay();
 

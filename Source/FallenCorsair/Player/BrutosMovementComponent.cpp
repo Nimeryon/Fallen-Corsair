@@ -32,9 +32,10 @@ void UBrutosMovementComponent::DashPressed()
 {
 	if(m_bCanDash)
 	{
-		PerformDash();
-		m_bCanDash = false;
-		GetWorld()->GetTimerManager().SetTimer(m_dashTimer, this, &UBrutosMovementComponent::DashCD, m_dashCD);
+		// if(m_bIsSprint)
+		// 	MaxWalkSpeed = m_sprintSpeed;
+		// else
+		// 	MaxWalkSpeed = m_walkSpeed;
 	}
 }
 

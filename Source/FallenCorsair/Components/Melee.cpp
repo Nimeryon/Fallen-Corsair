@@ -388,7 +388,7 @@ void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
 				
 					if (Distance >=  GetCurrentMelee().MaxDistance)
 					{
-						DammageValue = 0;
+						DammageValue = GetCurrentMelee().MinDammage;
 						break;
 					}
 				
@@ -406,8 +406,8 @@ void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
 			}
 
 			DammageValue = UKismetMathLibrary::FCeil(DammageValue);
-			GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, TEXT("Distance : ") + UKismetStringLibrary::Conv_FloatToString(Distance));
-			GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, TEXT("Dammage : ") +UKismetStringLibrary::Conv_FloatToString(DammageValue));
+			//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, TEXT("Distance : ") + UKismetStringLibrary::Conv_FloatToString(Distance));
+			//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, TEXT("Dammage : ") +UKismetStringLibrary::Conv_FloatToString(DammageValue));
 			CharacterHited->TakeDamage(DammageValue, eventDamage, nullptr, GetOwner());
 		}
 	}

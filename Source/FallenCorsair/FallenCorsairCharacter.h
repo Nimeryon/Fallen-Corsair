@@ -7,12 +7,8 @@
 #include "InputActionValue.h"
 #include "FallenCorsairCharacter.generated.h"
 
-UENUM()
-enum class ECustomMovementMode
-{
-	Default,
-	Dash,
-};
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnShoot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAim);
 
 // Event dispatcher OnPlayerSpawn
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerSpawn);
@@ -59,10 +55,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* MeleeAction;
 
-	// Shoot Input Action
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* ShootAction;
-
 	// Aim Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* AimAction;
@@ -106,6 +98,8 @@ protected:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void Landed(const FHitResult& Hit) override;
+
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerSpawn OnPlayerSpawn;
@@ -116,13 +110,16 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	UFUNCTION()
-	void Shoot();
-
-	UFUNCTION()
 	void Aim(const FInputActionValue& bIsZoom);
 
 	UFUNCTION()
 	void Charge(const FInputActionValue& value);
+
+	UPROPERTY()
+	FOnShoot OnShoot;
+
+	UPROPERTY()
+	FOnAim OnAim;
 
 private:
 
@@ -208,9 +205,21 @@ private:
 
 #pragma endregion
 
+#pragma region Health Variables
+	
 	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Vie du joueur"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 1000, UIMax = 1000))
-	float m_health = 50.f;
+	float m_maxHealth = 50.f;
 
+	UPROPERTY()
+	float m_currentHealth = 50.f;
+
+	/**
+	 * Define The Percentage Of Health That The Player Will Recover Each Second
+	 */
+	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Pourcentage de récupétation"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 100, UIMax = 100))
+	float m_recovery = 50.f;
+
+#pragma endregion 
 	
 };
 

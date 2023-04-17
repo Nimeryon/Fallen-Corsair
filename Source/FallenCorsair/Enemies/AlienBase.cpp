@@ -19,6 +19,9 @@ void AAlienBase::BeginPlay()
 
 	GetCharacterMovement()->MaxWalkSpeed = m_movementSpeed;
 	m_currentHealth = m_health;
+
+	if (OnSpawn.IsBound())
+		OnSpawn.Broadcast();
 }
 
 // Called every frame
@@ -39,7 +42,12 @@ float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	m_currentHealth -= DamageAmount;
 	UE_LOG(LogTemp, Warning, TEXT("%d"), m_currentHealth);
 	if (m_currentHealth <= 0)
+	{
+		if (OnDeath.IsBound())
+			OnDeath.Broadcast();
+		
 		Destroy();
+	}
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }

@@ -74,8 +74,17 @@ struct FAttackData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CollisionShapeSphere")
 	float SocketSphereRadius = 30;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dammage")
 	float Dammage = 0;	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	float MinDammage = 0;	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	float MinDistance = 0;	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	float MaxDistance = 0;	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	float TimeDilationOnHit = 1;

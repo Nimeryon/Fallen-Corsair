@@ -373,7 +373,42 @@ void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
 
 			// Damage Target
 			FDamageEvent eventDamage;
-			CharacterHited->TakeDamage(GetCurrentMelee().Dammage, eventDamage, nullptr, GetOwner());
+
+			float DammageValue = 0;
+			float Distance;
+			
+			switch (attackType)
+			{
+				case EAttackType::Soft:
+					DammageValue = GetCurrentMelee().Dammage;
+					break;
+				case EAttackType::Heavy:
+
+					Distance = FVector::Distance(CharacterHited->GetActorLocation(), GetOwner()->GetActorLocation());
+				
+					if (Distance >=  GetCurrentMelee().MaxDistance)
+					{
+						DammageValue = 0;
+						break;
+					}
+				
+					if (Distance <= GetCurrentMelee().MinDistance)
+					{
+						DammageValue = GetCurrentMelee().Dammage;
+						break;
+					}
+			
+					DammageValue = GetCurrentMelee().MinDammage + (GetCurrentMelee().Dammage - GetCurrentMelee().MinDammage) * (1 - UKismetMathLibrary::NormalizeToRange(Distance, GetCurrentMelee().MinDistance, GetCurrentMelee().MaxDistance));
+					break;
+				default:
+					DammageValue = GetCurrentMelee().Dammage;
+					break;
+			}
+
+			DammageValue = UKismetMathLibrary::FCeil(DammageValue);
+			GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, TEXT("Distance : ") + UKismetStringLibrary::Conv_FloatToString(Distance));
+			GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, TEXT("Dammage : ") +UKismetStringLibrary::Conv_FloatToString(DammageValue));
+			CharacterHited->TakeDamage(DammageValue, eventDamage, nullptr, GetOwner());
 		}
 	}
 }
@@ -387,6 +422,7 @@ void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
 void UMelee::TriggerHitWithCollisionShape()
 {
 	FVector OffsetPos = GetOwner()->GetActorForwardVector() * GetCurrentMelee().CollisionShapeOffset.X + GetOwner()->GetActorRightVector() * GetCurrentMelee().CollisionShapeOffset.Y + GetOwner()->GetActorUpVector() * GetCurrentMelee().CollisionShapeOffset.Z;
+	//FVector OffsetPos = GetOwner()->GetActorForwardVector() * GetCurrentMelee().CollisionShapeOffset;
 	FVector Start = GetOwner()->GetActorLocation() + OffsetPos;
 	FRotator Orientation = UKismetMathLibrary::MakeRotFromX(GetOwner()->GetActorForwardVector());
 	Orientation += GetCurrentMelee().CollisionShapeRotation;

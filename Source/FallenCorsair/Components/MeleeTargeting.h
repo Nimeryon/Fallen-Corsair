@@ -23,7 +23,7 @@ public:
 	float SpeedMoveToActor = 1000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	float TargetMaxDistanceFromOwner = 350;
+	float TargetMaxDistanceFromOwner = 400;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	float DistanceSecurity = 200;

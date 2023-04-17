@@ -123,33 +123,33 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		MeleeComponent->StartAttack(true);
 	}
 	
-	// float transition;
-	// if(m_bIsFocus)
-	// 	transition = m_transitionSpeedZoom;
-	// else
-	// 	transition = m_transitionSpeedDezoom;
+	float transition;
+	if(m_bIsFocus)
+		transition = m_transitionSpeedZoom;
+	else
+		transition = m_transitionSpeedDezoom;
 	
-	// m_alpha = FMath::Clamp( m_alpha + (1 / transition * m_direction) * DeltaTime, 0, 1);
+	m_alpha = FMath::Clamp( m_alpha + (1 / transition * m_direction) * DeltaTime, 0, 1);
 
-	// if((m_alpha != 0) || (m_alpha != 1))
-	// {
-	// 	FVector2D newLoc = FMath::InterpEaseIn(m_CameraOffset_S, m_CameraOffset_A, m_alpha, 2);
+	if((m_alpha != 0) || (m_alpha != 1))
+	{
+		FVector2D newLoc = FMath::InterpEaseIn(m_CameraOffset_S, m_CameraOffset_A, m_alpha, 2);
 		
-	// 	GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_S, m_distanceFromPlayer_A, m_alpha, 2);
-	// 	GetCameraBoom()->SetRelativeLocation(FVector(0,newLoc.X,newLoc.Y));
-	// 	GetFollowCamera()->SetFieldOfView(FMath::InterpEaseIn(m_fieldOfView_S, m_fieldOfView_A, m_alpha, 2));
-	// 	m_cameraManager->ViewPitchMin = FMath::InterpEaseIn(m_pitchMin_S, m_pitchMin_A, m_alpha, 2);
-	// 	m_cameraManager->ViewPitchMax = FMath::InterpEaseIn(m_pitchMax_S, m_pitchMax_A, m_alpha, 2);
+		GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_S, m_distanceFromPlayer_A, m_alpha, 2);
+		GetCameraBoom()->SetRelativeLocation(FVector(0,newLoc.X,newLoc.Y));
+		GetFollowCamera()->SetFieldOfView(FMath::InterpEaseIn(m_fieldOfView_S, m_fieldOfView_A, m_alpha, 2));
+		m_cameraManager->ViewPitchMin = FMath::InterpEaseIn(m_pitchMin_S, m_pitchMin_A, m_alpha, 2);
+		m_cameraManager->ViewPitchMax = FMath::InterpEaseIn(m_pitchMax_S, m_pitchMax_A, m_alpha, 2);
 
-	// 	if(m_bIsFocus)
-	// 	{
-	// 		FRotator newRot;
-	// 		newRot.Roll = GetActorRotation().Roll;
-	// 		newRot.Pitch = GetActorRotation().Pitch;
-	// 		newRot.Yaw = GetCameraBoom()->GetTargetRotation().Yaw;
-	// 		SetActorRotation(newRot);
-	// 	}
-	// }
+		if(m_bIsFocus)
+		{
+			FRotator newRot;
+			newRot.Roll = GetActorRotation().Roll;
+			newRot.Pitch = GetActorRotation().Pitch;
+			newRot.Yaw = GetCameraBoom()->GetTargetRotation().Yaw;
+			SetActorRotation(newRot);
+		}
+	}
 }
 
 void AFallenCorsairCharacter::Shoot()

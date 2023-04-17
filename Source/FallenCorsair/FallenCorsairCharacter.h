@@ -35,13 +35,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* FollowCamera;
 
-	/** Melee Component */
-	UPROPERTY(EditAnywhere, Category = Melee, meta = (AllowPrivateAccess = "true"))
-	class UMelee* MeleeComponent;
-
-	UPROPERTY(EditAnywhere, Category = Melee, meta = (AllowPrivateAccess = "true"))
-	class UMeleeTargeting* MeleeTargetingComponent;
-
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputMappingContext* DefaultMappingContext;
@@ -81,6 +74,14 @@ private:
 
 public:
 	AFallenCorsairCharacter(const FObjectInitializer& ObjectInitializer);
+
+	/** Melee Component */
+	UPROPERTY(EditAnywhere, Category = Melee, meta = (AllowPrivateAccess = "true"))
+		class UMelee* MeleeComponent;
+
+	UPROPERTY(EditAnywhere, Category = MeleeTargeting, meta = (AllowPrivateAccess = "true"))
+		class UMeleeTargeting* MeleeTargetingComponent;
+
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UBarrel* barrelComp;

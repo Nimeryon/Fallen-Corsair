@@ -14,6 +14,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Materials/MaterialParameterCollection.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Player/BrutosMovementComponent.h"
 
@@ -65,7 +66,7 @@ AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& Objec
 	// Create Gun Component
 	gunComp = CreateDefaultSubobject<UGun>(TEXT("GunComponnent"));
 
-	GetCameraBoom()->SetRelativeLocation(FVector(0,m_CameraOffset_S.X,m_CameraOffset_S.Y));
+	GetFollowCamera()->SetRelativeLocation(FVector(0,m_CameraOffset_S.X,m_CameraOffset_S.Y));
 
 	// Create Melee Component
 	MeleeComponent = CreateDefaultSubobject<UMelee>(TEXT("MeleeComponnent"));
@@ -113,16 +114,20 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		Melee_TriggeredSeconds += DeltaTime;
 	}
 
-
-	if (MeleeTargetingComponent->TargetReached)
-	{
-		MeleeTargetingComponent->TargetReached = false;
-		
-		// Perform the first attack combo
-		MeleeComponent->ResetRotation();
-		MeleeComponent->StartAttack(true);
-	}
 	
+
+#pragma region Health Recovery
+	if(m_currentHealth < m_maxHealth)
+	{
+		m_currentHealth = m_currentHealth + ((m_recovery / 100)  * m_maxHealth * DeltaTime);
+	}
+	if(m_currentHealth >= m_maxHealth)
+	{
+	m_currentHealth = m_maxHealth;
+	}
+#pragma endregion 
+
+#pragma region Camera Zoom
 	float transition;
 	if(m_bIsFocus)
 		transition = m_transitionSpeedZoom;
@@ -150,16 +155,34 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 			SetActorRotation(newRot);
 		}
 	}
+#pragma endregion
+
+#pragma region Melee
+	if (MeleeTargetingComponent->TargetReached)
+	{
+		MeleeTargetingComponent->TargetReached = false;
+		
+		// Perform the first attack combo
+		MeleeComponent->ResetRotation();
+		MeleeComponent->StartAttack(true);
+	}
+#pragma endregion
+
+	//GetCameraBoom()->TargetArmLength = FMath::Clamp( GetCameraBoom()->TargetArmLength, m_distanceFromPlayer_S / 4, m_distanceFromPlayer_S);
 }
 
-void AFallenCorsairCharacter::Shoot()
+void AFallenCorsairCharacter::Landed(const FHitResult& Hit)
 {
-	if(m_bIsFocus)
-		gunComp->Shoot();
+	Super::Landed(Hit);
+	
+	// BrutosMovementComponent->AirControl = 0.35f;
+	// BrutosMovementComponent->DashPressed();
+	
 }
 
 void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 {
+	OnAim.Broadcast();
 	m_bIsFocus = bIsZoom.Get<bool>();
 	GetCameraBoom()->bEnableCameraLag = !m_bIsFocus;
 	
@@ -175,13 +198,14 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 
 void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 {
-	if(BrutosMovementComponent)
-	{
-		if(value.Get<bool>())
-			BrutosMovementComponent->SprintPressed();
-		else
-			BrutosMovementComponent->SprintReleased();
-	}
+	// if(GetVelocity().Z == 0)
+	// {
+	// 	BrutosMovementComponent->StopMovementImmediately();
+	// 	Jump();
+	// 	BrutosMovementComponent->AirControl = 0.f;
+	// }
+
+	
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -217,7 +241,7 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::Aim);
 
 		EnhancedInputComponent->BindAction(ChargeAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::Charge);
-		EnhancedInputComponent->BindAction(ChargeAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::Charge);
+		//EnhancedInputComponent->BindAction(ChargeAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::Charge);
 	}
 }
 
@@ -269,10 +293,8 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 		}
 		if(m_cameraCurve)
 		{
-			AddControllerYawInput(LookAxisVector.X * yawSensibility);
-			AddControllerPitchInput(LookAxisVector.Y * pitchSensibility);
-			// AddControllerYawInput(m_cameraCurve->GetFloatValue(LookAxisVector.X) * yawSensibility);
-			// AddControllerPitchInput(m_cameraCurve->GetFloatValue(LookAxisVector.Y) * pitchSensibility);
+			AddControllerYawInput(m_cameraCurve->GetFloatValue(LookAxisVector.X) * yawSensibility);
+			AddControllerPitchInput(m_cameraCurve->GetFloatValue(LookAxisVector.Y) * pitchSensibility);
 		}
 	}
 }
@@ -310,6 +332,9 @@ void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 	if(m_bIsFocus)
 	{
 		gunComp->Shoot();
+		if (OnShoot.IsBound())
+			OnShoot.Broadcast();
+
 		return;
 	}
 

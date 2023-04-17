@@ -35,10 +35,10 @@ public:
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")
-	int m_maxEnemies = 50;
+	int m_maxEnemies = 199;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")
-	int m_minEnemies = 25;
+	int m_minEnemies = 100;
 
 	UPROPERTY()
 	int m_enemiesAlive;

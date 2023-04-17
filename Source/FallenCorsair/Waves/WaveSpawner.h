@@ -20,8 +20,12 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	
+
+	UFUNCTION()
 	virtual void SpawnEnemy();
+
+	UFUNCTION()
+	virtual FVector3d GetSpawnLocation();
 
 public:	
 	// Called every frame
@@ -32,6 +36,9 @@ public:
 	virtual void OnWaveOver();
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	float m_spawnDistance = 10.0f;
+	
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	// TSubclassOf<class AGroundAlien> m_enemyToSpawn;
 	

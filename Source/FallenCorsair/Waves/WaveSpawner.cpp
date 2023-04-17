@@ -50,7 +50,7 @@ void UWaveSpawner::SpawnEnemy()
 		SpawnParams.Instigator = Cast<APawn>(GetOwner());
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParams.bNoFail = true;
-		AActor* spawnedActor = GetWorld()->SpawnActor<AActor>(m_waveZoneOwner->GetAlienToSpawn(), m_location, FRotator::ZeroRotator, SpawnParams);
+		AActor* spawnedActor = GetWorld()->SpawnActor<AActor>(m_waveZoneOwner->GetAlienToSpawn(), GetSpawnLocation(), FRotator::ZeroRotator, SpawnParams);
 	}
 	else if (!m_waveZoneOwner)
 	{
@@ -60,6 +60,11 @@ void UWaveSpawner::SpawnEnemy()
 	{
 		UE_LOG(LogTemp, Error, TEXT("WaveTracker not found"));
 	}
+}
+
+FVector3d UWaveSpawner::GetSpawnLocation()
+{
+	return m_location + FVector3d(FMath::RandRange(-m_spawnDistance, m_spawnDistance), FMath::RandRange(-m_spawnDistance, m_spawnDistance), 0.0f);
 }
 
 // Called every frame

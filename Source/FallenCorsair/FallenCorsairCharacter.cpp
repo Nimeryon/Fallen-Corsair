@@ -13,8 +13,10 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "VectorUtil.h"
 #include "Materials/MaterialParameterCollection.h"
 #include "Player/BrutosMovementComponent.h"
+#include "Kismet/KismetMaterialLibrary.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -105,17 +107,30 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 	if (Melee_IsTrigerred)
 		Melee_TriggeredSeconds += DeltaTime;
 
-	
-
-#pragma region Health Recovery
+#pragma region Health Gestion
 	if(m_currentHealth < m_maxHealth)
 	{
 		m_currentHealth = m_currentHealth + ((m_recovery / 100)  * m_maxHealth * DeltaTime);
 	}
 	if(m_currentHealth >= m_maxHealth)
 	{
-	m_currentHealth = m_maxHealth;
+		m_currentHealth = m_maxHealth;
 	}
+
+	if(m_currentHealth < 20)
+	{
+		m_bIsHealing = true;
+		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "bIsLowHP", 1.f);
+		m_alphaRecover = 1.f;
+	}
+	else if(m_bIsHealing)
+	{
+		m_alphaRecover = FMath::Clamp(m_alphaRecover - (1 / m_changeSpeed) * DeltaTime, 0.f, 1.f);
+		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "bIsLowHP", m_alphaRecover);
+		if(m_alphaRecover == 0.f)
+			m_bIsHealing = false;
+	}
+
 #pragma endregion 
 
 #pragma region Camera Zoom
@@ -147,9 +162,6 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		}
 	}
 #pragma endregion
-
-
-	//GetCameraBoom()->TargetArmLength = FMath::Clamp( GetCameraBoom()->TargetArmLength, m_distanceFromPlayer_S / 4, m_distanceFromPlayer_S);
 }
 
 void AFallenCorsairCharacter::Landed(const FHitResult& Hit)
@@ -159,6 +171,23 @@ void AFallenCorsairCharacter::Landed(const FHitResult& Hit)
 	// BrutosMovementComponent->AirControl = 0.35f;
 	// BrutosMovementComponent->DashPressed();
 	
+}
+
+float AFallenCorsairCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if(m_currentHealth > DamageAmount)
+	{
+		m_currentHealth = m_currentHealth - DamageAmount;
+	}
+	else
+	{
+		m_currentHealth = 0;
+		/// called death event
+	}
+
+	
+	
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
 void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
@@ -343,6 +372,7 @@ void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 	}
 	
 }
+
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////

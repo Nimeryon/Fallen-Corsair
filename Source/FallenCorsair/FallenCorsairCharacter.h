@@ -11,6 +11,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnShoot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAim);
 
 
+
 UCLASS(config=Game)
 class AFallenCorsairCharacter : public ACharacter
 {
@@ -84,6 +85,8 @@ protected:
 	void MeleeTriggered(const FInputActionValue& Value);
 	void MeleeStarted(const FInputActionValue& Value);
 	void MeleeCompleted(const FInputActionValue& Value);
+
+	
 			
 
 protected:
@@ -97,6 +100,9 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Landed(const FHitResult& Hit) override;
+
+	UFUNCTION(BlueprintCallable)
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 public:
 	/** Returns CameraBoom subobject **/
@@ -201,18 +207,36 @@ private:
 #pragma endregion
 
 #pragma region Health Variables
-	
-	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Vie du joueur"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 1000, UIMax = 1000))
-	float m_maxHealth = 50.f;
 
 	UPROPERTY()
 	float m_currentHealth = 50.f;
+
+	UPROPERTY()
+	float m_alphaRecover = 1.f;
+
+	UPROPERTY()
+	bool m_bIsHealing = false;
+	
+	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Vie du joueur"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 1000, UIMax = 1000))
+	float m_maxHealth = 50.f;
 
 	/**
 	 * Define The Percentage Of Health That The Player Will Recover Each Second
 	 */
 	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Pourcentage de récupétation"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 100, UIMax = 100))
 	float m_recovery = 50.f;
+
+	/**
+	 * Define when the player is in low HP
+	 */
+	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Vie du joueur Low"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 100, UIMax = 100))
+	float m_lowHP = 20.f;
+
+	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Fade Speed"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 10, UIMax = 10))
+	float m_changeSpeed = 20.f;
+
+	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "MPC"))
+	UMaterialParameterCollection* m_collection;
 
 #pragma endregion 
 	

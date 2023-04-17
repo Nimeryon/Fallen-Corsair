@@ -44,7 +44,7 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 	if(alien)
 	{
 		FDamageEvent DamageEvent;
-		OtherActor->TakeDamage(m_dammage, DamageEvent, nullptr, this);
+		OtherActor->TakeDamage(m_dammage, DamageEvent, nullptr, GetOwner());
 	}
 	
 	/// NON

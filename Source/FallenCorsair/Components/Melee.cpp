@@ -372,7 +372,6 @@ void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
 			CharacterHited->GetCharacterMovement()->AddImpulse(Force, true);
 
 			// Damage Target
-			FDamageEvent eventDamage;
 
 			float DammageValue = 0;
 			float Distance;
@@ -406,9 +405,12 @@ void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
 			}
 
 			DammageValue = UKismetMathLibrary::FCeil(DammageValue);
+			
+			// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, CharacterHited->GetName());
 			//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, TEXT("Distance : ") + UKismetStringLibrary::Conv_FloatToString(Distance));
 			//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, TEXT("Dammage : ") +UKismetStringLibrary::Conv_FloatToString(DammageValue));
-			CharacterHited->TakeDamage(DammageValue, eventDamage, nullptr, GetOwner());
+			FDamageEvent EventDamage;
+			CharacterHited->TakeDamage(DammageValue, EventDamage, nullptr, GetOwner());
 		}
 	}
 }

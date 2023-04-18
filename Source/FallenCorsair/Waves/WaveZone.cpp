@@ -13,7 +13,7 @@ AWaveZone::AWaveZone(): m_player(nullptr), m_bIsPlayerInZone(false)
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CreateDefaultSubobject<UWaveTracker>(TEXT("WaveTracker"));
+	m_waveTracker = CreateDefaultSubobject<UWaveTracker>(TEXT("WaveTracker"));
 }
 
 // Called when the game starts or when spawned

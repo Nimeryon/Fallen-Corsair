@@ -5,6 +5,7 @@
 #include "Components/Barrel.h"
 #include "Components/Gun.h"
 #include "Components/Melee.h"
+#include "Components/MeleeTargeting.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -13,8 +14,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Materials/MaterialParameterCollection.h"
+#include "Kismet/KismetStringLibrary.h"
 #include "Player/BrutosMovementComponent.h"
-
 
 //////////////////////////////////////////////////////////////////////////
 // AFallenCorsairCharacter
@@ -30,12 +32,15 @@ AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& Objec
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw =  false;
 	bUseControllerRotationRoll = false;
 
+
 	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
+
+	GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...
+
+	// GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
@@ -61,10 +66,11 @@ AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& Objec
 	// Create Gun Component
 	gunComp = CreateDefaultSubobject<UGun>(TEXT("GunComponnent"));
 
-	GetCameraBoom()->SetRelativeLocation(FVector(0,m_CameraOffset_S.X,m_CameraOffset_S.Y));
+	GetFollowCamera()->SetRelativeLocation(FVector(0,m_CameraOffset_S.X,m_CameraOffset_S.Y));
 
 	// Create Melee Component
 	MeleeComponent = CreateDefaultSubobject<UMelee>(TEXT("MeleeComponnent"));
+	MeleeTargetingComponent = CreateDefaultSubobject<UMeleeTargeting>(TEXT("MeleeTargetingComponnent"));
 
 
 
@@ -104,8 +110,24 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 
 	// Chrono for melee input
 	if (Melee_IsTrigerred)
+	{
 		Melee_TriggeredSeconds += DeltaTime;
+	}
 
+	
+
+#pragma region Health Recovery
+	if(m_currentHealth < m_maxHealth)
+	{
+		m_currentHealth = m_currentHealth + ((m_recovery / 100)  * m_maxHealth * DeltaTime);
+	}
+	if(m_currentHealth >= m_maxHealth)
+	{
+	m_currentHealth = m_maxHealth;
+	}
+#pragma endregion 
+
+#pragma region Camera Zoom
 	float transition;
 	if(m_bIsFocus)
 		transition = m_transitionSpeedZoom;
@@ -133,16 +155,34 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 			SetActorRotation(newRot);
 		}
 	}
+#pragma endregion
+
+#pragma region Melee
+	if (MeleeTargetingComponent->TargetReached)
+	{
+		MeleeTargetingComponent->TargetReached = false;
+		
+		// Perform the first attack combo
+		MeleeComponent->ResetRotation();
+		MeleeComponent->StartAttack(true);
+	}
+#pragma endregion
+
+	//GetCameraBoom()->TargetArmLength = FMath::Clamp( GetCameraBoom()->TargetArmLength, m_distanceFromPlayer_S / 4, m_distanceFromPlayer_S);
 }
 
-void AFallenCorsairCharacter::Shoot()
+void AFallenCorsairCharacter::Landed(const FHitResult& Hit)
 {
-	if(m_bIsFocus)
-		gunComp->Shoot();
+	Super::Landed(Hit);
+	
+	// BrutosMovementComponent->AirControl = 0.35f;
+	// BrutosMovementComponent->DashPressed();
+	
 }
 
 void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 {
+	OnAim.Broadcast();
 	m_bIsFocus = bIsZoom.Get<bool>();
 	GetCameraBoom()->bEnableCameraLag = !m_bIsFocus;
 	
@@ -158,13 +198,14 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 
 void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 {
-	if(BrutosMovementComponent)
-	{
-		if(value.Get<bool>())
-			BrutosMovementComponent->SprintPressed();
-		else
-			BrutosMovementComponent->SprintReleased();
-	}
+	// if(GetVelocity().Z == 0)
+	// {
+	// 	BrutosMovementComponent->StopMovementImmediately();
+	// 	Jump();
+	// 	BrutosMovementComponent->AirControl = 0.f;
+	// }
+
+	
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -189,6 +230,8 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::MeleeTriggered);
 		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::MeleeStarted);
 		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::MeleeCompleted);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::MeleeSetRotation);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::MeleeResetRotation);
 
 		// Shoot
 		//EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::MeleeStarted);
@@ -198,9 +241,8 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::Aim);
 
 		EnhancedInputComponent->BindAction(ChargeAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::Charge);
-		EnhancedInputComponent->BindAction(ChargeAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::Charge);
+		//EnhancedInputComponent->BindAction(ChargeAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::Charge);
 	}
-
 }
 
 void AFallenCorsairCharacter::Move(const FInputActionValue& Value)
@@ -225,6 +267,7 @@ void AFallenCorsairCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(RightDirection, MovementVector.X);
 	}
 }
+
 
 void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 {
@@ -263,61 +306,100 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_BoolToString(MeleeComponent->MeleeIsValid()));
+	if (m_bIsFocus)
+		return;
 
-	if(!m_bIsFocus)
+	if (MeleeTargetingComponent->IsMeleeTargeting())
+		return;
+
+	if (!MeleeComponent->MeleeIsValid())
+		return;
+
+	if (!MeleeComponent->IsReleased())
 	{
-		if (!MeleeComponent->MeleeIsValid())
-			return;
 
-		if (!MeleeComponent->IsReleased())
-		{
-			if (!MeleeComponent->AttackIsStarted()) {
-				Melee_IsTrigerred = true;
-				MeleeComponent->UpdateTypeAttack(Melee_TriggeredSeconds);
-			}
+		if (!MeleeComponent->AttackIsStarted()) {
+			Melee_IsTrigerred = true;
+			MeleeComponent->PlayAnimationChargingMeleeHeavy();
+			MeleeComponent->SetOwnerModeAttack(true);
+			MeleeComponent->UpdateTypeAttack(Melee_TriggeredSeconds);
 		}
-		//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_FloatToString(Melee_TriggeredSeconds));
 	}
-	
 }
 
 void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 {
-
 	if(m_bIsFocus)
-		gunComp->Shoot();
-	else
 	{
-		if (!MeleeComponent->MeleeIsValid())
-			return;
+		gunComp->Shoot();
+		if (OnShoot.IsBound())
+			OnShoot.Broadcast();
 
-		if (MeleeComponent->AttackIsStarted()) {
-			MeleeComponent->PerformAttack();
-		}
-
-		MeleeComponent->SetReleased(false);
+		return;
 	}
-	
+
+	if (MeleeTargetingComponent->IsMeleeTargeting())
+		return;
+
+	if (!MeleeComponent->MeleeIsValid())
+		return;
+
+	if (MeleeComponent->AttackIsStarted()) {
+		MeleeComponent->PerformAttack();
+	}
+
+	MeleeComponent->SetReleased(false);
 }
 
 void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 {
-	if(!m_bIsFocus)
+	if (m_bIsFocus)
+		return;
+
+	if (MeleeTargetingComponent->IsMeleeTargeting())
+		return;
+
+	if (!MeleeComponent->MeleeIsValid())
+		return;
+
+	Melee_IsTrigerred = false;
+	Melee_TriggeredSeconds = 0;
+
+	if (!MeleeComponent->IsReleased())
 	{
-		if (!MeleeComponent->MeleeIsValid())
-			return;
-
-		Melee_IsTrigerred = false;
-		Melee_TriggeredSeconds = 0;
-
-		if (!MeleeComponent->IsReleased())
+		if (MeleeComponent->IsFirstCombo())
 		{
-			MeleeComponent->StartAttack(true);
+			// Start the melee targeting if GetTarget() got a valid ennemie to go
+			if (MeleeTargetingComponent->GetTarget())
+			{
+				MeleeComponent->StopAnimationChargingMeleeHeavy();
+				MeleeComponent->SetOwnerModeAttack(true);
+			}
+			else 
+			{
+				MeleeComponent->StartAttack(true);
+			}
 		}
 	}
-	
+
+	MeleeComponent->SetReleased(true);
 }
+
+
+void AFallenCorsairCharacter::MeleeSetRotation(const FInputActionValue& Value)
+{
+	// input is a Vector2D
+	FVector2D MovementVector = Value.Get<FVector2D>();
+	FVector MovementVector3D = FVector(MovementVector.Y, MovementVector.X, 0);
+	MeleeComponent->CalculRotation(MovementVector3D);
+	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_Vector2dToString(MovementVector));
+}
+
+void AFallenCorsairCharacter::MeleeResetRotation(const FInputActionValue& Value)
+{
+	MeleeComponent->ResetRotation();
+}
+
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////

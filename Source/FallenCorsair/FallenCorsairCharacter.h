@@ -7,12 +7,8 @@
 #include "InputActionValue.h"
 #include "FallenCorsairCharacter.generated.h"
 
-UENUM()
-enum class ECustomMovementMode
-{
-	Default,
-	Dash,
-};
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnShoot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAim);
 
 // Event dispatcher OnPlayerSpawn
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerSpawn);
@@ -33,35 +29,32 @@ private:
 
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
+		class UCameraComponent* FollowCamera;
 
-	/** Melee Component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UMelee* MeleeComponent;
-	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputMappingContext* DefaultMappingContext;
+		class UInputMappingContext* DefaultMappingContext;
 
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* JumpAction;
+		class UInputAction* JumpAction;
 
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* MoveAction;
+		class UInputAction* MoveAction;
 
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;	
-	
+		class UInputAction* LookAction;
+
 	/** Melee Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* MeleeAction;
+		class UInputAction* MeleeAction;
 
-	// Shoot Input Action
+	/** Melee Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* ShootAction;
+		class UInputAction* MeleeCancelAction;
+
 
 	// Aim Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -73,6 +66,14 @@ private:
 
 public:
 	AFallenCorsairCharacter(const FObjectInitializer& ObjectInitializer);
+
+	/** Melee Component */
+	UPROPERTY(EditAnywhere, Category = Melee, meta = (AllowPrivateAccess = "true"))
+		class UMelee* MeleeComponent;
+
+	UPROPERTY(EditAnywhere, Category = MeleeTargeting, meta = (AllowPrivateAccess = "true"))
+		class UMeleeTargeting* MeleeTargetingComponent;
+
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UBarrel* barrelComp;
@@ -94,17 +95,21 @@ protected:
 	void MeleeTriggered(const FInputActionValue& Value);
 	void MeleeStarted(const FInputActionValue& Value);
 	void MeleeCompleted(const FInputActionValue& Value);
-			
+	void MeleeSetRotation(const FInputActionValue& Value);
+	void MeleeResetRotation(const FInputActionValue& Value);
+
 
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
+
 	// To add mapping context
 	virtual void BeginPlay();
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void Landed(const FHitResult& Hit) override;
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -116,13 +121,16 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	UFUNCTION()
-	void Shoot();
-
-	UFUNCTION()
 	void Aim(const FInputActionValue& bIsZoom);
 
 	UFUNCTION()
 	void Charge(const FInputActionValue& value);
+
+	UPROPERTY()
+	FOnShoot OnShoot;
+
+	UPROPERTY()
+	FOnAim OnAim;
 
 private:
 
@@ -208,9 +216,21 @@ private:
 
 #pragma endregion
 
+#pragma region Health Variables
+	
 	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Vie du joueur"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 1000, UIMax = 1000))
-	float m_health = 50.f;
+	float m_maxHealth = 50.f;
 
+	UPROPERTY()
+	float m_currentHealth = 50.f;
+
+	/**
+	 * Define The Percentage Of Health That The Player Will Recover Each Second
+	 */
+	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Pourcentage de récupétation"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 100, UIMax = 100))
+	float m_recovery = 50.f;
+
+#pragma endregion 
 	
 };
 

@@ -3,6 +3,8 @@
 
 #include "AlienBase.h"
 
+#include "Engine/DamageEvents.h"
+#include "FallenCorsair/DT_FallenCorsair.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -35,6 +37,16 @@ void AAlienBase::BeginPlay()
 void AAlienBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (m_bStunned && m_bCanBeStunned)
+	{
+		m_currentStunTime += DeltaTime;
+		if (m_currentStunTime >= m_stunTime)
+		{
+			m_bStunned = false;
+			m_currentStunTime = 0;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -43,19 +55,78 @@ void AAlienBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser)
+float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,AActor* DamageCauser)
 {
-	m_currentHealth -= DamageAmount;
+	// Calculate damage based on DamageEvent
+	UDT_FallenCorsair* damageClass = Cast<UDT_FallenCorsair>(DamageEvent.DamageTypeClass);
+	EDamageType damageType = EDamageType::Default;
+	if (damageClass)
+		damageType = damageClass->GetDamageType();
+	DamageAmount *= GetDamageMultiplicator(damageType);
+	
+	// Apply damage
+	if (OnDamaged.IsBound())
+		OnDamaged.Broadcast(DamageAmount);
+	
+	m_currentHealth = FMath::Clamp(m_currentHealth - DamageAmount, 0.f, m_health);
 	UE_LOG(LogTemp, Warning, TEXT("%d"), m_currentHealth);
+	
 	if (m_currentHealth <= 0)
 	{
 		if (OnDeath.IsBound())
 			OnDeath.Broadcast();
-
+		
 		if (m_destroyOnDeath)
 			Destroy();
 	}
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+bool AAlienBase::IsAlive() const
+{
+	return m_currentHealth > 0;
+}
+
+bool AAlienBase::IsStunned() const
+{
+	return m_bStunned;
+}
+
+float AAlienBase::GetRemainingStunTime() const
+{
+	return m_stunTime - m_currentStunTime;
+}
+
+float AAlienBase::GetStunTime() const
+{
+	return  m_stunTime;
+}
+
+bool AAlienBase::Stun(float Time)
+{
+	if (!m_bCanBeStunned) return false;
+
+	if (OnStunned.IsBound())
+		OnStunned.Broadcast(Time);
+	
+	m_stunTime = Time;
+	m_currentStunTime = 0.f;
+	return true;
+}
+
+float AAlienBase::GetDamageMultiplicator(EDamageType DamageType) const
+{
+	switch (DamageType)
+	{
+	case EDamageType::MeleeSoft:
+		return m_attackMeleeSoftMultiplicator;
+	case EDamageType::MeleeHeavy:
+		return m_attackMeleeHeavyMultiplicator;
+	case EDamageType::Distance:
+		return m_attackDistanceMultiplicator;
+	case EDamageType::Explosion:
+		return m_attackExplosionMultiplicator;
+	default: return 1.f;
+	}
 }

@@ -18,8 +18,9 @@ UWaveTracker::UWaveTracker(): m_enemiesAlive(0)
 void UWaveTracker::BeginPlay()
 {
 	Super::BeginPlay();
-
+#if WITH_EDITOR
 	UE_LOG(LogTemp, Warning, TEXT("WaveTracker begin"));
+#endif
 	CheckEnemyLeft();
 }
 
@@ -28,8 +29,9 @@ void UWaveTracker::BeginPlay()
 void UWaveTracker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+#if WITH_EDITOR
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Yellow, FString::Printf(TEXT("enemies alive: %d"), m_enemiesAlive));
+#endif
 }
 
 void UWaveTracker::CheckEnemyLeft() const

@@ -14,5 +14,5 @@ AFallenCorsairGameMode::AFallenCorsairGameMode()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
-	CreateDefaultSubobject<UWaveTracker>(TEXT("WaveTracker"));
+	//CreateDefaultSubobject<UWaveTracker>(TEXT("WaveTracker"));
 }

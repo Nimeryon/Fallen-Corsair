@@ -10,7 +10,6 @@ AAlienBase::AAlienBase()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
@@ -19,6 +18,10 @@ void AAlienBase::BeginPlay()
 	Super::BeginPlay();
 
 	GetCharacterMovement()->MaxWalkSpeed = m_movementSpeed;
+	m_currentHealth = m_health;
+
+	if (OnSpawn.IsBound())
+		OnSpawn.Broadcast();
 }
 
 // Called every frame
@@ -33,3 +36,19 @@ void AAlienBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	m_currentHealth -= DamageAmount;
+	UE_LOG(LogTemp, Warning, TEXT("%d"), m_currentHealth);
+	if (m_currentHealth <= 0)
+	{
+		if (OnDeath.IsBound())
+			OnDeath.Broadcast();
+
+		if (m_destroyOnDeath)
+			Destroy();
+	}
+	
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}

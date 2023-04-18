@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "AlienBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAlienSpawn);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAlienDeath);
+
 UCLASS()
 class FALLENCORSAIR_API AAlienBase : public ACharacter
 {
@@ -26,7 +29,24 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UPROPERTY()
+	FOnAlienSpawn OnSpawn;
+	
+	UPROPERTY()
+	FOnAlienDeath OnDeath;
+	
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health", meta = (ClampMin = "1", UIMin = "1"))
+	float m_health = 15;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Health")
+	float m_currentHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health")
+	bool m_destroyOnDeath = false;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float m_movementSpeed;
 

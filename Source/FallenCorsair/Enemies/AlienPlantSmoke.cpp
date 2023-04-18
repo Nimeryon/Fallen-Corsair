@@ -9,7 +9,7 @@
 // Sets default values
 AAlienPlantSmoke::AAlienPlantSmoke()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
@@ -18,7 +18,7 @@ AAlienPlantSmoke::AAlienPlantSmoke()
 void AAlienPlantSmoke::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -36,58 +36,61 @@ void AAlienPlantSmoke::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 }
 
 float AAlienPlantSmoke::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{	
+{
 	if (Cast<AAlienBase>(DamageCauser))
 		return 0;
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	
+
 	if (!bIsAlive() && CanEffect)
 	{
 		CanEffect = false;
+		StunAlien(); // Stun all aliens at proximity
+	}
 
-		// Make explosion smoke that will stun aliens hited
-		FCollisionShape SphereShape = FCollisionShape::MakeSphere(SphereRadius);
+	return ActualDamage;
+}
 
-		TArray<FHitResult> OutHits;
-		FCollisionQueryParams QueryParams;
-		QueryParams.AddIgnoredActor(GetOwner());
-		FVector Origin = GetActorLocation();
-		GetWorld()->SweepMultiByObjectType(OutHits, Origin, Origin, FQuat::Identity, UEngineTypes::ConvertToTraceType(ECC_Visibility), SphereShape, QueryParams);
-	
-		for (auto It = OutHits.CreateIterator(); It; It++)
+void AAlienPlantSmoke::StunAlien()
+{
+	// Make explosion smoke that will stun aliens hited
+	FCollisionShape SphereShape = FCollisionShape::MakeSphere(SphereRadius);
+
+	TArray<FHitResult> OutHits;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(GetOwner());
+	FVector Origin = GetActorLocation();
+	GetWorld()->SweepMultiByObjectType(OutHits, Origin, Origin, FQuat::Identity, UEngineTypes::ConvertToTraceType(ECC_Visibility), SphereShape, QueryParams);
+
+	for (auto It = OutHits.CreateIterator(); It; It++)
+	{
+		AAlienBase* Alien = Cast<AAlienBase>((*It).GetActor());
+
+		if (Alien)
 		{
-			AAlienBase* Alien = Cast<AAlienBase>((*It).GetActor());
-
-			if (Alien)
-			{
-				// Alien.SetStun(true, StunDuration);
-			}
-		}
-
-		// Niagara Smoke
-		if (NS_Smoke)
-		{
-			// Check if the Niagara FX asset was loaded successfully
-			// Set up the spawn parameters
-			FVector SpawnLocation = GetActorLocation();
-			FVector Scale = FVector(1, 1, 1);
-			FRotator SpawnRotation = FRotator::ZeroRotator;
-
-			// Spawn the Niagara FX system at the specified location and rotation
-			UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Smoke, SpawnLocation, SpawnRotation,  Scale, true);
-		}
-
-		if (Debug)
-		{
-			FColor Color = FColor::Red;
-			if (OutHits.Num())
-				Color = FColor::Green;
-			DrawDebugSphere(GetWorld(), Origin, SphereRadius, 10, Color, false, 1, 0, 1);
+			Alien->Stun(StunDuration);
 		}
 	}
 
+	// Niagara Smoke
+	if (NS_Smoke)
+	{
+		// Check if the Niagara FX asset was loaded successfully
+		// Set up the spawn parameters
+		FVector SpawnLocation = GetActorLocation();
+		FVector Scale = FVector(1, 1, 1);
+		FRotator SpawnRotation = FRotator::ZeroRotator;
 
-    return ActualDamage;
+		// Spawn the Niagara FX system at the specified location and rotation
+		UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Smoke, SpawnLocation, SpawnRotation, Scale, true);
+	}
+
+	if (Debug)
+	{
+		FColor Color = FColor::Red;
+		if (OutHits.Num())
+			Color = FColor::Green;
+		DrawDebugSphere(GetWorld(), Origin, SphereRadius, 10, Color, false, 1, 0, 1);
+	}
 }
 

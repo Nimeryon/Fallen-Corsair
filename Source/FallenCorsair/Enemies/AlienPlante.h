@@ -23,10 +23,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dammage")
 	float Dammage = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collider Sphere")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Collider Sphere")
 	float SphereRadius = 100;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collider Sphere")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Collider Sphere")
 	bool Debug = false;
 
 

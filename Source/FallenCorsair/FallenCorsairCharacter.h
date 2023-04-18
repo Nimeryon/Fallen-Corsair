@@ -49,12 +49,14 @@ private:
 
 	/** Melee Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* MeleeAction;
+		class UInputAction* MeleeSoftAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* MeleeHeavyAction;
 
 	/** Melee Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* MeleeCancelAction;
-
 
 	// Aim Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -131,12 +133,15 @@ public:
 
 	UPROPERTY()
 	FOnAim OnAim;
+	
+	bool IsStunned = false;
 
 private:
 
 	// Chrono for melee input
 	float Melee_TriggeredSeconds = 0;
 	bool Melee_IsTrigerred = false;
+
 
 #pragma region Camera Variables
 	UPROPERTY()

@@ -2,6 +2,9 @@
 
 
 #include "Explosion.h"
+
+#include <FallenCorsair/DT_FallenCorsair.h>
+
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -9,6 +12,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Engine/DamageEvents.h"
 #include "NiagaraSystem.h"
+#include "../FallenCorsairCharacter.h"
 
 // Sets default values for this component's properties
 UExplosion::UExplosion()
@@ -61,10 +65,22 @@ void UExplosion::PerformExplosion(const UWorld* InWorld, AActor *Self, float Dam
 			
 			FVector Force = RotatedDirection * PropulsionForce;
 			CharacterHited->GetCharacterMovement()->AddImpulse(Force, true);
+			
+			AFallenCorsairCharacter* FallenCorsairCharacter = Cast<AFallenCorsairCharacter>((*It).GetActor());
+			
+			if (FallenCorsairCharacter)
+			{
+				FallenCorsairCharacter->IsStunned = true;
+			}
 
+			
 
 			// Call Take dammage of character hited
 			FDamageEvent EventDamage;
+			// UDT_FallenCorsair DamageType;
+			// DamageType.SetDamageType(EDamageType::Explosion);
+			// EventDamage.DamageTypeClass = DamageType;
+			
 			CharacterHited->TakeDamage(Dammage, EventDamage, nullptr, Self);
 		}
 	}

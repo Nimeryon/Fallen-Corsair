@@ -85,9 +85,6 @@ struct FAttackData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	float MaxDistance = 0;	
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	float TimeDilationOnHit = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	UAnimMontage* Anim;
@@ -142,6 +139,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	UAnimMontage* AnimWhileChargingMeleeHeavy;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	bool CanAirAttack = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	float delayInputDepthMeleeHeavy = 1;
@@ -208,7 +208,7 @@ private:
 
 	// Vars
 
-	class ACharacter* ownerCharacter;
+	class ACharacter* OwnerCharacter;
 
 	// To avoid multiple hit while TriggerWithSokect
 	class TArray<ACharacter*> CharactersHited;

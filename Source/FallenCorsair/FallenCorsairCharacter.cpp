@@ -113,6 +113,11 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		Melee_TriggeredSeconds += DeltaTime;
 	}
 
+	if (GetCharacterMovement()->IsMovingOnGround())
+	{
+		IsStunned = false;
+	}
+
 	
 
 #pragma region Health Recovery
@@ -226,9 +231,9 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::Look);
 
 		//Melee
-		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::MeleeTriggered);
-		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::MeleeStarted);
-		EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::MeleeCompleted);
+		EnhancedInputComponent->BindAction(MeleeSoftAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::MeleeTriggered);
+		EnhancedInputComponent->BindAction(MeleeSoftAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::MeleeStarted);
+		EnhancedInputComponent->BindAction(MeleeSoftAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::MeleeCompleted);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::MeleeSetRotation);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::MeleeResetRotation);
 
@@ -298,7 +303,6 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 
 			AddControllerYawInput(LookAxisVector.X * yawSensibility);
 			AddControllerPitchInput(LookAxisVector.Y * pitchSensibility);
-
 		}
 	}
 }
@@ -310,6 +314,9 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
 {
+	if (IsStunned)
+		return;
+
 	if (m_bIsFocus)
 		return;
 
@@ -333,6 +340,9 @@ void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 {
+	if (IsStunned)
+		return;
+
 	if(m_bIsFocus)
 	{
 		gunComp->Shoot();
@@ -357,6 +367,9 @@ void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 {
+	if (IsStunned)
+		return;
+
 	if (m_bIsFocus)
 		return;
 
@@ -388,7 +401,6 @@ void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 
 	MeleeComponent->SetReleased(true);
 }
-
 
 void AFallenCorsairCharacter::MeleeSetRotation(const FInputActionValue& Value)
 {

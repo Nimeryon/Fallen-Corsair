@@ -4,7 +4,6 @@
 #include "AlienBase.h"
 
 #include "Engine/DamageEvents.h"
-#include "FallenCorsair/DT_FallenCorsair.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -51,10 +50,10 @@ void AAlienBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,AActor* DamageCauser)
 {
 	// Calculate damage based on DamageEvent
-	UDT_FallenCorsair* damageClass = Cast<UDT_FallenCorsair>(DamageEvent.DamageTypeClass);
+	const FDamageTypeEvent* damage = static_cast<const FDamageTypeEvent*>(&DamageEvent);
 	EDamageType damageType = EDamageType::Default;
-	if (damageClass)
-		damageType = damageClass->GetDamageType();
+	if (damage)
+		damageType = damage->DamageType;
 	DamageAmount *= GetDamageMultiplicator(damageType);
 	
 	// Apply damage

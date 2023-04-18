@@ -3,7 +3,6 @@
 
 #include "Bullet.h"
 #include "Components/SphereComponent.h"
-#include "Engine/DamageEvents.h"
 #include "FallenCorsair/Enemies/AlienBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
@@ -43,7 +42,7 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 	
 	if(alien)
 	{
-		FDamageEvent DamageEvent;
+		const FDamageTypeEvent DamageEvent(EDamageType::Distance);
 		OtherActor->TakeDamage(m_dammage, DamageEvent, nullptr, this);
 	}
 	

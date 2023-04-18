@@ -114,6 +114,8 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		Melee_TriggeredSeconds += DeltaTime;
 	}
 
+	
+
 #pragma region Health Recovery
 	if(m_currentHealth < m_maxHealth)
 	{
@@ -291,10 +293,8 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 		}
 		if(m_cameraCurve)
 		{
-			AddControllerYawInput(LookAxisVector.X * yawSensibility);
-			AddControllerPitchInput(LookAxisVector.Y * pitchSensibility);
-			// AddControllerYawInput(m_cameraCurve->GetFloatValue(LookAxisVector.X) * yawSensibility);
-			// AddControllerPitchInput(m_cameraCurve->GetFloatValue(LookAxisVector.Y) * pitchSensibility);
+			AddControllerYawInput(m_cameraCurve->GetFloatValue(LookAxisVector.X) * yawSensibility);
+			AddControllerPitchInput(m_cameraCurve->GetFloatValue(LookAxisVector.Y) * pitchSensibility);
 		}
 	}
 }
@@ -332,7 +332,6 @@ void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 	if(m_bIsFocus)
 	{
 		gunComp->Shoot();
-		
 		if (OnShoot.IsBound())
 			OnShoot.Broadcast();
 

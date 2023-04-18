@@ -45,8 +45,9 @@ float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	{
 		if (OnDeath.IsBound())
 			OnDeath.Broadcast();
-		
-		Destroy();
+
+		if (m_destroyOnDeath)
+			Destroy();
 	}
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);

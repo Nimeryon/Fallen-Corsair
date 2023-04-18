@@ -36,6 +36,8 @@ public:
 	
 	UPROPERTY()
 	FOnAlienDeath OnDeath;
+
+	bool bIsAlive() const;
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health", meta = (ClampMin = "1", UIMin = "1"))

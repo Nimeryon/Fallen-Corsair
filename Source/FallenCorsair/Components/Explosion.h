@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "NiagaraSystem.h"
 #include "Explosion.generated.h"
 
 
@@ -18,7 +17,7 @@ public:
 	UExplosion();
 
 
-	void static PerformExplosion(const UWorld* InWorld, AActor *Self, float Dammage, FVector Origin, float SphereRadius, float PropulsionForce, float RotationAngleDegrees, UNiagaraSystem* NS_Explosion, bool Debug = false);
+	void static PerformExplosion(const UWorld* InWorld, AActor *Self, float Dammage, FVector Origin, float SphereRadius, float PropulsionForce, float RotationAngleDegrees, class UNiagaraSystem* NS_Explosion, bool Debug = false);
 	
 
 protected:

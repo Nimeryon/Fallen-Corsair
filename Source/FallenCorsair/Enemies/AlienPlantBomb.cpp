@@ -1,7 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Enemies/AlienPlantBomb.h"
+#include "AlienPlantBomb.h"
+#include "AlienBase.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "../Components/Explosion.h"
+#include "NiagaraSystem.h"
 
 // Sets default values
 AAlienPlantBomb::AAlienPlantBomb()
@@ -15,7 +19,6 @@ AAlienPlantBomb::AAlienPlantBomb()
 void AAlienPlantBomb::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -29,6 +32,23 @@ void AAlienPlantBomb::Tick(float DeltaTime)
 void AAlienPlantBomb::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
 
+float AAlienPlantBomb::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{	
+	AAlienBase* Alien = Cast<AAlienBase>(DamageCauser);
+	
+	if (Alien)
+		return 0;
+
+	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (!bIsAlive() && CanEffect)
+	{
+		CanEffect = false;
+		UExplosion::PerformExplosion(GetWorld(), GetOwner(), Dammage, GetOwner()->GetActorLocation(), SphereRadius, PropulsionForce, RotationAngleDegrees, NS_Explosion, Debug);
+	}
+
+    return ActualDamage;
 }
 

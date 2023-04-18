@@ -5,25 +5,22 @@
 #include "CoreMinimal.h"
 #include "AlienPlante.h"
 #include "GameFramework/Character.h"
-#include "AlienPlantBomb.generated.h"
+#include "AlienPlantSmoke.generated.h"
 
 UCLASS()
-class FALLENCORSAIR_API AAlienPlantBomb : public AAlienPlante
+class FALLENCORSAIR_API AAlienPlantSmoke : public AAlienPlante
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AAlienPlantBomb();
+	AAlienPlantSmoke();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
-	float PropulsionForce = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX Smoke")
+	float StunDuration = 60;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
-	float RotationAngleDegrees = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX Explosion")
-	class UNiagaraSystem* NS_Explosion;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX Smoke")
+	class UNiagaraSystem* NS_Smoke;
 
 protected:
 	// Called when the game starts or when spawned

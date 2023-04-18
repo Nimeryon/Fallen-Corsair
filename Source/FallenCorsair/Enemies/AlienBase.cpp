@@ -12,7 +12,14 @@ AAlienBase::AAlienBase()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
+// Public
+
+bool AAlienBase::bIsAlive() const
+{
+	return m_currentHealth > 0;
+}
+
+// Proteceted
 void AAlienBase::BeginPlay()
 {
 	Super::BeginPlay();

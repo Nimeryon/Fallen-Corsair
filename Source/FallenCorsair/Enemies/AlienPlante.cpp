@@ -3,9 +3,6 @@
 
 #include "AlienPlante.h"
 
-#include "GameFramework/CharacterMovementComponent.h"
-#include "../Components/Explosion.h"
-
 // Sets default values
 AAlienPlante::AAlienPlante()
 {
@@ -24,6 +21,18 @@ void AAlienPlante::BeginPlay()
 void AAlienPlante::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!bIsAlive())
+	{
+		ReviveTimer += DeltaTime;
+	}
+
+	if (ReviveTimer >= ReviveCooldown)
+	{
+		CanEffect = true;
+		m_currentHealth = m_health;
+		ReviveTimer = 0;
+	}
 }
 
 // Called to bind functionality to input
@@ -34,19 +43,6 @@ void AAlienPlante::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 float AAlienPlante::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {	
-
-	if (CanExplose)
-	{
-		AAlienBase* Alien = Cast<AAlienBase>(DamageCauser);
-		
-		if (Alien)
-		{
-			return 0;
-		}
-
-		CanExplose = false;
-		UExplosion::PerformExplosion(GetWorld(), GetOwner(), Dammage, GetOwner()->GetActorLocation(), SphereRadius, PropulsionForce, RotationAngleDegrees, NS_Explosion, Debug);
-	}
 
     return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }

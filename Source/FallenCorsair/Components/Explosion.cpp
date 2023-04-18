@@ -8,6 +8,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Engine/DamageEvents.h"
+#include "NiagaraSystem.h"
 
 // Sets default values for this component's properties
 UExplosion::UExplosion()
@@ -68,7 +69,7 @@ void UExplosion::PerformExplosion(const UWorld* InWorld, AActor *Self, float Dam
 		}
 	}
 
-	// Niagara
+	// Niagara Explosion
 	if (NS_Explosion)
 	{
 		// Check if the Niagara FX asset was loaded successfully

@@ -73,7 +73,6 @@ AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& Objec
 	MeleeTargetingComponent = CreateDefaultSubobject<UMeleeTargeting>(TEXT("MeleeTargetingComponnent"));
 
 
-
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -293,8 +292,13 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 		}
 		if(m_cameraCurve)
 		{
-			AddControllerYawInput(m_cameraCurve->GetFloatValue(LookAxisVector.X) * yawSensibility);
-			AddControllerPitchInput(m_cameraCurve->GetFloatValue(LookAxisVector.Y) * pitchSensibility);
+
+			// AddControllerYawInput(m_cameraCurve->GetFloatValue(LookAxisVector.X) * yawSensibility);
+			// AddControllerPitchInput(m_cameraCurve->GetFloatValue(LookAxisVector.Y) * pitchSensibility);
+
+			AddControllerYawInput(LookAxisVector.X * yawSensibility);
+			AddControllerPitchInput(LookAxisVector.Y * pitchSensibility);
+
 		}
 	}
 }

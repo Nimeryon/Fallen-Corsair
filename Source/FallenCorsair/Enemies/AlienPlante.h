@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "AlienBase.h"
-#include "NiagaraSystem.h"
 #include "AlienPlante.generated.h"
 
 UCLASS()
@@ -18,31 +17,24 @@ public:
 	// Sets default values for this character's properties
 	AAlienPlante();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Plant Revive")
+	float ReviveCooldown = 60;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dammage")
 	float Dammage = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
-	float PropulsionForce = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
-	float RotationAngleDegrees = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collider Sphere")
 	float SphereRadius = 100;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
-	UNiagaraSystem* NS_Explosion;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collider Sphere")
 	bool Debug = false;
-
-	bool CanExplose = true;
-
 
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	bool CanEffect = true; // Permit the plant to explose or gaz
 
 public:	
 	// Called every frame
@@ -51,7 +43,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
-
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+private:
+	float ReviveTimer = 0;
 };

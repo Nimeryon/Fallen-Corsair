@@ -72,6 +72,13 @@ private:
 
 	float ConvDegreeTo360(float Degree);
 	bool TurnOnLeft(float CurrentDegree, float DegreeToReach, float fMin, float fMax);
+	
 	bool IsMovingToActorTarget = false;
+	bool IsObstabcle(class AActor *Actor);
+
+
+	// To avoid any bug while melee targeting
+	float MaxTimeTargeting = 0.3; // Secondes
+	float CurrentTimeTargeting = 0;
 
 };

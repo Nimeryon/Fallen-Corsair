@@ -94,9 +94,12 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 	// Called for melee input
-	void MeleeTriggered(const FInputActionValue& Value);
-	void MeleeStarted(const FInputActionValue& Value);
-	void MeleeCompleted(const FInputActionValue& Value);
+	void MeleeSoftStarted(const FInputActionValue& Value);
+
+	void MeleeHeavyStarted(const FInputActionValue& Value);
+	void MeleeHeavyCompleted(const FInputActionValue& Value);
+	void MeleeHeavyTriggered(const FInputActionValue& Value);
+
 	void MeleeSetRotation(const FInputActionValue& Value);
 	void MeleeResetRotation(const FInputActionValue& Value);
 
@@ -138,9 +141,13 @@ public:
 
 private:
 
+#pragma region Camera Variables
+
+
 	// Chrono for melee input
 	float Melee_TriggeredSeconds = 0;
 	bool Melee_IsTrigerred = false;
+#pragma endregion 
 
 
 #pragma region Camera Variables

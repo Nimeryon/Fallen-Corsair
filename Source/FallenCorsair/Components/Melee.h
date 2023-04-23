@@ -4,10 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Animation/AnimMontage.h"
-#include "InputActionValue.h"
 #include "Melee.generated.h"
-
 
 UENUM()
 enum class EMeleeCollisionShape
@@ -155,25 +152,27 @@ public:
 	virtual void PlayAnimationChargingMeleeHeavy();
 	virtual void StopAnimationChargingMeleeHeavy();
 	virtual void SetTypeAttack(EAttackType at);
-	virtual void StartAttack(bool start);
+	virtual void StartAttack(bool start, bool _bFreezeAnimation = false);
 	virtual void UpdateTypeAttack(float& eslapsedSeconds);
 	virtual void SetReleased(bool released);
 	virtual void SetOwnerModeAttack(bool ModeAttack);
 	virtual void CancelAttack();
-	virtual bool MeleeIsValid();
-	virtual bool AttackIsStarted();
-	virtual bool IsReleased() const;
 	virtual void CalculRotation(FVector _rot);
 	virtual void ResetRotation();
 	virtual void ResetCombo();
-	virtual bool IsFirstCombo();
-	virtual bool IsLastCombo();
+	virtual void ResumeAnimation();
+
+	virtual bool AttackIsStarted() const;
+	virtual bool MeleeIsValid() const;
+	virtual bool IsReleased() const;
+	virtual bool IsFirstCombo() const;
+	virtual bool IsLastCombo() const;
+	virtual bool MeleeIsHeavy() const;
+	virtual bool MeleeEnded() const;
 
 
 	UFUNCTION(BlueprintCallable, Category = Properties)
 	void TriggerHitWithSockets();
-
-
 
 protected:
 	// Called when the game starts
@@ -216,10 +215,10 @@ private:
 	// To disabled Character walk
 	float MaxWalkSpeed;
 	float MinWalkSpeed;
+	int indexCurrentAttack = 0;
 
 	EAttackType attackType = EAttackType::Soft;
 
-	int indexCurrentAttack = 0;
 
 	bool bCanAttack = true;
 	bool bCanExecuteNextAttack = false;
@@ -227,6 +226,10 @@ private:
 	bool bAttackStarted = false;
 	bool bInputReleased = false;
 	bool bIsDeleguate = false;
+	bool bMeleeEnded = false;
+	bool bFreezeAnimation = false;
 	FRotator RotatorWhileAttackStarted;
+
+	UAnimMontage* MontageToPlay;
 
 };

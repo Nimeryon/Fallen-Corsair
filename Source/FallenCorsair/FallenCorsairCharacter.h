@@ -116,6 +116,9 @@ public:
 	UFUNCTION()
 	void Charge(const FInputActionValue& value);
 
+	UFUNCTION()
+	TArray<AActor*> SetIgnoreCharacterActors();
+
 	UPROPERTY()
 	FOnShoot OnShoot;
 

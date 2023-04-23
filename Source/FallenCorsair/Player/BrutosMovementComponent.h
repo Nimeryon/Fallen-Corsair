@@ -26,22 +26,56 @@ class FALLENCORSAIR_API UBrutosMovementComponent : public UCharacterMovementComp
 	UPROPERTY()
 	class AFallenCorsairCharacter* m_ownerRef;
 
-	UPROPERTY()
-	bool m_bIsSprint = false;
-
 	/**
 	 * Dash
 	 */
+#pragma region Dash Variable
+	
+	UPROPERTY()
+	bool m_bCanDash = true;
+
+	UPROPERTY()
+	bool m_bIsDashing = false;
+
+	UPROPERTY()
+	bool m_bIsEdge = false;
+	
 	UPROPERTY(EditDefaultsOnly)
 	float m_dashCD = 1.f;
 
 	UPROPERTY(EditDefaultsOnly)
 	float m_impulse = 1000.f;
 
-	UPROPERTY()
-	bool m_bCanDash = true;
+	UPROPERTY(EditDefaultsOnly)
+	FVector m_startLoc;
+
+	UPROPERTY(EditDefaultsOnly)
+	FVector m_newLoc;
+
+	UPROPERTY(EditDefaultsOnly)
+	float m_groundDistance = 150.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float m_maxDistance = 300.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float m_actualDistance;
+
+	UPROPERTY(EditDefaultsOnly)
+	float m_dashTime = 0.5f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float m_maxAngleSlope = 45.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float m_invicibleTimePercent = 30.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float m_slowMoRate = 10.f;
 
 	FTimerHandle m_dashTimer;
+
+#pragma endregion 
 	
 public:
 	UBrutosMovementComponent();
@@ -59,10 +93,22 @@ public:
 	void PerformDash();
 
 	UFUNCTION()
+	void StartDash();
+
+	UFUNCTION()
+	void StopDash();
+	
+	UFUNCTION()
+	void DetectEdge();
+
+	UFUNCTION()
 	void DashCD();
 
 	UFUNCTION()
 	void DashPressed();
+
+	UFUNCTION()
+	void PhysDash(float deltaTime, int32 Iterations);
 	
 	UFUNCTION()
 	bool IsCustomMovementMode(EMyCustomMovementMode InCustomMovementMode) const;

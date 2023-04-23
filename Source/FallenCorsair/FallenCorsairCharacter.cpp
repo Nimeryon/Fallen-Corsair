@@ -208,14 +208,17 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 
 void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 {
-	// if(GetVelocity().Z == 0)
-	// {
-	// 	BrutosMovementComponent->StopMovementImmediately();
-	// 	Jump();
-	// 	BrutosMovementComponent->AirControl = 0.f;
-	// }
+	BrutosMovementComponent->DashPressed();
+}
 
-	
+TArray<AActor*> AFallenCorsairCharacter::SetIgnoreCharacterActors()
+{
+	TArray<AActor*> ActorToIgnore;
+	TArray<AActor*> CharacterChildren;
+	ActorToIgnore.Add(this);
+	GetAllChildActors(CharacterChildren);
+
+	return ActorToIgnore;
 }
 
 //////////////////////////////////////////////////////////////////////////

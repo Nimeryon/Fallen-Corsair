@@ -72,7 +72,8 @@ void ABullet::Tick(float DeltaTime)
 void ABullet::Explosion()
 {
 	projectileMovement->StopMovementImmediately();
-	bulletMesh->DestroyComponent();
+	if (bulletMesh)
+		bulletMesh->DestroyComponent();
 	dammageCollision->SetWorldScale3D(FVector(m_dammageRadius));
 	SetLifeSpan(0.2f);
 }

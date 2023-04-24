@@ -71,7 +71,7 @@ AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& Objec
 	// Create Melee Component
 	MeleeComponent = CreateDefaultSubobject<UMelee>(TEXT("MeleeComponnent"));
 	MeleeTargetingComponent = CreateDefaultSubobject<UMeleeTargeting>(TEXT("MeleeTargetingComponnent"));
-
+ 
 
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 

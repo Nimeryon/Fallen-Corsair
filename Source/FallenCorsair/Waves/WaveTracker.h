@@ -28,7 +28,11 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// Check if the number of enemies is under the set minimum
+	UFUNCTION()
 	void CheckEnemyLeft() const;
+
+	UFUNCTION()
+	void OnEnemyDeath();
 
 public:
 	UPROPERTY(BlueprintAssignable)

@@ -5,7 +5,7 @@
 
 #include "WaveTracker.h"
 #include "WaveZone.h"
-#include "FallenCorsair/Enemies/GroundAlien.h"
+#include "FallenCorsair/Enemies/AlienBase.h"
 #include "FallenCorsair/FallenCorsairGameMode.h"
 
 // Sets default values for this component's properties
@@ -64,7 +64,10 @@ void UWaveSpawner::SpawnEnemy()
 		SpawnParams.Instigator = Cast<APawn>(GetOwner());
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParams.bNoFail = true;
-		AActor* spawnedActor = GetWorld()->SpawnActor<AActor>(m_waveZoneOwner->GetAlienToSpawn(), GetSpawnLocation(), FRotator::ZeroRotator, SpawnParams);
+		
+		AAlienBase* spawnedActor = GetWorld()->SpawnActor<AAlienBase>(m_waveZoneOwner->GetAlienToSpawn(), GetSpawnLocation(), FRotator::ZeroRotator, SpawnParams);
+		
+		spawnedActor->OnDeath.AddDynamic(this->m_waveTracker, &UWaveTracker::OnEnemyDeath);
 	}
 #if WITH_EDITOR
 	else if (!m_waveZoneOwner)

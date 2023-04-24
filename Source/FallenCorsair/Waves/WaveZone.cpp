@@ -6,6 +6,7 @@
 #include "WaveTracker.h"
 #include "Components/BoxComponent.h"
 #include "FallenCorsair/FallenCorsairCharacter.h"
+#include "FallenCorsair/Enemies/AlienBase.h"
 
 // Sets default values
 AWaveZone::AWaveZone(): m_player(nullptr), m_bIsPlayerInZone(false)
@@ -71,7 +72,7 @@ void AWaveZone::OnPlayerSpawn()
 	m_bIsPlayerInZone = m_collisionBox->IsOverlappingActor(m_player);
 }
 
-TSubclassOf<AGroundAlien> AWaveZone::GetAlienToSpawn() const
+TSubclassOf<AAlienBase> AWaveZone::GetAlienToSpawn() const
 {
 	float totalRatio = 0.f;
 
@@ -80,7 +81,7 @@ TSubclassOf<AGroundAlien> AWaveZone::GetAlienToSpawn() const
 		totalRatio += enemy.Ratio;
 	}
 	
-	float random = FMath::FRandRange(0.f, 1.f) * totalRatio;
+	const float random = FMath::FRandRange(0.f, 1.f) * totalRatio;
 	
 	float ratio = 0.f;
 	for (const FEnemies& enemy : m_enemies)

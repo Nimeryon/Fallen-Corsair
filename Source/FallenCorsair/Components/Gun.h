@@ -25,6 +25,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
+
+#pragma region Variables
 	/**
 	 * This Is The Current Slot Of Ammo
 	 */
@@ -43,15 +45,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Gun", meta = (ClampMin = 1, UIMin = 1), meta = (displayName = "Coût tir simple"))
 	int m_ammoCost = 1;
 
-	/**
-	 * This Is The Cost Of A Super Shot (base 3)
-	 */
-	UPROPERTY(EditAnywhere, Category = "Gun", meta = (ClampMin = 1, UIMin = 1), meta = (displayName = "Coût tir puissant"))
-	int m_superAmmoCost = 3;
-
 	UPROPERTY()
 	float m_distance;
 
+	UPROPERTY()
+	class ABullet* m_spawnBullet;
+	
 	/**
 	 * Place the BP_Bullet, Nothing else
 	 */
@@ -78,9 +77,14 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Taille du projectile"), meta = (ClampMin = 0.5, UIMin = 0.5, ClampMax = 3, UIMax = 3))
 	float m_bulletRadius = 0.5f;
+	
+	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Vitesse de chargement"), meta = (ClampMin = 0.1, UIMin = 0.1, ClampMax = 10, UIMax = 10))
+	float m_ChargeSpeed = 1.f;
 
 	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Socket spawn location"))
 	FName m_socketLoc;
+
+#pragma endregion 
 	
 public:
 	UFUNCTION()
@@ -89,11 +93,10 @@ public:
 	UFUNCTION()
 	void SetAmmo(int newAmmo);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void Shoot();
 
 	UFUNCTION()
-	void SuperShoot();
-
+	void StopCharge(bool bIsCancel);
 	
 };

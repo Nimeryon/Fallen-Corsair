@@ -71,6 +71,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UGun* gunComp;
 
+	UPROPERTY(EditDefaultsOnly)
+	class UDashComponent* dashComp;
+
 protected:
 
 	

@@ -4,6 +4,7 @@
 
 #include "Components/Barrel.h"
 #include "Components/Gun.h"
+#include "Components/DashComponent.h"
 #include "Components/Melee.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -63,6 +64,8 @@ AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& Objec
 	barrelComp = CreateDefaultSubobject<UBarrel>(TEXT("BarrelComponnent"));
 	// Create Gun Component
 	gunComp = CreateDefaultSubobject<UGun>(TEXT("GunComponnent"));
+	// Create Dash Component
+	dashComp = CreateDefaultSubobject<UDashComponent>(TEXT("DashComponnent"));
 
 	GetFollowCamera()->SetRelativeLocation(FVector(0,m_CameraOffset_S.X,m_CameraOffset_S.Y));
 
@@ -202,13 +205,15 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 	}
 	else
 	{
+		gunComp->StopCharge(true);
 		m_direction = -1.f;
 	}
 }
 
 void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 {
-	BrutosMovementComponent->DashPressed();
+	//BrutosMovementComponent->DashPressed();
+	dashComp->DashPressed();
 }
 
 TArray<AActor*> AFallenCorsairCharacter::SetIgnoreCharacterActors()
@@ -373,7 +378,10 @@ void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 			MeleeComponent->StartAttack(true);
 		}
 	}
-	
+	else
+	{
+		gunComp->StopCharge(false);
+	}
 }
 
 //

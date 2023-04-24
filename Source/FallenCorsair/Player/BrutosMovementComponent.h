@@ -31,49 +31,49 @@ class FALLENCORSAIR_API UBrutosMovementComponent : public UCharacterMovementComp
 	 */
 #pragma region Dash Variable
 	
-	UPROPERTY()
-	bool m_bCanDash = true;
-
-	UPROPERTY()
-	bool m_bIsDashing = false;
-
-	UPROPERTY()
-	bool m_bIsEdge = false;
-	
-	UPROPERTY(EditDefaultsOnly)
-	float m_dashCD = 1.f;
-
-	UPROPERTY(EditDefaultsOnly)
-	float m_impulse = 1000.f;
-
-	UPROPERTY(EditDefaultsOnly)
-	FVector m_startLoc;
-
-	UPROPERTY(EditDefaultsOnly)
-	FVector m_newLoc;
-
-	UPROPERTY(EditDefaultsOnly)
-	float m_groundDistance = 150.f;
-
-	UPROPERTY(EditDefaultsOnly)
-	float m_maxDistance = 300.f;
-
-	UPROPERTY(EditDefaultsOnly)
-	float m_actualDistance;
-
-	UPROPERTY(EditDefaultsOnly)
-	float m_dashTime = 0.5f;
-
-	UPROPERTY(EditDefaultsOnly)
-	float m_maxAngleSlope = 45.f;
-
-	UPROPERTY(EditDefaultsOnly)
-	float m_invicibleTimePercent = 30.f;
-
-	UPROPERTY(EditDefaultsOnly)
-	float m_slowMoRate = 10.f;
-
-	FTimerHandle m_dashTimer;
+	// UPROPERTY()
+	// bool m_bCanDash = true;
+	//
+	// UPROPERTY()
+	// bool m_bIsDashing = false;
+	//
+	// UPROPERTY()
+	// bool m_bIsEdge = false;
+	//
+	// UPROPERTY(EditDefaultsOnly)
+	// float m_dashCD = 1.f;
+	//
+	// UPROPERTY(EditDefaultsOnly)
+	// float m_impulse = 1000.f;
+	//
+	// UPROPERTY(EditDefaultsOnly)
+	// FVector m_startLoc;
+	//
+	// UPROPERTY(EditDefaultsOnly)
+	// FVector m_newLoc;
+	//
+	// UPROPERTY(EditDefaultsOnly)
+	// float m_groundDistance = 150.f;
+	//
+	// UPROPERTY(EditDefaultsOnly)
+	// float m_maxDistance = 300.f;
+	//
+	// UPROPERTY(EditDefaultsOnly)
+	// float m_actualDistance;
+	//
+	// UPROPERTY(EditDefaultsOnly)
+	// float m_dashTime = 0.5f;
+	//
+	// UPROPERTY(EditDefaultsOnly)
+	// float m_maxAngleSlope = 45.f;
+	//
+	// UPROPERTY(EditDefaultsOnly)
+	// float m_invicibleTimePercent = 30.f;
+	//
+	// UPROPERTY(EditDefaultsOnly)
+	// float m_slowMoRate = 10.f;
+	//
+	// FTimerHandle m_dashTimer;
 
 #pragma endregion 
 	
@@ -81,6 +81,9 @@ public:
 	UBrutosMovementComponent();
 
 protected:
+
+	
+	
 	virtual void OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity) override;
 
 	virtual void InitializeComponent() override;
@@ -89,27 +92,27 @@ protected:
 	 
 public:
 	
-	UFUNCTION()
-	void PerformDash();
-
-	UFUNCTION()
-	void StartDash();
-
-	UFUNCTION()
-	void StopDash();
-	
-	UFUNCTION()
-	void DetectEdge();
-
-	UFUNCTION()
-	void DashCD();
-
-	UFUNCTION()
-	void DashPressed();
-
-	UFUNCTION()
-	void PhysDash(float deltaTime, int32 Iterations);
-	
-	UFUNCTION()
-	bool IsCustomMovementMode(EMyCustomMovementMode InCustomMovementMode) const;
+	// UFUNCTION()
+	// void PerformDash();
+	//
+	// UFUNCTION()
+	// void StartDash();
+	//
+	// UFUNCTION()
+	// void StopDash();
+	//
+	// UFUNCTION()
+	// void DetectEdge();
+	//
+	// UFUNCTION()
+	// void DashCD();
+	//
+	// UFUNCTION()
+	// void DashPressed();
+	//
+	// UFUNCTION()
+	// void PhysDash(float deltaTime);
+	//
+	// UFUNCTION()
+	// bool IsCustomMovementMode(EMyCustomMovementMode InCustomMovementMode) const;
 };

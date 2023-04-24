@@ -44,6 +44,7 @@ void UGun::BeginPlay()
 void UGun::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
 
 	// ...
 }
@@ -80,17 +81,24 @@ void UGun::Shoot()
 		FActorSpawnParameters SpawnInfo;
 		if(m_bullet)
 		{
-			/// spawn bullet, rotation base on camera rotation
-			GetWorld()->SpawnActor<ABullet>(m_bullet, start, m_ownerRef->GetFollowCamera()->GetComponentRotation(), SpawnInfo)
-			->SetBulletSetting(m_bulletSpeed,m_bulletDammage, m_bulletDammageRadius, m_bulletLifeSpan, m_bulletRadius);
+			m_spawnBullet = GetWorld()->SpawnActor<ABullet>(m_bullet, start, m_ownerRef->GetFollowCamera()->GetComponentRotation(), SpawnInfo);
+			m_spawnBullet->SetBulletSetting(m_bulletSpeed,m_bulletDammage, m_bulletDammageRadius, m_bulletLifeSpan, m_bulletRadius, m_ChargeSpeed, m_ownerRef);
+			
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Shoot"));
-		m_gunAmmo -= m_ammoCost;
-		m_barrelRef->SetSlot(m_gunAmmo);
 	}
 }
 
-void UGun::SuperShoot()
+void UGun::StopCharge(bool bIsCancel)
 {
-	/// special AOE attack
+	if(m_spawnBullet && !m_spawnBullet->GetIsBulletCharge() || bIsCancel)
+	{
+		m_spawnBullet->Destroy();
+	}
+	else if(m_spawnBullet->GetIsBulletCharge())
+	{
+		m_gunAmmo -= m_ammoCost;
+		m_barrelRef->SetSlot(m_gunAmmo);
+		m_spawnBullet->LaunchBullet();
+	}
 }

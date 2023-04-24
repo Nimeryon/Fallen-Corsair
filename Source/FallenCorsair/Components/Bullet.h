@@ -10,6 +10,8 @@ UCLASS()
 class FALLENCORSAIR_API ABullet : public AActor
 {
 	GENERATED_BODY()
+
+	
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
 	class UStaticMeshComponent* bulletMesh;
@@ -39,11 +41,39 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+
+	UPROPERTY()
+	class AFallenCorsairCharacter* m_ownerRef;
+
+	UPROPERTY()
+	bool m_bIsFullyCharge = false;
+
+	UPROPERTY()
+	bool m_bIsBulletLaunch = false;
+	
 	UPROPERTY()
 	float m_dammageRadius = 5.f;
 
 	UPROPERTY()
 	int m_dammage = 1;
+
+	UPROPERTY()
+	bool m_bIsCharging = true;
+
+	UPROPERTY()
+	float m_lifeSpan;
+
+	UPROPERTY()
+	float m_bulletRadius;
+
+	UPROPERTY()
+	float m_bulletSpeed;
+
+	UPROPERTY()
+	float m_chargeSpeed = 1.f;
+
+	UPROPERTY()
+	float m_currentCharge = 0;
 
 public:	
 	// Called every frame
@@ -53,6 +83,12 @@ public:
 	void Explosion();
 
 	UFUNCTION()
-	void SetBulletSetting(float bulletSpeed, int dammage, float dammageRadius, int lifeSpan, float bulletRadius);
+	void SetBulletSetting(float bulletSpeed, int dammage, float dammageRadius, int lifeSpan, float bulletRadius, float chargeSpeed, AFallenCorsairCharacter* character);
+
+	UFUNCTION()
+	void LaunchBullet();
+
+	UFUNCTION()
+	bool GetIsBulletCharge();
 	
 };

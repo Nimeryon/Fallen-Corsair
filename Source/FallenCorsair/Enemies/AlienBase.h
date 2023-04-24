@@ -3,15 +3,37 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FallenCorsair/DT_FallenCorsair.h"
+#include "Engine/DamageEvents.h"
 #include "GameFramework/Character.h"
 #include "AlienBase.generated.h"
-
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAlienSpawn);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAlienDeath);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAlienStunned, float, Time);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAlienDamaged, float, Damage);
+
+#pragma region DamageType
+UENUM()
+enum class EDamageType
+{
+	MeleeSoft,
+	MeleeHeavy,
+	Distance,
+	Explosion,
+	Default
+};
+
+USTRUCT()
+struct FDamageTypeEvent : public FDamageEvent
+{
+	GENERATED_USTRUCT_BODY();
+	
+	FDamageTypeEvent(EDamageType Type = EDamageType::Default) : DamageType(Type) {};
+
+	UPROPERTY(EditAnywhere)
+	EDamageType DamageType;
+};
+#pragma endregion 
 
 UCLASS()
 class FALLENCORSAIR_API AAlienBase : public ACharacter

@@ -2,6 +2,7 @@
 
 
 #include "WaveTracker.h"
+#include "FallenCorsair/Enemies/AlienBase.h"
 
 // Sets default values for this component's properties
 UWaveTracker::UWaveTracker(): m_enemiesAlive(0)
@@ -18,6 +19,7 @@ UWaveTracker::UWaveTracker(): m_enemiesAlive(0)
 void UWaveTracker::BeginPlay()
 {
 	Super::BeginPlay();
+	
 #if WITH_EDITOR
 	UE_LOG(LogTemp, Warning, TEXT("WaveTracker begin"));
 #endif
@@ -40,5 +42,17 @@ void UWaveTracker::CheckEnemyLeft() const
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Wave Over broadcast"));
 		OnWaveOver.Broadcast();
+	}
+}
+
+void UWaveTracker::OnEnemyDeath()
+{
+#if WITH_EDITOR
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.f, FColor::Yellow, FString::Printf(TEXT("enemy died")));
+#endif
+	if(m_enemiesAlive > 0)
+	{
+		--m_enemiesAlive;
+		CheckEnemyLeft();
 	}
 }

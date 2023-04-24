@@ -13,7 +13,7 @@ struct FEnemies
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, Category = "Enemy")
-	TSubclassOf<class AGroundAlien> Enemy;
+	TSubclassOf<class AAlienBase> Enemy;
 	
 	UPROPERTY(EditAnywhere, Category = "Enemy", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float Ratio;
@@ -49,7 +49,7 @@ public:
 	void OnPlayerSpawn();
 
 	UFUNCTION()
-	TSubclassOf<class AGroundAlien> GetAlienToSpawn() const;
+	TSubclassOf<class AAlienBase> GetAlienToSpawn() const;
 
 protected:
 	UPROPERTY()

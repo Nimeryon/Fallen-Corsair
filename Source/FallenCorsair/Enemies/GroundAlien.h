@@ -19,12 +19,20 @@ class FALLENCORSAIR_API AGroundAlien : public AAlienBase
 	GENERATED_BODY()
 
 public:
-	AGroundAlien(const FObjectInitializer& ObjectInitializer);
+	virtual void Destroyed() override;
 
+	virtual void BeginPlay() override;
+	
 	virtual void Tick(float DeltaSeconds) override;
-
+	
 	UFUNCTION()
+	virtual void OnNotifyReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
+	
+	UFUNCTION(BlueprintCallable)
 	virtual bool Attack(AActor* Target);
+
+	UFUNCTION(BlueprintCallable)
+	virtual bool CreateAvoidBox();
 	
 	UFUNCTION()
 	virtual AlienState GetState() const;
@@ -33,11 +41,6 @@ public:
 	virtual void SetState(AlienState State);
 	
 public:
-#pragma region Components
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	class UMelee* m_meleeComponent;
-#pragma endregion
-
 #pragma region State
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	AlienState m_state = AlienState::Normal;
@@ -70,6 +73,20 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attack")
 	AActor* m_attackTarget = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+	FVector m_attackBoxSize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+	FVector m_attackBoxOffset;
+#pragma endregion
+
+#pragma region Hit Chance
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit Chance", meta = (ClampMin = "0", UIMin = "0"))
+	FVector m_avoidBoxSize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit Chance", meta = (ClampMin = "0", UIMin = "0"))
+	FVector m_avoidBoxOffset;
 #pragma endregion
 
 #pragma region Jump Attack
@@ -79,4 +96,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack", meta = (ClampMin = "0", UIMin = "0"))
 	float m_attackJumpSpeed;
 #pragma endregion
+
+private:
+	UAnimInstance* GetAnimInstance() const;
 };

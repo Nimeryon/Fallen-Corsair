@@ -97,7 +97,6 @@ struct FAttackData
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	class USoundBase* AttackSound;
-
 };
 
 USTRUCT(BlueprintType)
@@ -189,7 +188,6 @@ protected:
 	virtual void DammageOnHits(TArray<FHitResult> OutHits);
 
 private:
-
 	// Functions
 	void TriggerHitWithCollisionShape();
 

@@ -58,6 +58,9 @@ protected:
 	UPROPERTY()
 	bool m_bIsPlayerInZone;
 
+	UPROPERTY(EditDefaultsOnly)
+	class UWaveTracker* m_waveTracker;
+
 	UPROPERTY(BlueprintReadWrite)
 	UBoxComponent* m_collisionBox= CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 

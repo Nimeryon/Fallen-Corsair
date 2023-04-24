@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "FallenCorsair/Configs/FallenCorsairSettings.h"
 #include "WaveTracker.generated.h"
 
 // Event dispatcher OnWaveOver
@@ -35,12 +36,11 @@ public:
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")
-	int m_maxEnemies = 199;
+	int m_maxEnemies = UConfigUtils::GetMaxAICount();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")
-	int m_minEnemies = 100;
+	int m_minEnemies = UConfigUtils::GetMaxAICount()/2;
 
 	UPROPERTY()
 	int m_enemiesAlive;
-		
 };

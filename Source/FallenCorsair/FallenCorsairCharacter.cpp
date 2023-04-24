@@ -177,7 +177,6 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		MeleeTargetingComponent->TargetReached = false;
 		
 		// Perform the first attack combo
-		MeleeComponent->ResetRotation();
 		MeleeComponent->ResumeAnimation();
 	}
 
@@ -423,7 +422,7 @@ void AFallenCorsairCharacter::MeleeSetRotation(const FInputActionValue& Value)
 	FVector2D MovementVector = Value.Get<FVector2D>();
 	FVector MovementVector3D = FVector(MovementVector.Y, MovementVector.X, 0);
 	MeleeComponent->CalculRotation(MovementVector3D);
-	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_Vector2dToString(MovementVector));
+	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_Vector2dToString(MovementVector));
 }
 
 void AFallenCorsairCharacter::MeleeResetRotation(const FInputActionValue& Value)

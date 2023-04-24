@@ -13,6 +13,8 @@
 #include "GameFramework/Character.h"
 #include "Animation/AnimInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "FallenCorsair/Enemies/AlienBase.h"
+
 
 // Sets default values for this component's properties
 UMelee::UMelee()
@@ -230,10 +232,15 @@ void UMelee::CancelAttack()
 void UMelee::CalculRotation(FVector _rot)
 {
 	AFallenCorsairCharacter* c = Cast<AFallenCorsairCharacter>(OwnerCharacter);
+
+	if (!c)
+		return;
+
 	FVector rot = c->GetCameraBoom()->GetTargetRotation().RotateVector(_rot);
 	rot.Normalize();
 	FRotator rotation = UKismetMathLibrary::MakeRotFromX(rot);
 	RotatorWhileAttackStarted = FRotator(0, rotation.Yaw, 0);
+	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_RotatorToString(RotatorWhileAttackStarted));
 }
 
 bool UMelee::AttackIsStarted() const
@@ -511,11 +518,23 @@ void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
 			DammageValue = UKismetMathLibrary::FCeil(DammageValue);
 			
 			// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, CharacterHited->GetName());
-			//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, TEXT("Distance : ") + UKismetStringLibrary::Conv_FloatToString(Distance));
-			//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, TEXT("Dammage : ") +UKismetStringLibrary::Conv_FloatToString(DammageValue));
-			FDamageEvent EventDamage;
-			// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_FloatToString(DammageValue));
-			CharacterHited->TakeDamage(DammageValue, EventDamage, nullptr, GetOwner());
+			FDamageTypeEvent DamageEvent;
+
+			switch (attackType)
+			{
+			case EAttackType::Soft:
+					DamageEvent.DamageType = EDamageType::MeleeSoft;
+					break;
+				case EAttackType::Heavy:
+					DamageEvent.DamageType = EDamageType::MeleeHeavy;
+					break;
+				default:
+					DamageEvent.DamageType = EDamageType::MeleeSoft;
+			}
+ 
+			// FDamageEvent EventDamage;
+			// CharacterHited->TakeDamage(DammageValue, EventDamage, nullptr, GetOwner());
+			CharacterHited->TakeDamage(DammageValue, DamageEvent, nullptr, GetOwner());
 		}
 	}
 }
@@ -623,6 +642,8 @@ void UMelee::TriggerHitWithSockets()
 void UMelee::SetRotation()
 {
 	OwnerCharacter->SetActorRotation(RotatorWhileAttackStarted);
+	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, UKismetStringLibrary::Conv_RotatorToString(RotatorWhileAttackStarted));
+
 }
 
 void UMelee::FreezeRotation(bool freeze)
@@ -674,7 +695,7 @@ void UMelee::AttackSequence()
 	EnableWalk(false);
 	bMeleeEnded = false;
 
-	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_IntToString(indexCurrentAttack));
+	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_IntToString(indexCurrentAttack));
 
 	// Play Animation
 	if (OwnerCharacter->GetMesh())

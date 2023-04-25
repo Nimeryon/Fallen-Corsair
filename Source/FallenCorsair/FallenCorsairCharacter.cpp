@@ -329,6 +329,7 @@ void AFallenCorsairCharacter::MeleeSoftStarted(const FInputActionValue& Value)
 	if(m_bIsFocus)
 	{
 		gunComp->Shoot();
+		
 		if (OnShoot.IsBound())
 			OnShoot.Broadcast();
 

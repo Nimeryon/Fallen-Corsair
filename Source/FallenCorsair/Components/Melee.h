@@ -193,6 +193,9 @@ protected:
 	UFUNCTION()
 	virtual void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
+	UFUNCTION()
+	virtual void OnMontageBlendOut(UAnimMontage* Montage, bool bInterrupted);
+
 	// Reaction to elements hited
 	virtual void DammageOnHits(TArray<FHitResult> OutHits);
 

@@ -6,6 +6,7 @@
 #include "FallenCorsair/Enemies/AlienBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "../FallenCorsairCharacter.h"
+#include "Kismet/KismetStringLibrary.h"
 
 // Sets default values
 ABullet::ABullet()
@@ -32,7 +33,7 @@ ABullet::ABullet()
 void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Hit"));
+	// UE_LOG(LogTemp, Warning, TEXT("Hit"));
 
 	if (Cast<AFallenCorsairCharacter>(OtherActor))
 		return;
@@ -41,7 +42,7 @@ void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrim
 
 	if(alien)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hit Bullet"));
+		// UE_LOG(LogTemp, Warning, TEXT("Hit Bullet"));
 		const FDamageTypeEvent DamageEvent(EDamageType::Distance);
 		OtherActor->TakeDamage(m_dammage, DamageEvent, nullptr, this);
 	}
@@ -57,7 +58,6 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 
 	if(alien)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hit Bullet"));
 		const FDamageTypeEvent DamageEvent(EDamageType::Distance);
 		OtherActor->TakeDamage(m_dammage, DamageEvent, nullptr, this);
 	}
@@ -100,9 +100,13 @@ void ABullet::Tick(float DeltaTime)
 		DrawDebugSphere(GetWorld(), Start, SphereRadius, 10, Color, false, 1, 0, 1);
 	}
 
+	// UE_LOG(LogTemp, Warning, UKismetStringLibrary::Conv_IntToString(4));
+
 	if (OutHits.Num())
 	{
-		Explosion();
+		UE_LOG(LogTemp, Warning, TEXT("Hit"));
+
+		// Explosion();
 	}
 }
 

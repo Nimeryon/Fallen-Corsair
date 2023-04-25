@@ -2,33 +2,25 @@
 
 
 #include "GroundAlien.h"
+
+#include "FallenCorsair/FallenCorsairCharacter.h"
 #include "FallenCorsair/Components/Melee.h"
+#include "FallenCorsair/Waves/WaveZone.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-void AGroundAlien::Destroyed()
+AGroundAlien::AGroundAlien(const FObjectInitializer& ObjectInitializer)
 {
-	Super::Destroyed();
-
-	UAnimInstance* AnimInstance = GetAnimInstance();
-	if (AnimInstance)
-		AnimInstance->OnPlayMontageNotifyBegin.RemoveDynamic(this, &AGroundAlien::OnNotifyReceived);
+	m_meleeComponent = CreateDefaultSubobject<UMelee>(TEXT("MeleeComponnent"));
 }
 
 void AGroundAlien::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetCharacterMovement()->JumpZVelocity = m_attackJumpForce;
 	m_attackTarget = GetWorld()->GetFirstPlayerController()->GetPawn();
-}
-
-void AGroundAlien::OnNotifyReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Notified"));
-	
-	if (NotifyName == "Attack")
-		Attack();
-	else if (NotifyName == "Doge")
-		CreateAvoidBox();
 }
 
 bool AGroundAlien::Attack()
@@ -42,10 +34,43 @@ bool AGroundAlien::Attack()
 
 bool AGroundAlien::CreateAvoidBox()
 {
-	const FVector Forward = GetActorForwardVector();
+	const FVector Position = GetActorLocation() + GetActorForwardVector() * m_attackBoxOffset;
+
+	FHitResult Hit;
+
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWaveZone::StaticClass(), ActorsToIgnore);
+
+	UKismetSystemLibrary::BoxTraceSingleByProfile(
+		GetWorld(),
+		Position,
+		Position,
+		m_attackBoxSize / 2.f,
+		GetActorRotation(),
+		TEXT("ECC_EngineTraceChannel1"),
+		false,
+		ActorsToIgnore,
+		EDrawDebugTrace::ForDuration,
+		Hit,
+		true
+	);
+
+	if (Hit.GetActor() == m_attackTarget)
+	{
+		
+	}
 	//UKismetSystemLibrary::DrawDebugBox(GetWorld(), GetActorLocation() + Forward * m_avoidBoxOffset, m_avoidBoxSize, FLinearColor::Blue, FRotator::ZeroRotator, 1.5, 1);
 
 	return true;
+}
+
+void AGroundAlien::JumpTowardsTarget()
+{
+	const FVector Direction = (m_attackTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+	
+	GetCharacterMovement()->AddImpulse(Direction * m_attackJumpSpeed, true);
+	Jump();
 }
 
 AlienState AGroundAlien::GetState() const { return m_state; }

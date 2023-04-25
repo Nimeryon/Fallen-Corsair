@@ -19,18 +19,18 @@ class FALLENCORSAIR_API AGroundAlien : public AAlienBase
 	GENERATED_BODY()
 
 public:
-	virtual void Destroyed() override;
+	AGroundAlien(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
-	
-	UFUNCTION()
-	virtual void OnNotifyReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 	
 	UFUNCTION(BlueprintCallable)
 	virtual bool Attack();
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool CreateAvoidBox();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void JumpTowardsTarget();
 	
 	UFUNCTION()
 	virtual AlienState GetState() const;
@@ -39,6 +39,11 @@ public:
 	virtual void SetState(AlienState State);
 	
 public:
+#pragma region Components
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	class UMelee* m_meleeComponent;
+#pragma endregion
+
 #pragma region State
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	AlienState m_state = AlienState::Normal;
@@ -89,7 +94,7 @@ public:
 
 #pragma region Jump Attack
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack", meta = (ClampMin = "0", UIMin = "0"))
-	float m_attackJumpHeight;
+	float m_attackJumpForce;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack", meta = (ClampMin = "0", UIMin = "0"))
 	float m_attackJumpSpeed;

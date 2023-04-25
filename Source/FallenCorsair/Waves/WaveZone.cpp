@@ -14,6 +14,7 @@ AWaveZone::AWaveZone(): m_player(nullptr), m_bIsPlayerInZone(false)
 	PrimaryActorTick.bCanEverTick = true;
 
 	m_waveTracker = CreateDefaultSubobject<UWaveTracker>(TEXT("WaveTracker"));
+	m_collisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 }
 
 // Called when the game starts or when spawned

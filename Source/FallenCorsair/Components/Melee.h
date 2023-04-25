@@ -150,7 +150,10 @@ public:
 
 	// Functions
 	//UFUNCTION(BlueprintCallable, Category = Properties)
+
+	UFUNCTION(BlueprintCallable)
 	virtual void PerformAttack();
+	
 	virtual void PlayAnimationChargingMeleeHeavy();
 	virtual void StopAnimationChargingMeleeHeavy();
 	virtual void SetTypeAttack(EAttackType at);

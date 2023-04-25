@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
 #include "WaveZone.generated.h"
 
@@ -61,8 +60,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	class UWaveTracker* m_waveTracker;
 
-	UPROPERTY(BlueprintReadWrite)
-	UBoxComponent* m_collisionBox= CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
+	UPROPERTY(EditDefaultsOnly)
+	class UBoxComponent* m_collisionBox;
 
 	UPROPERTY(EditAnywhere)
 	TArray<FEnemies> m_enemies;

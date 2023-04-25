@@ -28,7 +28,8 @@ void UVictoryConditionBase::BeginPlay()
 	AFallenCorsairCharacter* player = Cast<AFallenCorsairCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	
 	player->OnShoot.AddDynamic(this, &UVictoryConditionBase::OnShootPerformed);
-	player->MeleeComponent->DeleguateMelee.AddDynamic(this, &UVictoryConditionBase::OnLightAttackPerformed);
+	player->MeleeComponent->DeleguateMeleeSoft.AddDynamic(this, &UVictoryConditionBase::OnLightAttackPerformed);
+	player->MeleeComponent->DeleguateMeleeHeavy.AddDynamic(this, &UVictoryConditionBase::OnHeavyAttackPerformed);
 }
 
 

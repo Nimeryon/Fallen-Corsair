@@ -65,16 +65,6 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 		const FDamageTypeEvent DamageEvent(EDamageType::Distance);
 		OtherActor->TakeDamage(m_dammage, DamageEvent, nullptr, this);
 	}
-	
-	/// NON
-	/// Add damage to the actor overlap (Ennemy)
-	///if(OtherActor->ActorHasTag("ennemy"))
-	///{
-		/// impulse alien ? or call directly function in alien class ?
-		//OtherActor->Destroy();
-		///FDamageEvent DamageEvent;
-		///OtherActor->TakeDamage(1, DamageEvent, nullptr, this);
-	///}
 }
 
 // Called when the game starts or when spawned
@@ -89,7 +79,26 @@ void ABullet::BeginPlay()
 void ABullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
+	if(!m_bIsBulletLaunch)
+	{
+		SetActorLocation(m_ownerRef->GetActorLocation() + FVector(0,0, 100) + m_ownerRef->GetActorForwardVector() * 100);
+		SetActorRotation(m_ownerRef->GetFollowCamera()->GetComponentRotation());
+	}
+	
+	if(m_bIsCharging && m_ownerRef)
+	{
+		if(m_currentCharge >= 1)
+		{
+			m_bIsFullyCharge = true;
+			m_bIsCharging = false;
+		}
+		
+		FMath::Clamp(m_currentCharge = m_currentCharge + 1 / m_chargeSpeed * DeltaTime,0,1);
+		
+		bulletCollision->SetWorldScale3D(FVector(m_bulletRadius * m_currentCharge));
+	}
+	
 	if (!Explosed)
 	{
 		TArray<FHitResult> OutHits = MakeSphereCollision(BulletSphereRadius);
@@ -119,25 +128,6 @@ void ABullet::Tick(float DeltaTime)
 	{
 		TArray<FHitResult> OutHits = MakeSphereCollision(ExplosionSphereRadius);
 		DammageOnHits(OutHits, ExplosionDammage);
-	}
-	
-	if(!m_bIsBulletLaunch)
-	{
-		SetActorLocation(m_ownerRef->GetActorLocation() + FVector(0,0, 100) + m_ownerRef->GetActorForwardVector() * 100);
-		SetActorRotation(m_ownerRef->GetFollowCamera()->GetComponentRotation());
-	}
-	
-	if(m_bIsCharging && m_ownerRef)
-	{
-		if(m_currentCharge >= 1)
-		{
-			m_bIsFullyCharge = true;
-			m_bIsCharging = false;
-		}
-		
-		FMath::Clamp(m_currentCharge = m_currentCharge + 1 / m_chargeSpeed * DeltaTime,0,1);
-		
-		bulletCollision->SetWorldScale3D(FVector(m_bulletRadius * m_currentCharge));
 	}
 }
 

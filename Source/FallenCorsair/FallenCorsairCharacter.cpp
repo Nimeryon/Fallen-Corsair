@@ -333,7 +333,13 @@ void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 	{
 		gunComp->Shoot();
 		if (OnShoot.IsBound())
+		{
 			OnShoot.Broadcast();
+			
+#if WITH_EDITOR
+			GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.f, FColor::Yellow, FString::Printf(TEXT("onshoot broadcast")));
+#endif
+		}
 
 		return;
 	}

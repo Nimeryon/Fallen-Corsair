@@ -47,6 +47,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Wave")
 	class UWaveTracker* m_waveTracker;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Wave")
+	class UVictoryConditionBase* m_zoneVictoryConditions;
+
 	UPROPERTY()
 	APawn* m_player;
 	
@@ -55,11 +58,11 @@ protected:
 	bool m_bWaveEffect = false;
 
 	// The minimum time to wait between spawns, not editable if wave effect is activated
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave", meta = (EditCondition="!m_bWaveEffect", Units="s"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave", meta = (EditCondition="!m_bWaveEffect", EditConditionHides, Units="s"))
 	float m_spawnTimeMin = 1.0f;
 
 	// The maximum time to wait between spawns, not editable if wave effect is activated
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave", meta = (EditCondition="!m_bWaveEffect", Units="s"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave", meta = (EditCondition="!m_bWaveEffect", EditConditionHides, Units="s"))
 	float m_spawnTimeMax = 2.0f;
 
 	// Track the time between spawns
@@ -87,7 +90,7 @@ protected:
 	int m_numberOfWaves;
 
 	// The maximum number of waves to spawn
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn|Conditions|NumberOfWaves", meta = (EditCondition="!m_bSpawnIndefinitely"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn|Conditions|NumberOfWaves", meta = (EditCondition="!m_bSpawnIndefinitely", EditConditionHides))
 	int m_maxWaves = 0;
 
 	// Number of enemies spawned per wave
@@ -107,7 +110,7 @@ protected:
 	bool m_bTimedLastSpawn = false;
 
 	// The time to wait before the spawner stops spawning
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn|Conditions|Timers", meta = (EditCondition="m_bTimedLastSpawn", Units = "s"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn|Conditions|Timers", meta = (EditCondition="m_bTimedLastSpawn", EditConditionHides, Units = "s"))
 	float m_timeToLastSpawn = 180.0f;
 	
 	// Set to true if we want to deactivate the spawner if the player is too far away
@@ -115,7 +118,7 @@ protected:
 	bool m_bMaxDistance = false;
 	
 	// The distance the player needs to be from the spawner to spawn enemies
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn|Conditions|Distance", meta = (EditCondition="m_bMaxDistance", Units = "cm"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn|Conditions|Distance", meta = (EditCondition="m_bMaxDistance", EditConditionHides, Units = "cm"))
 	float m_distanceFromPlayer = 1000.0f;
 	
 	// Set to true if we want to deactivate the spawner if the player is not in the parent zone

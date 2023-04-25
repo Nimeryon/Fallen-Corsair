@@ -3,6 +3,7 @@
 
 #include "WaveSpawner.h"
 
+#include "VictoryConditionBase.h"
 #include "WaveTracker.h"
 #include "WaveZone.h"
 #include "FallenCorsair/Enemies/AlienBase.h"
@@ -37,6 +38,7 @@ void UWaveSpawner::BeginPlay()
 	if( m_waveZoneOwner )
 	{
 		m_waveTracker = m_waveZoneOwner->FindComponentByClass<UWaveTracker>();
+		m_zoneVictoryConditions = m_waveZoneOwner->FindComponentByClass<UVictoryConditionBase>();
 	}
 
 	if(m_waveTracker)
@@ -66,8 +68,12 @@ void UWaveSpawner::SpawnEnemy()
 		SpawnParams.bNoFail = true;
 		
 		AAlienBase* spawnedActor = GetWorld()->SpawnActor<AAlienBase>(m_waveZoneOwner->GetAlienToSpawn(), GetSpawnLocation(), FRotator::ZeroRotator, SpawnParams);
-		
-		spawnedActor->OnDeath.AddDynamic(this->m_waveTracker, &UWaveTracker::OnEnemyDeath);
+
+		if(m_waveTracker)
+			spawnedActor->OnDeath.AddDynamic(m_waveTracker, &UWaveTracker::OnEnemyDeath);
+
+		if(m_zoneVictoryConditions)
+			spawnedActor->OnDeathWithActor.AddDynamic(m_zoneVictoryConditions, &UVictoryConditionBase::OnEnemyDeath);
 	}
 #if WITH_EDITOR
 	else if (!m_waveZoneOwner)

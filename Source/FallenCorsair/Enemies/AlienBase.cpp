@@ -74,6 +74,9 @@ float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	{
 		if (OnDeath.IsBound())
 			OnDeath.Broadcast();
+
+		if (OnDeathWithActor.IsBound())
+			OnDeathWithActor.Broadcast(this);
 		
 		if (m_destroyOnDeath)
 			Destroy();

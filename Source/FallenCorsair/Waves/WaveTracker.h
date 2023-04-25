@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "FallenCorsair/Configs/FallenCorsairSettings.h"
 #include "WaveTracker.generated.h"
 
 // Event dispatcher OnWaveOver
@@ -27,7 +28,11 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// Check if the number of enemies is under the set minimum
+	UFUNCTION()
 	void CheckEnemyLeft() const;
+
+	UFUNCTION()
+	void OnEnemyDeath();
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -35,12 +40,11 @@ public:
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")
-	int m_maxEnemies = 199;
+	int m_maxEnemies = UConfigUtils::GetMaxAICount();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")
-	int m_minEnemies = 100;
+	int m_minEnemies = UConfigUtils::GetMaxAICount()/2;
 
 	UPROPERTY()
 	int m_enemiesAlive;
-		
 };

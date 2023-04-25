@@ -9,6 +9,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAlienSpawn);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAlienDeath);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAlienDeathWithActor, AAlienBase*, Alien);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAlienStunned, float, Time);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAlienDamaged, float, Damage);
 
@@ -74,6 +75,10 @@ public:
 	
 	UPROPERTY()
 	FOnAlienDeath OnDeath;
+
+
+	UPROPERTY()
+	FOnAlienDeathWithActor OnDeathWithActor;
 
 	bool bIsAlive() const;
 	

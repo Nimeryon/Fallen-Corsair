@@ -10,6 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "DrawDebugHelpers.h"
+#include "GameFramework/Controller.h"
 
 // Sets default values for this component's properties
 UMeleeTargeting::UMeleeTargeting()
@@ -69,16 +70,21 @@ void UMeleeTargeting::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	}
 
 	if (!ActorTarget)
+	{
+		TargetReached = true;
 		return;
+	}
 	
 	OrientOwnerToTarget(DeltaTime);
 	MoveToActorTarget(DeltaTime);
 
-	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_BoolToString(MovingToTargetEnded));
-	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, UKismetStringLibrary::Conv_BoolToString(RotationToTargetEnded));
+	CurrentTimeTargeting += DeltaTime;
 
-	if (MovingToTargetEnded && RotationToTargetEnded)
+	if ((MovingToTargetEnded && RotationToTargetEnded) || (CurrentTimeTargeting >= MaxTimeTargeting))
 	{
+		CurrentTimeTargeting = 0;
+		MovingToTargetEnded = true;
+		RotationToTargetEnded = true;
 		TargetReached = true;
 		IsMovingToActorTarget = false;
 		ActorTarget = nullptr;
@@ -90,6 +96,8 @@ void UMeleeTargeting::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 AActor* UMeleeTargeting::GetTarget()
 {
+	CurrentTimeTargeting = 0;
+
 	TArray<AActor*> Actors = GetAllTargetagbleOnScreenAndOnOwnerVision();
 
 	// AActor* Actor = GetActorDistanceLowestFromOwner(Actors);
@@ -265,7 +273,7 @@ bool UMeleeTargeting::ActorIsOnScreen(AActor &Actor, float Tolerance)
 	return false;
 }
 
-float UMeleeTargeting::GetLocationVisionFromOwner(class AActor &Actor)
+float UMeleeTargeting::GetLocationVisionFromOwner(AActor &Actor)
 {
 	FVector DirOwnerToActor = Actor.GetActorLocation() - GetOwner()->GetActorLocation();
 	DirOwnerToActor.Normalize();
@@ -303,6 +311,7 @@ void UMeleeTargeting::MoveToActorTarget(float DeltaTime)
 
 	float Distance = UKismetMathLibrary::Vector_Distance(ActorTarget->GetActorLocation(), GetOwner()->GetActorLocation());
 
+	// if (Distance <= DistanceSecurity || IsObstabcle(ActorTarget))
 	if (Distance <= DistanceSecurity)
 	{
 		MovingToTargetEnded = true;
@@ -313,9 +322,23 @@ void UMeleeTargeting::MoveToActorTarget(float DeltaTime)
 		FVector2D Direction2D = FVector2D(Direction.X, Direction.Y);
 		Direction2D.Normalize();
 		Direction = FVector(Direction2D.X, Direction2D.Y, 0);
+
+		ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+		
+		if (!OwnerCharacter)
+			return;
+		
+		AController* Controller = OwnerCharacter->GetController();
+
+		if (Controller)
+		{
+			// add movement 
+			// OwnerCharacter->AddMovementInput(Direction, 1);
+		}
+	
 		FVector NewLocation = Direction * SpeedMoveToActor * DeltaTime;
 		NewLocation += GetOwner()->GetActorLocation();
-		GetOwner()->SetActorLocation(NewLocation);
+		GetOwner()->SetActorLocation(NewLocation, true);
 	}
 }
 
@@ -375,5 +398,33 @@ float UMeleeTargeting::ConvDegreeTo360(float Degree)
 	return Degree;
 }
 
+bool UMeleeTargeting::IsObstabcle(AActor *Actor)
+{
+	// Obtenez une référence à l'objet du monde
+	UWorld* World = GetWorld();
 
+	// Vérifiez que l'objet du monde est valide
+	if (World)
+	{
+		// Obtenez la position et la direction de l'acteur qui effectue le line trace
+		FVector StartLocation = GetOwner()->GetActorLocation();
 
+		// Calculez le point final pour le line trace en fonction de la distance voulue
+		FVector EndLocation = Actor->GetActorLocation();
+
+		// Configurez les paramètres du line trace
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(GetOwner());
+		QueryParams.AddIgnoredActor(Actor);
+
+		// Effectuez le line trace
+		FHitResult HitResult;
+		World->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_GameTraceChannel1, QueryParams);
+
+		// Vérifiez si le line trace a frappé quelque chose
+		if (HitResult.bBlockingHit)
+			return true;
+
+	}
+	return false;
+}

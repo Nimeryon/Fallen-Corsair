@@ -11,7 +11,10 @@
 #include "Kismet/KismetStringLibrary.h"
 #include "Math/Quat.h"
 #include "GameFramework/Character.h"
+#include "Animation/AnimInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "FallenCorsair/Enemies/AlienBase.h"
+
 
 // Sets default values for this component's properties
 UMelee::UMelee()
@@ -20,9 +23,12 @@ UMelee::UMelee()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	ownerCharacter = CreateDefaultSubobject<ACharacter>(TEXT("ownerCharacter"));
+	OwnerCharacter = CreateDefaultSubobject<ACharacter>(TEXT("OwnerCharacter"));
 
-	DeleguateMelee.AddDynamic(this, &UMelee::OnMyDelegateTriggered);
+	// DeleguateMeleeSoft.AddDynamic(this, &UMelee::OnMyDelegateTriggered);
+
+	
+
 }
 
 void UMelee::OnMyDelegateTriggered()
@@ -39,9 +45,14 @@ void UMelee::BeginPlay()
 
 	if (character)
 	{
-		ownerCharacter = character;
-		MaxWalkSpeed = ownerCharacter->GetCharacterMovement()->MaxWalkSpeed;
-		MinWalkSpeed = ownerCharacter->GetCharacterMovement()->MinAnalogWalkSpeed;
+		OwnerCharacter = character;
+		MaxWalkSpeed = OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed;
+		MinWalkSpeed = OwnerCharacter->GetCharacterMovement()->MinAnalogWalkSpeed;
+
+		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+		
+		if (AnimInstance)
+			AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &UMelee::OnNotifyBeginReceived);
 	}
 
 }
@@ -78,25 +89,14 @@ void UMelee::PlayAnimationChargingMeleeHeavy()
 		return;
 
 	// Play Animation
-	if (ownerCharacter->GetMesh())
+	if (OwnerCharacter->GetMesh())
 	{
 
-		if (UAnimInstance* AnimInstance = ownerCharacter->GetMesh()->GetAnimInstance())
+		if (UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance())
 		{
-			//AnimInstance->StopAllMontages(0.0f);
-
-			const int32 NumLoops = 2;
-
-			// Jouez l'animation Montage en boucle
-			for (int32 i = 0; i < NumLoops; i++)
-			{
-				FOnMontageEnded EndDelegate;
-				AnimInstance->Montage_Play(AnimWhileChargingMeleeHeavy, 1.0f, EMontagePlayReturnType::Duration, 0, false);
-				AnimInstance->Montage_SetEndDelegate(EndDelegate, AnimWhileChargingMeleeHeavy);
-			}
-			
+			AnimInstance->Montage_Play(AnimWhileChargingMeleeHeavy);
+			MontageToPlay = AnimWhileChargingMeleeHeavy;
 		}
-		
 	}
 }
 
@@ -106,10 +106,9 @@ void UMelee::StopAnimationChargingMeleeHeavy()
 		return;
 
 	// Stop Animation
-	if (ownerCharacter->GetMesh())
+	if (OwnerCharacter->GetMesh())
 	{
-
-		if (UAnimInstance* AnimInstance = ownerCharacter->GetMesh()->GetAnimInstance())
+		if (UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance())
 		{
 			if (AnimInstance->Montage_IsPlaying(AnimWhileChargingMeleeHeavy))
 			{
@@ -131,7 +130,7 @@ void UMelee::SetOwnerModeAttack(bool ModeAttack)
 {
 	if (!MeleeIsValid())
 		return;
-
+		
 	if (ModeAttack)
 	{
 		FreezeRotation(true);
@@ -143,11 +142,15 @@ void UMelee::SetOwnerModeAttack(bool ModeAttack)
 		ResetCombo();
 		StartAttack(false);
 	}
+
+	bMeleeEnded = false;
+
 }
 
-void UMelee::StartAttack(bool start)
+void UMelee::StartAttack(bool start, bool _bFreezeAnimation)
 {
 	bAttackStarted = start;
+	bFreezeAnimation = _bFreezeAnimation;
 
 	if (start && indexCurrentAttack == 0)
 	{
@@ -161,17 +164,16 @@ void UMelee::UpdateTypeAttack(float& eslapsedSeconds)
 	{
 		if (eslapsedSeconds <= delayInputDepthMeleeHeavy)
 		{
-			SetTypeAttack(EAttackType::Soft);
+			// SetTypeAttack(EAttackType::Soft);
 		}
 		else {
-			eslapsedSeconds = 0;
 			SetTypeAttack(EAttackType::Heavy);
+			eslapsedSeconds = 0;
 			if (!MeleeIsValid())
 			{
 				SetTypeAttack(EAttackType::Soft);
 			}
-
-			SetReleased(true);
+			// SetReleased(true);
 			StartAttack(true);
 		}
 	}
@@ -180,16 +182,88 @@ void UMelee::UpdateTypeAttack(float& eslapsedSeconds)
 void UMelee::ResetRotation()
 {
 	FRotator Dir;
-	Dir = UKismetMathLibrary::Conv_VectorToRotator(ownerCharacter->GetActorForwardVector());
+	Dir = UKismetMathLibrary::Conv_VectorToRotator(OwnerCharacter->GetActorForwardVector());
 	RotatorWhileAttackStarted = Dir;
 }
 
-bool UMelee::MeleeIsValid()
+void UMelee::ResumeAnimation()
 {
+	if (OwnerCharacter->GetMesh())
+	{
+		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			if (MontageToPlay)
+			{
+				AnimInstance->Montage_Resume(MontageToPlay);
+			}
+		}
+	}
+}
+
+void UMelee::SetReleased(bool released)
+{
+	bInputReleased = released;
+}
+
+void UMelee::CancelAttack()
+{
+	ResetCombo();
+	SetOwnerModeAttack(false);
+	bMeleeEnded = false;
+
+	if (OwnerCharacter->GetMesh())
+	{
+		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			if (MontageToPlay)
+			{
+				AnimInstance->Montage_Stop(0, MontageToPlay);
+			}
+		}
+	}
+}
+
+void UMelee::CalculRotation(FVector _rot)
+{
+	AFallenCorsairCharacter* c = Cast<AFallenCorsairCharacter>(OwnerCharacter);
+
+	if (!c)
+		return;
+
+	FVector rot = c->GetCameraBoom()->GetTargetRotation().RotateVector(_rot);
+	rot.Normalize();
+	FRotator rotation = UKismetMathLibrary::MakeRotFromX(rot);
+	RotatorWhileAttackStarted = FRotator(0, rotation.Yaw, 0);
+}
+
+bool UMelee::AttackIsStarted() const
+{
+	return bAttackStarted;
+}
+
+bool UMelee::MeleeIsHeavy() const
+{
+	return attackType == EAttackType::Heavy;
+}
+
+bool UMelee::MeleeEnded() const
+{
+	return bMeleeEnded;
+}
+
+bool UMelee::MeleeIsValid() const
+{
+	if (!OwnerCharacter->GetCharacterMovement()->IsMovingOnGround() && !CanAirAttack)
+	{
+		return false;
+	}
+		
 	switch (attackType)
 	{
 	case EAttackType::Soft:
-		if (Melees.Soft.Num() > 0)
+		if (Melees.Soft.Num() > 0 && indexCurrentAttack < Melees.Soft.Num())
 		{
 			if (Melees.Soft[0].Anim)
 			{
@@ -200,7 +274,7 @@ bool UMelee::MeleeIsValid()
 		return false;
 		break;
 	case EAttackType::Heavy:
-		if (Melees.Heavy.Num() > 0)
+		if (Melees.Heavy.Num() > 0 && indexCurrentAttack < Melees.Heavy.Num())
 		{
 			if (Melees.Heavy[0].Anim)
 			{
@@ -211,7 +285,7 @@ bool UMelee::MeleeIsValid()
 		return false;
 		break;
 	default:
-		if (Melees.Soft.Num() > 0)
+		if (Melees.Soft.Num() > 0 && indexCurrentAttack < Melees.Soft.Num())
 		{
 			if (Melees.Soft[0].Anim)
 			{
@@ -228,31 +302,38 @@ bool UMelee::IsReleased() const
 	return bInputReleased;
 }
 
-void UMelee::SetReleased(bool released)
+
+bool UMelee::IsFirstCombo() const
 {
-	bInputReleased = released;
+	switch (attackType)
+	{
+	case EAttackType::Soft:
+		return indexCurrentAttack == 0;
+		break;
+	case EAttackType::Heavy:
+		return indexCurrentAttack == 0;
+		break;
+	default:
+		return indexCurrentAttack == 0;
+	}
 }
 
-void UMelee::CancelAttack()
+bool UMelee::IsLastCombo() const
 {
-	GetCurrentMelee().Anim;
-	ownerCharacter->GetMesh()->GetAnimInstance()->StopAllMontages(0);
-	ResetCombo();
+	switch (attackType)
+	{
+	case EAttackType::Soft:
+		return indexCurrentAttack == Melees.Soft.Num() - 1;
+		break;
+	case EAttackType::Heavy:
+		return indexCurrentAttack == Melees.Heavy.Num() - 1;
+		break;
+	default:
+		return indexCurrentAttack == Melees.Soft.Num() - 1;
+	}
 }
 
-bool UMelee::AttackIsStarted()
-{
-	return bAttackStarted;
-}
 
-void UMelee::CalculRotation(FVector _rot)
-{
-	AFallenCorsairCharacter* c = Cast<AFallenCorsairCharacter>(ownerCharacter);
-	FVector rot = c->GetCameraBoom()->GetTargetRotation().RotateVector(_rot);
-	rot.Normalize();
-	FRotator rotation = UKismetMathLibrary::MakeRotFromX(rot);
-	RotatorWhileAttackStarted = FRotator(0, rotation.Yaw, 0);
-}
 
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -262,15 +343,41 @@ void UMelee::CalculRotation(FVector _rot)
 
 void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_NameToString(NotifyName));
+	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_NameToString(NotifyName));
 
+	if (NotifyName == "PoseStarting")
+	{
+		// if (!bFreezeAnimation)
+		// 	return;
+			// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, TEXT("lol"));
+
+		if (OwnerCharacter->GetMesh())
+		{
+			UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+			if (AnimInstance)
+			{
+				if (MontageToPlay)
+				{
+					AnimInstance->Montage_Pause(MontageToPlay);
+				}
+			}
+		}
+	}	
 	if (NotifyName == "Propulsion")
 	{
 		PropulseOwner();
 	}	
 	else if (NotifyName == "StopPropulsion")
 	{
-		ResetVelocity();
+		AFallenCorsairCharacter *FallenCorsairCharacter = Cast<AFallenCorsairCharacter>(GetOwner());
+	
+		if (FallenCorsairCharacter)
+		{
+			if (!FallenCorsairCharacter->IsStunned)
+				ResetVelocity();
+		}
+		else 
+			ResetVelocity();
 	}
 	else if (NotifyName == "Hit")
 	{
@@ -279,7 +386,6 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	}	 
 	else if (NotifyName == "CanCombo")
 	{
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1); // Reset to normal time dilation
 		if (IsLastCombo())
 		{
 			StartAttack(false);
@@ -290,8 +396,7 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 			if (bExecuteNextAttack)
 			{
 				bExecuteNextAttack = false;
-				// Execute next attack
-				AttackSequence();
+				AttackSequence(); // Execute next attack
 			}
 			else
 			{
@@ -313,6 +418,7 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	}	
 	else if (NotifyName == "Recovery")
 	{
+		bMeleeEnded = true;
 		ResetCombo();
 		StartAttack(false);
 	}
@@ -344,10 +450,11 @@ void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
 			{
 				continue;
 			}
+
+			// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, CharacterHited->GetName());
+
 			
 			CharactersHited.Add(CharacterHited);
-
-			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), GetCurrentMelee().TimeDilationOnHit);
 
 			// Propulse ennemie
 			GetCurrentMelee().PropulsionDirectionEnnemie.Normalize();
@@ -372,7 +479,6 @@ void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
 			CharacterHited->GetCharacterMovement()->AddImpulse(Force, true);
 
 			// Damage Target
-			FDamageEvent eventDamage;
 
 			float DammageValue = 0;
 			float Distance;
@@ -406,9 +512,25 @@ void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
 			}
 
 			DammageValue = UKismetMathLibrary::FCeil(DammageValue);
-			//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, TEXT("Distance : ") + UKismetStringLibrary::Conv_FloatToString(Distance));
-			//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, TEXT("Dammage : ") +UKismetStringLibrary::Conv_FloatToString(DammageValue));
-			CharacterHited->TakeDamage(DammageValue, eventDamage, nullptr, GetOwner());
+			
+			// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, CharacterHited->GetName());
+			FDamageTypeEvent DamageEvent;
+
+			switch (attackType)
+			{
+			case EAttackType::Soft:
+					DamageEvent.DamageType = EDamageType::MeleeSoft;
+					break;
+				case EAttackType::Heavy:
+					DamageEvent.DamageType = EDamageType::MeleeHeavy;
+					break;
+				default:
+					DamageEvent.DamageType = EDamageType::MeleeSoft;
+			}
+ 
+			// FDamageEvent EventDamage;
+			// CharacterHited->TakeDamage(DammageValue, EventDamage, nullptr, GetOwner());
+			CharacterHited->TakeDamage(DammageValue, DamageEvent, nullptr, GetOwner());
 		}
 	}
 }
@@ -422,7 +544,6 @@ void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
 void UMelee::TriggerHitWithCollisionShape()
 {
 	FVector OffsetPos = GetOwner()->GetActorForwardVector() * GetCurrentMelee().CollisionShapeOffset.X + GetOwner()->GetActorRightVector() * GetCurrentMelee().CollisionShapeOffset.Y + GetOwner()->GetActorUpVector() * GetCurrentMelee().CollisionShapeOffset.Z;
-	//FVector OffsetPos = GetOwner()->GetActorForwardVector() * GetCurrentMelee().CollisionShapeOffset;
 	FVector Start = GetOwner()->GetActorLocation() + OffsetPos;
 	FRotator Orientation = UKismetMathLibrary::MakeRotFromX(GetOwner()->GetActorForwardVector());
 	Orientation += GetCurrentMelee().CollisionShapeRotation;
@@ -476,20 +597,24 @@ void UMelee::TriggerHitWithCollisionShape()
 
 void UMelee::TriggerHitWithSockets()
 {
-	TArray<FHitResult> OutHits;
+	if (!GetCurrentMelee().CollisionWithSockets)
+	{
+		return;
+	}
+
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(GetOwner());
 	
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(GetOwner());
 
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(GetOwner());
-
-	FVector StartLocation = ownerCharacter->GetMesh()->GetSocketLocation(GetCurrentMelee().SocketStart);;
-	FVector EndLocation = ownerCharacter->GetMesh()->GetSocketLocation(GetCurrentMelee().SocketEnd);
+	FVector StartLocation = OwnerCharacter->GetMesh()->GetSocketLocation(GetCurrentMelee().SocketStart);;
+	FVector EndLocation = OwnerCharacter->GetMesh()->GetSocketLocation(GetCurrentMelee().SocketEnd);
 	float SphereRadius = GetCurrentMelee().SocketSphereRadius; // The radius of the sphere you want to trace
 	FCollisionShape SphereShape = FCollisionShape::MakeSphere(SphereRadius);
 
 	// Perform the multi-sphere trace operation
+	TArray<FHitResult> OutHits;
 	GetWorld()->SweepMultiByObjectType(OutHits, StartLocation, EndLocation, FQuat::Identity, UEngineTypes::ConvertToTraceType(ECC_Visibility), SphereShape, QueryParams);
 
 	if (Debug)
@@ -508,37 +633,38 @@ void UMelee::TriggerHitWithSockets()
 	DammageOnHits(OutHits);
 }
 
-
 // Character
 
 void UMelee::SetRotation()
 {
-	ownerCharacter->SetActorRotation(RotatorWhileAttackStarted);
+	OwnerCharacter->SetActorRotation(RotatorWhileAttackStarted);
+	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, UKismetStringLibrary::Conv_RotatorToString(RotatorWhileAttackStarted));
+
 }
 
 void UMelee::FreezeRotation(bool freeze)
 {
-	ownerCharacter->GetCharacterMovement()->bUseControllerDesiredRotation = !freeze;
-	ownerCharacter->GetCharacterMovement()->bOrientRotationToMovement = !freeze;
+	OwnerCharacter->GetCharacterMovement()->bUseControllerDesiredRotation = !freeze;
+	OwnerCharacter->GetCharacterMovement()->bOrientRotationToMovement = !freeze;
 }
 
 void UMelee::EnableWalk(bool enable)
 {
 	if (enable)
 	{
-		ownerCharacter->GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
-		ownerCharacter->GetCharacterMovement()->MinAnalogWalkSpeed = MinWalkSpeed;
+		OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+		OwnerCharacter->GetCharacterMovement()->MinAnalogWalkSpeed = MinWalkSpeed;
 	}
 	else {
-		ownerCharacter->GetCharacterMovement()->MaxWalkSpeed = 0;
-		ownerCharacter->GetCharacterMovement()->MinAnalogWalkSpeed = 0;
+		OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = 0;
+		OwnerCharacter->GetCharacterMovement()->MinAnalogWalkSpeed = 0;
 
 	}
 }
 
 void UMelee::ResetVelocity()
 {
-	ownerCharacter->GetCharacterMovement()->Velocity = FVector(0, 0, 0);
+	OwnerCharacter->GetCharacterMovement()->Velocity = FVector(0, 0, 0);
 }
 
 void UMelee::PropulseOwner()
@@ -553,54 +679,49 @@ void UMelee::PropulseOwner()
 
 	FVector Force = Dir * GetCurrentMelee().PropulsionForceOwner;
 
-	ownerCharacter->GetCharacterMovement()->AddImpulse(Force, true);
+	OwnerCharacter->GetCharacterMovement()->AddImpulse(Force, true);
 }
 
 // Attack
-
 void UMelee::AttackSequence()
 {
-	SetRotation();
 	CharactersHited.Reset();
+
+	SetRotation();
 	EnableWalk(false);
+	bMeleeEnded = false;
 
-	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_IntToString(indexCurrentAttack));
-
+	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_IntToString(indexCurrentAttack));
 
 	// Play Animation
-	if (ownerCharacter->GetMesh())
+	if (OwnerCharacter->GetMesh())
 	{
-		UAnimInstance* AnimInstance = ownerCharacter->GetMesh()->GetAnimInstance();
-		AnimInstance->StopAllMontages(0.0f);
+		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 		
 		if (AnimInstance)
 		{
 			bool bPlayedSuccessfully = false;
-			UAnimMontage* MontageToPlay = GetCurrentMelee().Anim;
-			const float MontageLength = AnimInstance->Montage_Play(MontageToPlay, 1, EMontagePlayReturnType::Duration, 0, true);
+			MontageToPlay = GetCurrentMelee().Anim;
+			const float MontageLength = AnimInstance->Montage_Play(MontageToPlay);
 			
 			bPlayedSuccessfully = (MontageLength > 0.f);
 
 			if (bPlayedSuccessfully)
 			{
-				UAnimInstance* AnimInstancePtr = AnimInstance;
-				
-				if (FAnimMontageInstance* MontageInstance = AnimInstance->GetActiveInstanceForMontage(MontageToPlay))
+				switch (attackType)
 				{
-					int MontageInstanceID = MontageInstance->GetInstanceID();
-				}
-
-				if (bIsDeleguate)
-				{
-					AnimInstance->OnPlayMontageNotifyBegin.RemoveDynamic(this, &UMelee::OnNotifyBeginReceived);
-				}
-
-				AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &UMelee::OnNotifyBeginReceived);
-				bIsDeleguate = true;
-
-				if (DeleguateMelee.IsBound())
-				{
-					DeleguateMelee.Broadcast();
+				case EAttackType::Soft:
+					if (DeleguateMeleeSoft.IsBound())
+						DeleguateMeleeSoft.Broadcast();
+					break;
+				case EAttackType::Heavy:
+					if (DeleguateMeleeHeavy.IsBound())
+						DeleguateMeleeHeavy.Broadcast();
+					break;
+				default:
+					if (DeleguateMeleeSoft.IsBound())
+						DeleguateMeleeSoft.Broadcast();
+					break;
 				}
 			}
 		}
@@ -643,36 +764,6 @@ void UMelee::IncrementCurrentAttack()
 		break;
 	default:
 		indexCurrentAttack %= Melees.Soft.Num();
-	}
-}
-
-bool UMelee::IsFirstCombo()
-{
-	switch (attackType)
-	{
-	case EAttackType::Soft:
-		return indexCurrentAttack == 0;
-		break;
-	case EAttackType::Heavy:
-		return indexCurrentAttack == 0;
-		break;
-	default:
-		return indexCurrentAttack == 0;
-	}
-}
-
-bool UMelee::IsLastCombo()
-{
-	switch (attackType)
-	{
-	case EAttackType::Soft:
-		return indexCurrentAttack == Melees.Soft.Num() - 1;
-		break;
-	case EAttackType::Heavy:
-		return indexCurrentAttack == Melees.Heavy.Num() - 1;
-		break;
-	default:
-		return indexCurrentAttack == Melees.Soft.Num() - 1;
 	}
 }
 

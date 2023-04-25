@@ -82,7 +82,7 @@ void UGun::Shoot()
 		{
 			/// spawn bullet, rotation base on camera rotation
 			GetWorld()->SpawnActor<ABullet>(m_bullet, start, m_ownerRef->GetFollowCamera()->GetComponentRotation(), SpawnInfo)
-			->SetBulletSetting(m_bulletSpeed,m_bulletDammage, m_bulletDammageRadius, m_bulletLifeSpan, m_bulletRadius);
+			->SetBulletSetting(GetOwner(), m_bulletSpeed,m_bulletDammage, m_bulletDammageRadius, m_bulletLifeSpan, m_bulletRadius);
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Shoot"));
 		m_gunAmmo -= m_ammoCost;

@@ -64,7 +64,7 @@ private:
 	UPROPERTY()
 	class UBarrel* m_barrelRef;
 
-	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Vitesse du projectile"), meta = (ClampMin = 1000, UIMin = 1000, ClampMax = 20000, UIMax = 20000))
+	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Vitesse du projectile"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 20000, UIMax = 20000))
 	float m_bulletSpeed = 2000;
 
 	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Dégât du projectile"), meta = (ClampMin = 1, UIMin = 1))

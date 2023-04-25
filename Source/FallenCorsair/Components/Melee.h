@@ -4,10 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Animation/AnimMontage.h"
-#include "InputActionValue.h"
 #include "Melee.generated.h"
-
 
 UENUM()
 enum class EMeleeCollisionShape
@@ -85,9 +82,6 @@ struct FAttackData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	float MaxDistance = 0;	
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	float TimeDilationOnHit = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	UAnimMontage* Anim;
@@ -133,8 +127,11 @@ public:
 	UFUNCTION()
 	void OnMyDelegateTriggered();
 
-	UPROPERTY(BlueprintAssignable, Category = "MyDelegate")
-	FDeleguateMelee DeleguateMelee;
+	UPROPERTY(BlueprintAssignable, Category = "DelegateMelee")
+	FDeleguateMelee DeleguateMeleeSoft;
+
+	UPROPERTY(BlueprintAssignable, Category = "DelegateMelee")
+	FDeleguateMelee DeleguateMeleeHeavy;
 
 	// Vars
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
@@ -142,6 +139,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	UAnimMontage* AnimWhileChargingMeleeHeavy;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	bool CanAirAttack = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	float delayInputDepthMeleeHeavy = 1;
@@ -155,25 +155,27 @@ public:
 	virtual void PlayAnimationChargingMeleeHeavy();
 	virtual void StopAnimationChargingMeleeHeavy();
 	virtual void SetTypeAttack(EAttackType at);
-	virtual void StartAttack(bool start);
+	virtual void StartAttack(bool start, bool _bFreezeAnimation = false);
 	virtual void UpdateTypeAttack(float& eslapsedSeconds);
 	virtual void SetReleased(bool released);
 	virtual void SetOwnerModeAttack(bool ModeAttack);
 	virtual void CancelAttack();
-	virtual bool MeleeIsValid();
-	virtual bool AttackIsStarted();
-	virtual bool IsReleased() const;
 	virtual void CalculRotation(FVector _rot);
 	virtual void ResetRotation();
 	virtual void ResetCombo();
-	virtual bool IsFirstCombo();
-	virtual bool IsLastCombo();
+	virtual void ResumeAnimation();
+
+	virtual bool AttackIsStarted() const;
+	virtual bool MeleeIsValid() const;
+	virtual bool IsReleased() const;
+	virtual bool IsFirstCombo() const;
+	virtual bool IsLastCombo() const;
+	virtual bool MeleeIsHeavy() const;
+	virtual bool MeleeEnded() const;
 
 
 	UFUNCTION(BlueprintCallable, Category = Properties)
 	void TriggerHitWithSockets();
-
-
 
 protected:
 	// Called when the game starts
@@ -208,7 +210,7 @@ private:
 
 	// Vars
 
-	class ACharacter* ownerCharacter;
+	class ACharacter* OwnerCharacter;
 
 	// To avoid multiple hit while TriggerWithSokect
 	class TArray<ACharacter*> CharactersHited;
@@ -216,10 +218,10 @@ private:
 	// To disabled Character walk
 	float MaxWalkSpeed;
 	float MinWalkSpeed;
+	int indexCurrentAttack = 0;
 
 	EAttackType attackType = EAttackType::Soft;
 
-	int indexCurrentAttack = 0;
 
 	bool bCanAttack = true;
 	bool bCanExecuteNextAttack = false;
@@ -227,6 +229,10 @@ private:
 	bool bAttackStarted = false;
 	bool bInputReleased = false;
 	bool bIsDeleguate = false;
+	bool bMeleeEnded = false;
+	bool bFreezeAnimation = false;
 	FRotator RotatorWhileAttackStarted;
+
+	UAnimMontage* MontageToPlay;
 
 };

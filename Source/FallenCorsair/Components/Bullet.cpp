@@ -73,16 +73,19 @@ void ABullet::BeginPlay()
 	Super::BeginPlay();
 
 	//m_ownerRef = Cast<AFallenCorsairCharacter>(GetOwner());
+	
 }
 
 // Called every frame
 void ABullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
+#pragma region Bullet Charge
 	if(!m_bIsBulletLaunch)
 	{
-		SetActorLocation(m_ownerRef->GetActorLocation() + FVector(0,0, 100) + m_ownerRef->GetActorForwardVector() * 100);
+		//SetActorLocation(m_ownerRef->GetActorLocation() + FVector(0,0, 100) + m_ownerRef->GetActorForwardVector() * 100);
+		SetActorLocation(m_ownerRef->GetMesh()->GetSocketLocation("BulletStart"));
 		SetActorRotation(m_ownerRef->GetFollowCamera()->GetComponentRotation());
 	}
 	
@@ -98,6 +101,8 @@ void ABullet::Tick(float DeltaTime)
 		
 		bulletCollision->SetWorldScale3D(FVector(m_bulletRadius * m_currentCharge));
 	}
+
+#pragma endregion
 	
 	if (!Explosed)
 	{
@@ -106,9 +111,10 @@ void ABullet::Tick(float DeltaTime)
 		if (OutHits.Num())
 		{
 			DammageOnHits(OutHits, BulletDammage);
-			projectileMovement->StopMovementImmediately();
-			bulletMesh->DestroyComponent();
-			SetLifeSpan(ExplosionDuration);
+			Explosion();
+			// projectileMovement->StopMovementImmediately();
+			// bulletMesh->DestroyComponent();
+			// SetLifeSpan(ExplosionDuration);
 			Explosed = true;
 
 			// Niagara Explosion
@@ -145,13 +151,13 @@ void ABullet::SetBulletSetting(float bulletSpeed, int dammage, float dammageRadi
 	OwnerCauser = character;
 	m_dammage = dammage;
 	m_dammageRadius = dammageRadius;
-	
 	m_bulletSpeed = bulletSpeed;
-	
 	m_bulletRadius = bulletRadius;
 	m_lifeSpan = lifeSpan;
 	m_chargeSpeed = chargeSpeed;
 	m_ownerRef = character;
+	
+
 }
 
 void ABullet::LaunchBullet()
@@ -209,4 +215,9 @@ void ABullet::DammageOnHits(TArray<FHitResult> OutHits, float DammageValue, FDam
 bool ABullet::GetIsBulletCharge()
 {
 	return m_bIsFullyCharge;
+}
+
+bool ABullet::GetIsBulletLaunch()
+{
+	return m_bIsBulletLaunch;
 }

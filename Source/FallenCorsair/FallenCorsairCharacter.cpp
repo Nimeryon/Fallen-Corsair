@@ -272,8 +272,11 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 
 void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 {
-	dashComp->DashPressed();
-	OnDodge.Broadcast();
+	if(m_bIsFocus)
+	{
+		dashComp->DashPressed();
+		OnDodge.Broadcast();
+	}
 }
 
 TArray<AActor*> AFallenCorsairCharacter::SetIgnoreCharacterActors()

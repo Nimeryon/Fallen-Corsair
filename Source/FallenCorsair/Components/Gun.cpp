@@ -91,9 +91,12 @@ void UGun::Shoot()
 
 void UGun::StopCharge(bool bIsCancel)
 {
+
+	/// when de aiming exist bullet is delete, haveto modify this function to arrange that
+	
 	if(m_spawnBullet && !m_spawnBullet->GetIsBulletCharge() || bIsCancel)
 	{
-		if(m_spawnBullet)
+		if(m_spawnBullet && m_spawnBullet->GetIsBulletLaunch())
 			m_spawnBullet->Destroy();
 	}
 	else if(m_spawnBullet->GetIsBulletCharge())

@@ -115,6 +115,9 @@ public:
 
 	UFUNCTION()
 	bool GetIsBulletCharge();
+
+	UFUNCTION()
+	bool GetIsBulletLaunch();
 	
 	void DammageOnHits(TArray<FHitResult> OutHits, float DammageValue, FDamageTypeEvent DamageEvent = EDamageType::Default);
 

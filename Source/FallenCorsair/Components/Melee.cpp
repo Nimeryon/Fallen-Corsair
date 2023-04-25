@@ -711,16 +711,16 @@ void UMelee::AttackSequence()
 				switch (attackType)
 				{
 				case EAttackType::Soft:
-					if (DeleguateMeleeHeavy.IsBound())
-						DeleguateMeleeHeavy.Broadcast();
-					break;
-				case EAttackType::Heavy:
 					if (DeleguateMeleeSoft.IsBound())
 						DeleguateMeleeSoft.Broadcast();
 					break;
-				default:
+				case EAttackType::Heavy:
 					if (DeleguateMeleeHeavy.IsBound())
 						DeleguateMeleeHeavy.Broadcast();
+					break;
+				default:
+					if (DeleguateMeleeSoft.IsBound())
+						DeleguateMeleeSoft.Broadcast();
 					break;
 				}
 			}

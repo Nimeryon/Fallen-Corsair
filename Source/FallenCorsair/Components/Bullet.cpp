@@ -73,7 +73,7 @@ void ABullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(!m_bIsBulletLaunch)
+	if(!bIsBulletLaunch)
 	{
 		SetActorLocation(m_ownerRef->GetActorLocation() + FVector(0,0, 100) + m_ownerRef->GetActorForwardVector() * 100);
 		SetActorRotation(m_ownerRef->GetFollowCamera()->GetComponentRotation());
@@ -81,16 +81,15 @@ void ABullet::Tick(float DeltaTime)
 	
 	if(m_bIsCharging && m_ownerRef)
 	{
-		if(m_currentCharge >= 1)
+		if(currentCharge >= 1)
 		{
-			//LaunchBullet();
 			m_bIsFullyCharge = true;
 			m_bIsCharging = false;
 		}
 		
-		FMath::Clamp(m_currentCharge = m_currentCharge + 1 / m_chargeSpeed * DeltaTime,0,1);
+		FMath::Clamp(currentCharge = currentCharge + 1 / m_chargeSpeed * DeltaTime,0,1);
 		
-		bulletCollision->SetWorldScale3D(FVector(m_bulletRadius * m_currentCharge));
+		bulletCollision->SetWorldScale3D(FVector(m_bulletRadius * currentCharge));
 	}
 }
 
@@ -118,7 +117,7 @@ void ABullet::SetBulletSetting(float bulletSpeed, int dammage, float dammageRadi
 void ABullet::LaunchBullet()
 {
 	projectileMovement->Velocity =  GetActorForwardVector() * m_bulletSpeed;
-	m_bIsBulletLaunch = true;
+	bIsBulletLaunch = true;
 	
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABullet::Explosion, m_lifeSpan, false);

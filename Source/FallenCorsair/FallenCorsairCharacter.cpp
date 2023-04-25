@@ -18,6 +18,7 @@
 #include "Materials/MaterialParameterCollection.h"
 #include "Player/BrutosMovementComponent.h"
 #include "Kismet/KismetMaterialLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -110,6 +111,10 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 	if (Melee_IsTrigerred)
 		Melee_TriggeredSeconds += DeltaTime;
 
+	float BrutosOpacity = UKismetMathLibrary::MapRangeClamped(FVector::Distance(GetFollowCamera()->GetComponentLocation(), GetActorLocation()), 80, 160, 0, 1);
+	UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "Opacity", BrutosOpacity);
+
+
 #pragma region Health Gestion
 	if(m_currentHealth < m_maxHealth)
 	{
@@ -145,15 +150,38 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 	
 	m_alpha = FMath::Clamp( m_alpha + (1 / transition * m_direction) * DeltaTime, 0, 1);
 
+	
+	
 	if((m_alpha != 0) || (m_alpha != 1))
 	{
-		FVector2D newLoc = FMath::InterpEaseIn(m_CameraOffset_S, m_CameraOffset_A, m_alpha, 2);
+		if(m_bIsCharge && m_bIsFocus)
+		{
+			m_alphaCharge = FMath::Clamp( m_alphaCharge + (1 / 1) * DeltaTime, 0, 1);
+			GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_A, m_distanceFromPlayer_C, m_alphaCharge, 2);
+			GetFollowCamera()->SetFieldOfView(FMath::InterpEaseIn(m_fieldOfView_A, m_fieldOfView_C, m_alphaCharge, 2));
+			if(m_cameraShake)
+				m_cameraManager->StartCameraShake(m_cameraShake, m_alphaCharge, ECameraShakePlaySpace::CameraLocal);
+		}
+		else if(m_alphaCharge > 0)
+		{
+			if(m_cameraShake)
+				m_cameraManager->StopCameraShake(m_currentCameraShake, true);
+			
+			m_alphaCharge = FMath::Clamp( m_alphaCharge + (1 / -0.1) * DeltaTime, 0, 1);
+			GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_A, m_distanceFromPlayer_C, m_alphaCharge, 2);
+			GetFollowCamera()->SetFieldOfView(FMath::InterpEaseIn(m_fieldOfView_A, m_fieldOfView_C, m_alphaCharge, 2));
+		}
+		else
+		{
+			m_alphaCharge = 0;
+			FVector2D newLoc = FMath::InterpEaseIn(m_CameraOffset_S, m_CameraOffset_A, m_alpha, 2);
 		
-		GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_S, m_distanceFromPlayer_A, m_alpha, 2);
-		GetCameraBoom()->SetRelativeLocation(FVector(0,newLoc.X,newLoc.Y));
-		GetFollowCamera()->SetFieldOfView(FMath::InterpEaseIn(m_fieldOfView_S, m_fieldOfView_A, m_alpha, 2));
-		m_cameraManager->ViewPitchMin = FMath::InterpEaseIn(m_pitchMin_S, m_pitchMin_A, m_alpha, 2);
-		m_cameraManager->ViewPitchMax = FMath::InterpEaseIn(m_pitchMax_S, m_pitchMax_A, m_alpha, 2);
+			GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_S, m_distanceFromPlayer_A, m_alpha, 2);
+			GetCameraBoom()->SetRelativeLocation(FVector(0,newLoc.X,newLoc.Y));
+			GetFollowCamera()->SetFieldOfView(FMath::InterpEaseIn(m_fieldOfView_S, m_fieldOfView_A, m_alpha, 2));
+			m_cameraManager->ViewPitchMin = FMath::InterpEaseIn(m_pitchMin_S, m_pitchMin_A, m_alpha, 2);
+			m_cameraManager->ViewPitchMax = FMath::InterpEaseIn(m_pitchMax_S, m_pitchMax_A, m_alpha, 2);
+		}
 
 		if(m_bIsFocus)
 		{
@@ -178,7 +206,7 @@ void AFallenCorsairCharacter::Landed(const FHitResult& Hit)
 
 float AFallenCorsairCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if(m_currentHealth > DamageAmount)
+	if(m_currentHealth > DamageAmount && m_bCanBeDammage)
 	{
 		m_currentHealth = m_currentHealth - DamageAmount;
 	}
@@ -205,15 +233,19 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 	}
 	else
 	{
-		gunComp->StopCharge(true);
-		m_direction = -1.f;
+		if(gunComp)
+		{
+			gunComp->StopCharge(true);
+			m_direction = -1.f;
+		}
+		
 	}
 }
 
 void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 {
-	//BrutosMovementComponent->DashPressed();
 	dashComp->DashPressed();
+	OnDodge.Broadcast();
 }
 
 TArray<AActor*> AFallenCorsairCharacter::SetIgnoreCharacterActors()
@@ -224,6 +256,11 @@ TArray<AActor*> AFallenCorsairCharacter::SetIgnoreCharacterActors()
 	GetAllChildActors(CharacterChildren);
 
 	return ActorToIgnore;
+}
+
+void AFallenCorsairCharacter::SetCanBeDamage(bool bCanBeDammage)
+{
+	m_bCanBeDammage = bCanBeDammage;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -343,9 +380,10 @@ void AFallenCorsairCharacter::MeleeTriggered(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 {
-
+	
 	if(m_bIsFocus)
 	{
+		m_bIsCharge = Value.Get<bool>();
 		gunComp->Shoot();
 		OnShoot.Broadcast();
 	}
@@ -365,6 +403,7 @@ void AFallenCorsairCharacter::MeleeStarted(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 {
+	
 	if(!m_bIsFocus)
 	{
 		if (!MeleeComponent->MeleeIsValid())
@@ -380,6 +419,7 @@ void AFallenCorsairCharacter::MeleeCompleted(const FInputActionValue& Value)
 	}
 	else
 	{
+		m_bIsCharge = Value.Get<bool>();
 		gunComp->StopCharge(false);
 	}
 }

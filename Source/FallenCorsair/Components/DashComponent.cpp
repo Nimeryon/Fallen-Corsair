@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Barrel.h"
 
 // Sets default values for this component's properties
 UDashComponent::UDashComponent()
@@ -27,6 +28,7 @@ void UDashComponent::BeginPlay()
 
 	// ...
 	m_ownerRef = Cast<AFallenCorsairCharacter>(GetOwner());
+	m_barrelRef = m_ownerRef->barrelComp;
 	
 }
 
@@ -46,13 +48,14 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 			float CurrentDistance = (m_ownerRef->GetActorLocation() - m_startLoc).Length() + 5;
 			if(CurrentDistance <= m_actualDistance)
 			{
-				m_ownerRef->GetCharacterMovement()->MaxWalkSpeed = m_maxDistance / m_dashTime;
+				m_ownerRef->GetCharacterMovement()->MaxWalkSpeed = m_maxDistance / m_dashTime * m_DashCurve->GetFloatValue(CurrentDistance / m_actualDistance);
 				m_ownerRef->GetCharacterMovement()->Velocity = (m_newLoc - m_startLoc).GetSafeNormal() * m_ownerRef->GetCharacterMovement()->MaxWalkSpeed;
 				m_ownerRef->GetCharacterMovement()->AddInputVector((m_newLoc - m_startLoc).GetSafeNormal(), true);
 				
 
 				if(CurrentDistance / m_actualDistance > m_invicibleTimePercent / 100)
 				{
+					m_ownerRef->SetCanBeDamage(true);
 					// Not Invincible
 					if(CurrentDistance / m_actualDistance > m_slowMoTimePercent / 100 && m_bIsPerfectDodge)
 					{
@@ -61,9 +64,11 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 						m_ownerRef->CustomTimeDilation = m_slowMoRate * 0.5;
 					}
 				}
-				else
+				else if(m_bHasIFrames)
 				{
 					// Invincible
+					// set a bool cant take damage
+					m_ownerRef->SetCanBeDamage(false);
 				}
 			}
 			else
@@ -77,11 +82,16 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UDashComponent::DashPressed()
 {
-	if(m_bCanDash && !m_bIsSlowMo)
+	if(m_barrelRef->GetSlot() > m_energyCost && m_DashCurve)
 	{
-		PerformDash();
-		m_bCanDash = false;
-		GetWorld()->GetTimerManager().SetTimer(m_dashTimer, this, &UDashComponent::DashCD, m_dashCD);
+		if(m_bCanDash && !m_bIsSlowMo)
+		{
+			PerformDash();
+			m_bCanDash = false;
+			GetWorld()->GetTimerManager().SetTimer(m_dashTimer, this, &UDashComponent::DashCD, m_dashCD);
+
+			m_barrelRef->SetSlot(m_barrelRef->GetSlot() - m_energyCost);
+		}
 	}
 }
 
@@ -121,7 +131,7 @@ void UDashComponent::StartDash()
 
 	
 	UKismetSystemLibrary::SphereTraceSingleByProfile(GetWorld(), startTrace, endTrace, 30.f, TEXT("Visibility"), false, m_ownerRef->SetIgnoreCharacterActors(), EDrawDebugTrace::None, Hit, true);
-
+	
 	if(Hit.bBlockingHit && FVector::DotProduct(Hit.Normal, (Hit.TraceStart - Hit.Location).GetSafeNormal()) < 1)
 	{
 		StopDash();

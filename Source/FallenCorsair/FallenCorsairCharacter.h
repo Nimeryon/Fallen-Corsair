@@ -9,6 +9,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnShoot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAim);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDodge);
 
 
 
@@ -122,11 +123,17 @@ public:
 	UFUNCTION()
 	TArray<AActor*> SetIgnoreCharacterActors();
 
+	UFUNCTION()
+	void SetCanBeDamage(bool bCanBeDammage);
+
 	UPROPERTY()
 	FOnShoot OnShoot;
 
 	UPROPERTY()
 	FOnAim OnAim;
+
+	UPROPERTY()
+	FOnAim OnDodge;
 
 private:
 
@@ -139,7 +146,13 @@ private:
 	bool m_bIsFocus = false;
 
 	UPROPERTY()
+	bool m_bIsCharge = false;
+
+	UPROPERTY()
 	float m_alpha = 0.f;
+
+	UPROPERTY()
+	float m_alphaCharge = 0.f;
 	
 	UPROPERTY()
 	float m_direction = 0.f;
@@ -165,11 +178,17 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Field of view", meta = (displayName = "Field of view Aim"), meta = (ClampMin = 10.f, UIMin = 10.f, ClampMax = 170.f, UIMax = 170.f))
 	float m_fieldOfView_A = 90.f;
 
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Field of view", meta = (displayName = "Field of view enCharge"), meta = (ClampMin = 10.f, UIMin = 10.f, ClampMax = 170.f, UIMax = 170.f))
+	float m_fieldOfView_C = 120.f;
+
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Distance", meta = (displayName = "Distance de la camera standard"), meta = (ClampMin = 100.f, UIMin = 100.f, ClampMax = 2000.f, UIMax = 2000.f))
 	float m_distanceFromPlayer_S = 400.f;
 
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Distance", meta = (displayName = "Distance de la camera Aim"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 2000.f, UIMax = 2000.f))
 	float m_distanceFromPlayer_A = 40.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Distance", meta = (displayName = "Distance de la camera en Charge"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 2000.f, UIMax = 2000.f))
+	float m_distanceFromPlayer_C = 40.f;
 
 	/**
 	 * X IS Horizontal And Y Is Vertical
@@ -210,9 +229,18 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Default", meta = (displayName = "Camera Curve"))
 	UCurveFloat* m_cameraCurve;
 
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Default", meta = (displayName = "Camera Shake"))
+	TSubclassOf<UCameraShakeBase> m_cameraShake;
+	
+	UPROPERTY()
+	UCameraShakeBase* m_currentCameraShake;
+
 #pragma endregion
 
 #pragma region Health Variables
+
+	UPROPERTY()
+	bool m_bCanBeDammage = true;
 
 	UPROPERTY()
 	float m_currentHealth = 50.f;

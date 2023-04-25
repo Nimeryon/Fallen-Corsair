@@ -39,7 +39,6 @@ void UGun::BeginPlay()
 	
 }
 
-
 // Called every frame
 void UGun::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -79,6 +78,7 @@ void UGun::Shoot()
 		GetWorld()->LineTraceSingleByChannel(outHit, start, end, ECC_Visibility);
 
 		FActorSpawnParameters SpawnInfo;
+		//SpawnInfo.
 		if(m_bullet)
 		{
 			m_spawnBullet = GetWorld()->SpawnActor<ABullet>(m_bullet, start, m_ownerRef->GetFollowCamera()->GetComponentRotation(), SpawnInfo);
@@ -93,7 +93,8 @@ void UGun::StopCharge(bool bIsCancel)
 {
 	if(m_spawnBullet && !m_spawnBullet->GetIsBulletCharge() || bIsCancel)
 	{
-		m_spawnBullet->Destroy();
+		if(m_spawnBullet)
+			m_spawnBullet->Destroy();
 	}
 	else if(m_spawnBullet->GetIsBulletCharge())
 	{
@@ -101,4 +102,23 @@ void UGun::StopCharge(bool bIsCancel)
 		m_barrelRef->SetSlot(m_gunAmmo);
 		m_spawnBullet->LaunchBullet();
 	}
+}
+
+bool UGun::GetBulletCharging()
+{
+	if(m_spawnBullet)
+	{
+		return !m_spawnBullet->bIsBulletLaunch;
+	}
+	return false;
+}
+
+float UGun::GetBulletCurrentCharge()
+{
+	if(m_spawnBullet)
+	{
+		return m_spawnBullet->currentCharge;
+	}
+
+	return 0;
 }

@@ -47,18 +47,12 @@ private:
 
 	UPROPERTY()
 	bool m_bIsFullyCharge = false;
-
-	UPROPERTY()
-	bool m_bIsBulletLaunch = false;
 	
 	UPROPERTY()
 	float m_dammageRadius = 5.f;
 
 	UPROPERTY()
 	int m_dammage = 1;
-
-	UPROPERTY()
-	bool m_bIsCharging = true;
 
 	UPROPERTY()
 	float m_lifeSpan;
@@ -73,12 +67,20 @@ private:
 	float m_chargeSpeed = 1.f;
 
 	UPROPERTY()
-	float m_currentCharge = 0;
+	bool m_bIsCharging = true;
+
+	
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY()
+	float currentCharge = 0;
+
+	UPROPERTY()
+	bool bIsBulletLaunch = false;
+	
 	UFUNCTION()
 	void Explosion();
 

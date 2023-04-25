@@ -63,6 +63,5 @@ void AGroundAlien::SetState(AlienState State) { m_state = State; }
 
 UAnimInstance* AGroundAlien::GetAnimInstance() const
 {
-	GetMe
 	return GetMesh()->GetAnimInstance();
 }

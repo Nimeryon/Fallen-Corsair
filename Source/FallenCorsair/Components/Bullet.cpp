@@ -10,6 +10,7 @@
 #include "FallenCorsair/Enemies/AlienBase.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values
 ABullet::ABullet()
@@ -80,6 +81,8 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//m_ownerRef = Cast<AFallenCorsairCharacter>(GetOwner());
 }
 
 // Called every frame
@@ -112,9 +115,29 @@ void ABullet::Tick(float DeltaTime)
 			}
 		}
 	}
-	else {
+	else 
+	{
 		TArray<FHitResult> OutHits = MakeSphereCollision(ExplosionSphereRadius);
 		DammageOnHits(OutHits, ExplosionDammage);
+	}
+	
+	if(!m_bIsBulletLaunch)
+	{
+		SetActorLocation(m_ownerRef->GetActorLocation() + FVector(0,0, 100) + m_ownerRef->GetActorForwardVector() * 100);
+		SetActorRotation(m_ownerRef->GetFollowCamera()->GetComponentRotation());
+	}
+	
+	if(m_bIsCharging && m_ownerRef)
+	{
+		if(m_currentCharge >= 1)
+		{
+			m_bIsFullyCharge = true;
+			m_bIsCharging = false;
+		}
+		
+		FMath::Clamp(m_currentCharge = m_currentCharge + 1 / m_chargeSpeed * DeltaTime,0,1);
+		
+		bulletCollision->SetWorldScale3D(FVector(m_bulletRadius * m_currentCharge));
 	}
 }
 
@@ -127,16 +150,27 @@ void ABullet::Explosion()
 }
 
 void ABullet::SetBulletSetting(AActor *_OwnerCauser, float bulletSpeed, int dammage, float dammageRadius, int lifeSpan, float bulletRadius)
+void ABullet::SetBulletSetting(float bulletSpeed, int dammage, float dammageRadius, int lifeSpan, float bulletRadius, float chargeSpeed, AFallenCorsairCharacter* character)
 {
 	OwnerCauser = _OwnerCauser;
 	m_dammage = dammage;
 	m_dammageRadius = dammageRadius;
-	projectileMovement->Velocity =  projectileMovement->Velocity * bulletSpeed;
+	
+	m_bulletSpeed = bulletSpeed;
+	
+	m_bulletRadius = bulletRadius;
+	m_lifeSpan = lifeSpan;
+	m_chargeSpeed = chargeSpeed;
+	m_ownerRef = character;
+}
 
-	bulletCollision->SetWorldScale3D(FVector(bulletRadius));
+void ABullet::LaunchBullet()
+{
+	projectileMovement->Velocity =  GetActorForwardVector() * m_bulletSpeed;
+	m_bIsBulletLaunch = true;
 	
 	FTimerHandle UnusedHandle;
-	// GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABullet::Explosion, lifeSpan, false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABullet::Explosion, lifeSpan, false);
 }
 
 TArray<FHitResult> ABullet::MakeSphereCollision(float _SphereRadius)
@@ -180,4 +214,9 @@ void ABullet::DammageOnHits(TArray<FHitResult> OutHits, float DammageValue, FDam
 			CharacterHited->TakeDamage(DammageValue, DamageEvent, nullptr, GetOwner());
 		}
 	}
+}
+
+bool ABullet::GetIsBulletCharge()
+{
+	return m_bIsFullyCharge;
 }

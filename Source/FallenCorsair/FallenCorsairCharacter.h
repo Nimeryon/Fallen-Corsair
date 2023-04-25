@@ -9,6 +9,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnShoot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAim);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDodge);
+
 
 // Event dispatcher OnPlayerSpawn
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerSpawn);
@@ -83,14 +85,10 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UGun* gunComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Viewfinder")
-	UBlueprint* WBP_Viewfinder;
-	// UClass* WViewfinder;
+	UPROPERTY(EditDefaultsOnly)
+	class UDashComponent* dashComp;
 
 protected:
-
-	
-	
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
@@ -107,7 +105,6 @@ protected:
 	void MeleeSetRotation(const FInputActionValue& Value);
 	void MeleeResetRotation(const FInputActionValue& Value);
 
-
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -119,6 +116,9 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Landed(const FHitResult& Hit) override;
+
+	UFUNCTION(BlueprintCallable)
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -135,6 +135,12 @@ public:
 	UFUNCTION()
 	void Charge(const FInputActionValue& value);
 
+	UFUNCTION()
+	TArray<AActor*> SetIgnoreCharacterActors();
+
+	UFUNCTION()
+	void SetCanBeDamage(bool bCanBeDammage);
+
 	UPROPERTY()
 	FOnShoot OnShoot;
 
@@ -142,6 +148,9 @@ public:
 	FOnAim OnAim;
 	
 	bool IsStunned = false;
+
+	UPROPERTY()
+	FOnAim OnDodge;
 
 private:
 
@@ -159,7 +168,13 @@ private:
 	bool m_bIsFocus = false;
 
 	UPROPERTY()
+	bool m_bIsCharge = false;
+
+	UPROPERTY()
 	float m_alpha = 0.f;
+
+	UPROPERTY()
+	float m_alphaCharge = 0.f;
 	
 	UPROPERTY()
 	float m_direction = 0.f;
@@ -185,11 +200,17 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Field of view", meta = (displayName = "Field of view Aim"), meta = (ClampMin = 10.f, UIMin = 10.f, ClampMax = 170.f, UIMax = 170.f))
 	float m_fieldOfView_A = 90.f;
 
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Field of view", meta = (displayName = "Field of view enCharge"), meta = (ClampMin = 10.f, UIMin = 10.f, ClampMax = 170.f, UIMax = 170.f))
+	float m_fieldOfView_C = 120.f;
+
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Distance", meta = (displayName = "Distance de la camera standard"), meta = (ClampMin = 100.f, UIMin = 100.f, ClampMax = 2000.f, UIMax = 2000.f))
 	float m_distanceFromPlayer_S = 400.f;
 
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Distance", meta = (displayName = "Distance de la camera Aim"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 2000.f, UIMax = 2000.f))
 	float m_distanceFromPlayer_A = 40.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Distance", meta = (displayName = "Distance de la camera en Charge"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 2000.f, UIMax = 2000.f))
+	float m_distanceFromPlayer_C = 40.f;
 
 	/**
 	 * X IS Horizontal And Y Is Vertical
@@ -203,16 +224,16 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Offset", meta = (displayName = "Camera Offset Aim"))
 	FVector2D m_CameraOffset_A = FVector2D(30.f,70.f);
 
-	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Standard", meta = (displayName = "Camera bottom limit standard"), meta = (ClampMin = -90, UIMin = -90, ClampMax = -1, UIMax = -1))
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Standard", meta = (displayName = "Camera bottom limit standard"), meta = (ClampMin = -90, UIMin = -90, ClampMax = 90, UIMax = 90))
 	float m_pitchMin_S = -70.f;
 
-	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Standard", meta = (displayName = "Camera top limit standard"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 90, UIMax = 90))
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Standard", meta = (displayName = "Camera top limit standard"), meta = (ClampMin = -90, UIMin = -90, ClampMax = 90, UIMax = 90))
 	float m_pitchMax_S = 70.f;
 
-	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Aim", meta = (displayName = "Camera bottom limit Aim"), meta = (ClampMin = -90, UIMin = -90, ClampMax = -1, UIMax = -1))
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Aim", meta = (displayName = "Camera bottom limit Aim"), meta = (ClampMin = -90, UIMin = -90, ClampMax = 90, UIMax = 90))
 	float m_pitchMin_A = -45.f;
 
-	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Aim", meta = (displayName = "Camera top limit Aim"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 90, UIMax = 90))
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Clamp|Aim", meta = (displayName = "Camera top limit Aim"), meta = (ClampMin = -90, UIMin = -90, ClampMax = 90, UIMax = 90))
 	float m_pitchMax_A = 45.f;
 
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Mouse|Standard", meta = (displayName = "Sensibilité de la souris vertical standard"), meta = (ClampMin = 0.1, UIMin = 0.1, ClampMax = 5, UIMax = 5))
@@ -230,21 +251,48 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Default", meta = (displayName = "Camera Curve"))
 	UCurveFloat* m_cameraCurve;
 
+	UPROPERTY(EditAnywhere, Category = "Camera Option|Default", meta = (displayName = "Camera Shake"))
+	TSubclassOf<UCameraShakeBase> m_cameraShake;
+	
+	UPROPERTY()
+	UCameraShakeBase* m_currentCameraShake;
+
 #pragma endregion
 
 #pragma region Health Variables
-	
-	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Vie du joueur"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 1000, UIMax = 1000))
-	float m_maxHealth = 50.f;
+
+	UPROPERTY()
+	bool m_bCanBeDammage = true;
 
 	UPROPERTY()
 	float m_currentHealth = 50.f;
+
+	UPROPERTY()
+	float m_alphaRecover = 1.f;
+
+	UPROPERTY()
+	bool m_bIsHealing = false;
+	
+	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Vie du joueur"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 1000, UIMax = 1000))
+	float m_maxHealth = 50.f;
 
 	/**
 	 * Define The Percentage Of Health That The Player Will Recover Each Second
 	 */
 	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Pourcentage de récupétation"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 100, UIMax = 100))
 	float m_recovery = 50.f;
+
+	/**
+	 * Define when the player is in low HP
+	 */
+	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Vie du joueur Low"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 100, UIMax = 100))
+	float m_lowHP = 20.f;
+
+	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Fade Speed"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 10, UIMax = 10))
+	float m_changeSpeed = 20.f;
+
+	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "MPC"))
+	UMaterialParameterCollection* m_collection;
 
 #pragma endregion 
 	

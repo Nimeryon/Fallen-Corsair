@@ -54,7 +54,7 @@ void ADropSoul::Tick(float DeltaTime)
 	
 	 if(CurrentDistance < m_distance)
 	 {
-	 	FVector NewLoc = GetActorLocation() + (Direction * (m_speed * DeltaTime));
+	 	FVector NewLoc = GetActorLocation() + (Direction * ((m_speed + m_distance - CurrentDistance) * DeltaTime));
 	 	SetActorLocation(NewLoc);
 	 	ResetLifeSpan();
 	}
@@ -62,7 +62,6 @@ void ADropSoul::Tick(float DeltaTime)
 
 void ADropSoul::ResetLifeSpan()
 {
-	if(m_bHaveLifeSpan)
-		SetLifeSpan(m_lifeSpan);
+	SetLifeSpan(m_lifeSpan);
 }
 

@@ -69,17 +69,16 @@ private:
 	UPROPERTY()
 	bool m_bIsCharging = true;
 
+	UPROPERTY()
+	float m_currentCharge = 0;
+
+	UPROPERTY()
+	bool m_bIsBulletLaunch = false;
 	
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	UPROPERTY()
-	float currentCharge = 0;
-
-	UPROPERTY()
-	bool bIsBulletLaunch = false;
 	
 	UFUNCTION()
 	void Explosion();

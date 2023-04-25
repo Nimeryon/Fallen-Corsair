@@ -103,22 +103,3 @@ void UGun::StopCharge(bool bIsCancel)
 		m_spawnBullet->LaunchBullet();
 	}
 }
-
-bool UGun::GetBulletCharging()
-{
-	if(m_spawnBullet)
-	{
-		return !m_spawnBullet->bIsBulletLaunch;
-	}
-	return false;
-}
-
-float UGun::GetBulletCurrentCharge()
-{
-	if(m_spawnBullet)
-	{
-		return m_spawnBullet->currentCharge;
-	}
-
-	return 0;
-}

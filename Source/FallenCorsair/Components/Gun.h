@@ -98,11 +98,5 @@ public:
 
 	UFUNCTION()
 	void StopCharge(bool bIsCancel);
-
-	UFUNCTION()
-	bool GetBulletCharging();
-
-	UFUNCTION()
-	float GetBulletCurrentCharge();
 	
 };

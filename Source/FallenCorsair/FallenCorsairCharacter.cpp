@@ -166,7 +166,8 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		{
 			if(m_cameraShake)
 				m_cameraManager->StopCameraShake(m_currentCameraShake, true);
-			
+
+			m_bIsCharge = false;
 			m_alphaCharge = FMath::Clamp( m_alphaCharge + (1 / -0.1) * DeltaTime, 0, 1);
 			GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_A, m_distanceFromPlayer_C, m_alphaCharge, 2);
 			GetFollowCamera()->SetFieldOfView(FMath::InterpEaseIn(m_fieldOfView_A, m_fieldOfView_C, m_alphaCharge, 2));

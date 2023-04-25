@@ -7,6 +7,9 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "../FallenCorsairCharacter.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "FallenCorsair/Enemies/AlienBase.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values
 ABullet::ABullet()
@@ -84,29 +87,34 @@ void ABullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FVector Start = GetActorLocation();
-	FCollisionShape SphereShape = FCollisionShape::MakeSphere(SphereRadius);
-	TArray<FHitResult> OutHits;
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this);
-
-	GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, FQuat::Identity, UEngineTypes::ConvertToTraceType(ECC_Visibility), SphereShape, QueryParams);
-
-	if (Debug)
+	if (!Explosed)
 	{
-		FColor Color = FColor::Red;
+		TArray<FHitResult> OutHits = MakeSphereCollision(BulletSphereRadius);
+
 		if (OutHits.Num())
-			Color = FColor::Green;
-		DrawDebugSphere(GetWorld(), Start, SphereRadius, 10, Color, false, 1, 0, 1);
+		{
+			DammageOnHits(OutHits, BulletDammage);
+			projectileMovement->StopMovementImmediately();
+			bulletMesh->DestroyComponent();
+			SetLifeSpan(ExplosionDuration);
+			Explosed = true;
+
+			// Niagara Explosion
+			if (NS_Explosion)
+			{
+				// Check if the Niagara FX asset was loaded successfully
+				// Set up the spawn parameters
+				FVector SpawnLocation = GetActorLocation();
+				FVector Scale = FVector(1, 1, 1);
+				FRotator SpawnRotation = FRotator::ZeroRotator;
+				// Spawn the Niagara FX system at the specified location and rotation
+				UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Explosion, SpawnLocation, SpawnRotation,  Scale, true);
+			}
+		}
 	}
-
-	// UE_LOG(LogTemp, Warning, UKismetStringLibrary::Conv_IntToString(4));
-
-	if (OutHits.Num())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Hit"));
-
-		// Explosion();
+	else {
+		TArray<FHitResult> OutHits = MakeSphereCollision(ExplosionSphereRadius);
+		DammageOnHits(OutHits, ExplosionDammage);
 	}
 }
 
@@ -118,8 +126,9 @@ void ABullet::Explosion()
 	SetLifeSpan(ExplosionDuration);
 }
 
-void ABullet::SetBulletSetting(float bulletSpeed, int dammage, float dammageRadius, int lifeSpan, float bulletRadius)
+void ABullet::SetBulletSetting(AActor *_OwnerCauser, float bulletSpeed, int dammage, float dammageRadius, int lifeSpan, float bulletRadius)
 {
+	OwnerCauser = _OwnerCauser;
 	m_dammage = dammage;
 	m_dammageRadius = dammageRadius;
 	projectileMovement->Velocity =  projectileMovement->Velocity * bulletSpeed;
@@ -128,4 +137,47 @@ void ABullet::SetBulletSetting(float bulletSpeed, int dammage, float dammageRadi
 	
 	FTimerHandle UnusedHandle;
 	// GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABullet::Explosion, lifeSpan, false);
+}
+
+TArray<FHitResult> ABullet::MakeSphereCollision(float _SphereRadius)
+{
+	FVector Start = GetActorLocation();
+	FCollisionShape SphereShape = FCollisionShape::MakeSphere(_SphereRadius);
+	TArray<FHitResult> OutHits;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	QueryParams.AddIgnoredActor(OwnerCauser);
+
+	GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, FQuat::Identity, UEngineTypes::ConvertToTraceType(ECC_Visibility), SphereShape, QueryParams);
+
+	if (Debug)
+	{
+		FColor Color = FColor::Red;
+		if (OutHits.Num())
+			Color = FColor::Green;
+		DrawDebugSphere(GetWorld(), Start, _SphereRadius, 10, Color, false, 1, 0, 1);
+	}
+
+	return OutHits;
+}
+
+void ABullet::DammageOnHits(TArray<FHitResult> OutHits, float DammageValue, FDamageTypeEvent DamageEvent)
+{
+	for (auto It = OutHits.CreateIterator(); It; It++)
+	{
+		ACharacter* CharacterHited = Cast<ACharacter>((*It).GetActor());
+		if (CharacterHited)
+		{
+			if (Explosed)
+			{
+				if (ActorHitedByExplosion.Contains(CharacterHited))
+				{
+					continue;
+				}
+				ActorHitedByExplosion.Add(CharacterHited);
+			}
+
+			CharacterHited->TakeDamage(DammageValue, DamageEvent, nullptr, GetOwner());
+		}
+	}
 }

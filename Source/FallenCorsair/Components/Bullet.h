@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../Enemies/AlienBase.h"
 #include "Bullet.generated.h"
 
 UCLASS()
@@ -40,16 +41,22 @@ public:
 	bool Debug = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sphere Radius Collision")
-	float SphereRadius = 10;
+	float BulletSphereRadius = 10;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sphere Radius Collision")
+	float ExplosionSphereRadius = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dammage")
 	float BulletDammage = 10;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dammage")
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dammage")
 	float ExplosionDammage = 10;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion Duration")
 	float ExplosionDuration = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion FX")
+	class UNiagaraSystem* NS_Explosion;
 
 protected:
 	// Called when the game starts or when spawned
@@ -70,6 +77,15 @@ public:
 	void Explosion();
 
 	UFUNCTION()
-	void SetBulletSetting(float bulletSpeed, int dammage, float dammageRadius, int lifeSpan, float bulletRadius);
+	void SetBulletSetting(AActor *_OwnerCauser, float bulletSpeed, int dammage, float dammageRadius, int lifeSpan, float bulletRadius);
 	
+	void DammageOnHits(TArray<FHitResult> OutHits, float DammageValue, FDamageTypeEvent DamageEvent = EDamageType::Default);
+
+	TArray<FHitResult> MakeSphereCollision(float _SphereRadius);
+
+	AActor *OwnerCauser;
+
+	bool Explosed = false;
+	TArray<class AActor*> ActorHitedByExplosion;
+
 };

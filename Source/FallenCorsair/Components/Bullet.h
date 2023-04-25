@@ -22,6 +22,8 @@ class FALLENCORSAIR_API ABullet : public AActor
 	
 	UPROPERTY(EditDefaultsOnly)
 	class UProjectileMovementComponent* projectileMovement;
+
+	
 	
 public:	
 	// Sets default values for this actor's properties
@@ -32,8 +34,23 @@ public:
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
 	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug Sphere Collision")
+	bool Debug = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sphere Radius Collision")
+	float SphereRadius = 10;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dammage")
+	float BulletDammage = 10;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dammage")
+
+	float ExplosionDammage = 10;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion Duration")
+	float ExplosionDuration = 1;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

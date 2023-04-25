@@ -69,7 +69,7 @@ float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	
 	m_currentHealth = FMath::Clamp(m_currentHealth - DamageAmount, 0.f, m_health);
 	UE_LOG(LogTemp, Warning, TEXT("%d"), m_currentHealth);
-	
+
 	if (m_currentHealth <= 0)
 	{
 		if (OnDeath.IsBound())

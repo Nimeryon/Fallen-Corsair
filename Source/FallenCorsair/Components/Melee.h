@@ -127,8 +127,11 @@ public:
 	UFUNCTION()
 	void OnMyDelegateTriggered();
 
-	UPROPERTY(BlueprintAssignable, Category = "MyDelegate")
-	FDeleguateMelee DeleguateMelee;
+	UPROPERTY(BlueprintAssignable, Category = "DelegateMelee")
+	FDeleguateMelee DeleguateMeleeSoft;
+
+	UPROPERTY(BlueprintAssignable, Category = "DelegateMelee")
+	FDeleguateMelee DeleguateMeleeHeavy;
 
 	// Vars
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")

@@ -111,16 +111,16 @@ public:
 
 #pragma region Multiplicator
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplicator", meta = (ClampMin = "0", UIMin = "0"))
-	float m_attackMeleeSoftMultiplicator;
+	float m_attackMeleeSoftMultiplicator = 1;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplicator", meta = (ClampMin = "0", UIMin = "0"))
-	float m_attackMeleeHeavyMultiplicator;
+	float m_attackMeleeHeavyMultiplicator = 1;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplicator", meta = (ClampMin = "0", UIMin = "0"))
-	float m_attackDistanceMultiplicator;
+	float m_attackDistanceMultiplicator = 1;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplicator", meta = (ClampMin = "0", UIMin = "0"))
-	float m_attackExplosionMultiplicator;
+	float m_attackExplosionMultiplicator = 1;
 #pragma endregion
 	
 #pragma region Movement

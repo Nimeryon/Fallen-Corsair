@@ -172,10 +172,9 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		MeleeComponent->SetOwnerModeAttack(false);
 	}
 
-	if (MeleeTargetingComponent->TargetReached)
+	if (MeleeTargetingComponent->TargetReached && !MeleeComponent->MeleeIsHeavy())
 	{
 		MeleeTargetingComponent->TargetReached = false;
-		
 		// Perform the first attack combo
 		MeleeComponent->ResumeAnimation();
 	}
@@ -382,6 +381,7 @@ void AFallenCorsairCharacter::MeleeHeavyStarted(const FInputActionValue& Value)
 		return;
 
 	Melee_IsTrigerred = true;
+	MeleeComponent->SetTypeAttack(EAttackType::Heavy);
 	MeleeComponent->ResetCombo();
 	MeleeComponent->PlayAnimationChargingMeleeHeavy();
 	MeleeComponent->SetOwnerModeAttack(true);

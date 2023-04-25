@@ -9,6 +9,8 @@ AAlienNexus::AAlienNexus()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	MeshShield = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshShield"));
+    RootComponent = MeshShield;
 }
 
 // Called when the game starts or when spawned
@@ -23,6 +25,17 @@ void AAlienNexus::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bAllAliensAreDestroyed())
+		MeshShield->SetVisibility(false);
+
+	if (m_currentHealth < m_health)
+	{
+		CurrentTimeAutoRegeneration += DeltaTime;
+		AutoRegeneration();
+	}
+	else {
+		CurrentTimeAutoRegeneration = 0;
+	}
 }
 
 // Called to bind functionality to input
@@ -31,4 +44,46 @@ void AAlienNexus::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
+float AAlienNexus::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{	
+	float ActualDamage;
+
+	if (!bAllAliensAreDestroyed())
+		DamageAmount *= DammageReductionWhileShield;
+
+	ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+    return ActualDamage;
+}
+
+
+// Private
+
+void AAlienNexus::AutoRegeneration()
+{
+	if (CurrentTimeAutoRegeneration >= AutoRegenerationCooldown)
+	{
+		CurrentTimeAutoRegeneration = 0;
+		m_currentHealth += GainHp;
+
+		if (m_currentHealth > m_health)
+			m_currentHealth = m_health;
+	}
+}
+
+bool AAlienNexus::bAllAliensAreDestroyed() const
+{
+	for (auto *Alien : AliensToDestroyBefore) {
+		if (Alien)
+		{	
+			if (Alien->IsAlive())
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 

@@ -25,7 +25,10 @@ UMelee::UMelee()
 
 	OwnerCharacter = CreateDefaultSubobject<ACharacter>(TEXT("OwnerCharacter"));
 
-	DeleguateMelee.AddDynamic(this, &UMelee::OnMyDelegateTriggered);
+	// DeleguateMeleeSoft.AddDynamic(this, &UMelee::OnMyDelegateTriggered);
+
+	
+
 }
 
 void UMelee::OnMyDelegateTriggered()
@@ -45,6 +48,11 @@ void UMelee::BeginPlay()
 		OwnerCharacter = character;
 		MaxWalkSpeed = OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed;
 		MinWalkSpeed = OwnerCharacter->GetCharacterMovement()->MinAnalogWalkSpeed;
+
+		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+		
+		if (AnimInstance)
+			AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &UMelee::OnNotifyBeginReceived);
 	}
 
 }
@@ -86,20 +94,9 @@ void UMelee::PlayAnimationChargingMeleeHeavy()
 
 		if (UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance())
 		{
-			//AnimInstance->StopAllMontages(0.0f);
-
-			const int32 NumLoops = 2;
-
-			// Jouez l'animation Montage en boucle
-			for (int32 i = 0; i < NumLoops; i++)
-			{
-				FOnMontageEnded EndDelegate;
-				AnimInstance->Montage_Play(AnimWhileChargingMeleeHeavy, 1.0f, EMontagePlayReturnType::Duration, 0, false);
-				AnimInstance->Montage_SetEndDelegate(EndDelegate, AnimWhileChargingMeleeHeavy);
-			}
-			
+			AnimInstance->Montage_Play(AnimWhileChargingMeleeHeavy);
+			MontageToPlay = AnimWhileChargingMeleeHeavy;
 		}
-		
 	}
 }
 
@@ -111,7 +108,6 @@ void UMelee::StopAnimationChargingMeleeHeavy()
 	// Stop Animation
 	if (OwnerCharacter->GetMesh())
 	{
-
 		if (UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance())
 		{
 			if (AnimInstance->Montage_IsPlaying(AnimWhileChargingMeleeHeavy))
@@ -168,7 +164,7 @@ void UMelee::UpdateTypeAttack(float& eslapsedSeconds)
 	{
 		if (eslapsedSeconds <= delayInputDepthMeleeHeavy)
 		{
-			SetTypeAttack(EAttackType::Soft);
+			// SetTypeAttack(EAttackType::Soft);
 		}
 		else {
 			SetTypeAttack(EAttackType::Heavy);
@@ -240,7 +236,6 @@ void UMelee::CalculRotation(FVector _rot)
 	rot.Normalize();
 	FRotator rotation = UKismetMathLibrary::MakeRotFromX(rot);
 	RotatorWhileAttackStarted = FRotator(0, rotation.Yaw, 0);
-	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_RotatorToString(RotatorWhileAttackStarted));
 }
 
 bool UMelee::AttackIsStarted() const
@@ -348,12 +343,13 @@ bool UMelee::IsLastCombo() const
 
 void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_NameToString(NotifyName));
+	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_NameToString(NotifyName));
 
 	if (NotifyName == "PoseStarting")
 	{
-		if (!bFreezeAnimation)
-			return;
+		// if (!bFreezeAnimation)
+		// 	return;
+			// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, TEXT("lol"));
 
 		if (OwnerCharacter->GetMesh())
 		{
@@ -712,14 +708,21 @@ void UMelee::AttackSequence()
 
 			if (bPlayedSuccessfully)
 			{
-				if (bIsDeleguate)
-					AnimInstance->OnPlayMontageNotifyBegin.RemoveDynamic(this, &UMelee::OnNotifyBeginReceived);
-
-				AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &UMelee::OnNotifyBeginReceived);
-				bIsDeleguate = true;
-
-				// if (DeleguateMelee.IsBound())
-				// 	DeleguateMelee.Broadcast();
+				switch (attackType)
+				{
+				case EAttackType::Soft:
+					if (DeleguateMeleeHeavy.IsBound())
+						DeleguateMeleeHeavy.Broadcast();
+					break;
+				case EAttackType::Heavy:
+					if (DeleguateMeleeSoft.IsBound())
+						DeleguateMeleeSoft.Broadcast();
+					break;
+				default:
+					if (DeleguateMeleeHeavy.IsBound())
+						DeleguateMeleeHeavy.Broadcast();
+					break;
+				}
 			}
 		}
 	}

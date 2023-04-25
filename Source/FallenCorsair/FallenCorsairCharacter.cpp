@@ -293,10 +293,8 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 		}
 		if(m_cameraCurve)
 		{
-			AddControllerYawInput(LookAxisVector.X * yawSensibility);
-			AddControllerPitchInput(LookAxisVector.Y * pitchSensibility);
-			// AddControllerYawInput(m_cameraCurve->GetFloatValue(LookAxisVector.X) * yawSensibility);
-			// AddControllerPitchInput(m_cameraCurve->GetFloatValue(LookAxisVector.Y) * pitchSensibility);
+			AddControllerYawInput(m_cameraCurve->GetFloatValue(LookAxisVector.X) * yawSensibility);
+			AddControllerPitchInput(m_cameraCurve->GetFloatValue(LookAxisVector.Y) * pitchSensibility);
 		}
 	}
 }

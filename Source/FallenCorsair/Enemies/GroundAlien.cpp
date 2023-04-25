@@ -29,13 +29,8 @@ bool AGroundAlien::Attack()
 	//UKismetSystemLibrary::DrawDebugBox(GetWorld(), GetActorLocation() + Forward * m_attackBoxOffset, m_attackBoxSize, FLinearColor::Yellow, FRotator::ZeroRotator, 1, 1);
 	
 	if (!m_attackTarget) return false;
-	return true;
-}
 
-bool AGroundAlien::CreateAvoidBox()
-{
 	const FVector Position = GetActorLocation() + GetActorForwardVector() * m_attackBoxOffset;
-
 	FHitResult Hit;
 
 	TArray<AActor*> ActorsToIgnore;
@@ -60,6 +55,12 @@ bool AGroundAlien::CreateAvoidBox()
 	{
 		
 	}
+	return true;
+}
+
+bool AGroundAlien::CreateAvoidBox()
+{
+	const FVector Forward = GetActorForwardVector();
 	//UKismetSystemLibrary::DrawDebugBox(GetWorld(), GetActorLocation() + Forward * m_avoidBoxOffset, m_avoidBoxSize, FLinearColor::Blue, FRotator::ZeroRotator, 1.5, 1);
 
 	return true;

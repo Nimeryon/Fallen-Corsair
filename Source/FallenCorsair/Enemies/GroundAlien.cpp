@@ -18,16 +18,7 @@ void AGroundAlien::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UAnimInstance* AnimInstance = GetAnimInstance();
-	if (AnimInstance)
-	{
-		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &AGroundAlien::OnNotifyReceived);
-	}
-}
-
-void AGroundAlien::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
+	m_attackTarget = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
 void AGroundAlien::OnNotifyReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
@@ -35,24 +26,24 @@ void AGroundAlien::OnNotifyReceived(FName NotifyName, const FBranchingPointNotif
 	UE_LOG(LogTemp, Warning, TEXT("Notified"));
 	
 	if (NotifyName == "Attack")
-		Attack(m_attackTarget);
+		Attack();
 	else if (NotifyName == "Doge")
 		CreateAvoidBox();
 }
 
-bool AGroundAlien::Attack(AActor* Target)
+bool AGroundAlien::Attack()
 {
 	const FVector Forward = GetActorForwardVector();
-	UKismetSystemLibrary::DrawDebugBox(GetWorld(), GetActorLocation() + Forward * m_attackBoxOffset, m_attackBoxSize, FLinearColor::Yellow, FRotator::ZeroRotator, 1, 1);
-
-	if (!Target) return false;
+	//UKismetSystemLibrary::DrawDebugBox(GetWorld(), GetActorLocation() + Forward * m_attackBoxOffset, m_attackBoxSize, FLinearColor::Yellow, FRotator::ZeroRotator, 1, 1);
+	
+	if (!m_attackTarget) return false;
 	return true;
 }
 
 bool AGroundAlien::CreateAvoidBox()
 {
 	const FVector Forward = GetActorForwardVector();
-	UKismetSystemLibrary::DrawDebugBox(GetWorld(), GetActorLocation() + Forward * m_avoidBoxOffset, m_avoidBoxSize, FLinearColor::Blue, FRotator::ZeroRotator, 1.5, 1);
+	//UKismetSystemLibrary::DrawDebugBox(GetWorld(), GetActorLocation() + Forward * m_avoidBoxOffset, m_avoidBoxSize, FLinearColor::Blue, FRotator::ZeroRotator, 1.5, 1);
 
 	return true;
 }

@@ -23,13 +23,11 @@ public:
 
 	virtual void BeginPlay() override;
 	
-	virtual void Tick(float DeltaSeconds) override;
-	
 	UFUNCTION()
 	virtual void OnNotifyReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 	
 	UFUNCTION(BlueprintCallable)
-	virtual bool Attack(AActor* Target);
+	virtual bool Attack();
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool CreateAvoidBox();

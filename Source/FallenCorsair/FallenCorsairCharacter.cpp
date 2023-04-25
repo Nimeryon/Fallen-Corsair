@@ -158,7 +158,7 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region Melee
-	if (MeleeTargetingComponent->TargetReached)
+	if (MeleeTargetingComponent && MeleeTargetingComponent->TargetReached)
 	{
 		MeleeTargetingComponent->TargetReached = false;
 		

@@ -141,6 +141,9 @@ public:
 	UAnimMontage* AnimWhileChargingMeleeHeavy;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	UAnimMontage* AnimWhileChargingMeleeHeavyLoop;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	bool CanAirAttack = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
@@ -186,6 +189,9 @@ protected:
 
 	UFUNCTION()
 	virtual void OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
+	
+	UFUNCTION()
+	virtual void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 	// Reaction to elements hited
 	virtual void DammageOnHits(TArray<FHitResult> OutHits);

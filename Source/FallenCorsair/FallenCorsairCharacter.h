@@ -64,7 +64,7 @@ private:
 
 	// Charge Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction*	ChargeAction;
+	class UInputAction*	ChargeAction; 
 
 public:
 	AFallenCorsairCharacter(const FObjectInitializer& ObjectInitializer);
@@ -82,6 +82,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	class UGun* gunComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Viewfinder")
+	UBlueprint* WBP_Viewfinder;
+	// UClass* WViewfinder;
 
 protected:
 

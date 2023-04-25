@@ -52,7 +52,11 @@ void UMelee::BeginPlay()
 		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 		
 		if (AnimInstance)
+		{
 			AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &UMelee::OnNotifyBeginReceived);
+			AnimInstance->OnMontageEnded.AddDynamic(this, &UMelee::OnMontageEnded);
+		}
+
 	}
 
 }
@@ -302,7 +306,6 @@ bool UMelee::IsReleased() const
 	return bInputReleased;
 }
 
-
 bool UMelee::IsFirstCombo() const
 {
 	switch (attackType)
@@ -434,6 +437,22 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 		if (GetCurrentMelee().PlayerVoiceSound)
 		{
 			UGameplayStatics::PlaySound2D(GetWorld(), GetCurrentMelee().PlayerVoiceSound, 1, 1, 0);
+		}
+	}
+}
+
+void UMelee::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (MontageToPlay == AnimWhileChargingMeleeHeavy)
+	{
+		// Play Animation
+		if (OwnerCharacter->GetMesh())
+		{
+			if (UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance())
+			{
+				AnimInstance->Montage_Play(AnimWhileChargingMeleeHeavyLoop);
+				MontageToPlay = AnimWhileChargingMeleeHeavyLoop;
+			}
 		}
 	}
 }

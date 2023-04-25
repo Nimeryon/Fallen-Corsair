@@ -384,6 +384,7 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	}
 	else if (NotifyName == "Hit")
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Hit"));
 		if (!GetCurrentMelee().CollisionWithSockets)
 			TriggerHitWithCollisionShape();
 	}	 

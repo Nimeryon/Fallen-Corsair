@@ -91,7 +91,6 @@ struct FAttackData
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	class USoundBase* AttackSound;
-
 };
 
 USTRUCT(BlueprintType)
@@ -154,7 +153,10 @@ public:
 
 	// Functions
 	//UFUNCTION(BlueprintCallable, Category = Properties)
+
+	UFUNCTION(BlueprintCallable)
 	virtual void PerformAttack();
+	
 	virtual void PlayAnimationChargingMeleeHeavy();
 	virtual void StopAnimationChargingMeleeHeavy();
 	virtual void SetTypeAttack(EAttackType at);
@@ -197,7 +199,6 @@ protected:
 	virtual void DammageOnHits(TArray<FHitResult> OutHits);
 
 private:
-
 	// Functions
 	void TriggerHitWithCollisionShape();
 

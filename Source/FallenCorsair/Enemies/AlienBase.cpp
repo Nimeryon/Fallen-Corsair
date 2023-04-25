@@ -56,6 +56,9 @@ void AAlienBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,AActor* DamageCauser)
 {
+	if (!m_bCanTakeDamage)
+		return Super::TakeDamage(0, DamageEvent, EventInstigator, DamageCauser);
+	
 	// Calculate damage based on DamageEvent
 	const FDamageTypeEvent* damage = static_cast<const FDamageTypeEvent*>(&DamageEvent);
 	EDamageType damageType = EDamageType::Default;

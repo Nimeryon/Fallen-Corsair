@@ -58,16 +58,22 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION()
 	virtual bool IsAlive() const;
 
+	UFUNCTION()
 	virtual bool IsStunned() const;
 
+	UFUNCTION()
 	virtual float GetRemainingStunTime() const;
 
+	UFUNCTION()
 	virtual float GetStunTime() const;
 
+	UFUNCTION()
 	virtual bool Stun(float Time);
 
+	UFUNCTION()
 	virtual float GetDamageMultiplicator(EDamageType DamageType) const;
 	
 	UPROPERTY()
@@ -114,39 +120,25 @@ public:
 	float m_currentStunTime;
 #pragma endregion
 
-#pragma region Multiplicator
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplicator", meta = (ClampMin = "0", UIMin = "0"))
+#pragma region Damage
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+	bool m_bCanTakeDamage = true;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (ClampMin = "0", UIMin = "0", EditCondition="m_bCanTakeDamage"))
 	float m_attackMeleeSoftMultiplicator = 1;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplicator", meta = (ClampMin = "0", UIMin = "0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (ClampMin = "0", UIMin = "0", EditCondition="m_bCanTakeDamage"))
 	float m_attackMeleeHeavyMultiplicator = 1;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplicator", meta = (ClampMin = "0", UIMin = "0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (ClampMin = "0", UIMin = "0", EditCondition="m_bCanTakeDamage"))
 	float m_attackDistanceMultiplicator = 1;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Multiplicator", meta = (ClampMin = "0", UIMin = "0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (ClampMin = "0", UIMin = "0", EditCondition="m_bCanTakeDamage"))
 	float m_attackExplosionMultiplicator = 1;
 #pragma endregion
 	
 #pragma region Movement
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float m_movementSpeed;
-#pragma endregion
-
-#pragma region Attack
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-	float m_attackDamage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-	float m_attackSpeed;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-	float m_attackRange;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-	float m_attackDelay;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-	float m_cooldownTime;
 #pragma endregion
 };

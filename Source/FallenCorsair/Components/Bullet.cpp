@@ -134,8 +134,9 @@ void ABullet::Tick(float DeltaTime)
 void ABullet::Explosion()
 {
 	projectileMovement->StopMovementImmediately();
-	bulletMesh->DestroyComponent();
-	// dammageCollision->SetWorldScale3D(FVector(m_dammageRadius));
+	if (bulletMesh)
+		bulletMesh->DestroyComponent();
+	
 	SetLifeSpan(ExplosionDuration);
 }
 

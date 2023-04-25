@@ -311,6 +311,7 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 
 		//Melee
 		EnhancedInputComponent->BindAction(MeleeSoftAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::MeleeSoftStarted);
+		EnhancedInputComponent->BindAction(MeleeSoftAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::ShootCompleted);
 		EnhancedInputComponent->BindAction(MeleeHeavyAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::MeleeHeavyStarted);
 		EnhancedInputComponent->BindAction(MeleeHeavyAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::MeleeHeavyTriggered);
 		EnhancedInputComponent->BindAction(MeleeHeavyAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::MeleeHeavyCompleted);
@@ -500,6 +501,15 @@ void AFallenCorsairCharacter::MeleeSetRotation(const FInputActionValue& Value)
 void AFallenCorsairCharacter::MeleeResetRotation(const FInputActionValue& Value)
 {
 	MeleeComponent->ResetRotation();
+}
+
+void AFallenCorsairCharacter::ShootCompleted(const FInputActionValue& Value)
+{
+	if (m_bIsFocus)
+	{
+		m_bIsCharge = Value.Get<bool>();
+		gunComp->StopCharge(false);
+	}
 }
 
 //

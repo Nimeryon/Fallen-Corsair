@@ -149,10 +149,9 @@ void ABullet::Explosion()
 	SetLifeSpan(ExplosionDuration);
 }
 
-void ABullet::SetBulletSetting(AActor *_OwnerCauser, float bulletSpeed, int dammage, float dammageRadius, int lifeSpan, float bulletRadius)
 void ABullet::SetBulletSetting(float bulletSpeed, int dammage, float dammageRadius, int lifeSpan, float bulletRadius, float chargeSpeed, AFallenCorsairCharacter* character)
 {
-	OwnerCauser = _OwnerCauser;
+	OwnerCauser = character;
 	m_dammage = dammage;
 	m_dammageRadius = dammageRadius;
 	
@@ -170,7 +169,7 @@ void ABullet::LaunchBullet()
 	m_bIsBulletLaunch = true;
 	
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABullet::Explosion, lifeSpan, false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABullet::Explosion, m_lifeSpan, false);
 }
 
 TArray<FHitResult> ABullet::MakeSphereCollision(float _SphereRadius)

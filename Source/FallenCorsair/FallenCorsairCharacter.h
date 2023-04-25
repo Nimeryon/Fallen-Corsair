@@ -105,6 +105,8 @@ protected:
 	void MeleeSetRotation(const FInputActionValue& Value);
 	void MeleeResetRotation(const FInputActionValue& Value);
 
+	void ShootCompleted(const FInputActionValue& Value);
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

@@ -133,16 +133,19 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 	if(m_currentHealth < 20)
 	{
 		m_bIsHealing = true;
+		m_bIsLowHP = true;
 		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "bIsLowHP", 1.f);
 		m_alphaRecover = 1.f;
 	}
-	else if(m_bIsHealing)
+	else if(m_bIsLowHP)
 	{
 		m_alphaRecover = FMath::Clamp(m_alphaRecover - (1 / m_changeSpeed) * DeltaTime, 0.f, 1.f);
 		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "bIsLowHP", m_alphaRecover);
 		if(m_alphaRecover == 0.f)
 			m_bIsHealing = false;
 	}
+	else
+		m_bIsLowHP = false;
 
 #pragma endregion 
 
@@ -272,7 +275,7 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 
 void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 {
-	if(!m_bIsFocus)
+	if(!m_bIsFocus && !MeleeComponent->AttackIsStarted() && !MeleeComponent->MeleeIsHeavy())
 	{
 		dashComp->DashPressed();
 		OnDodge.Broadcast();

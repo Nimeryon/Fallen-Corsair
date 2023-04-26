@@ -157,6 +157,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void PerformAttack();
 	
+	virtual bool PerformHeavyAttack(float& eslapsedSeconds);
 	virtual void PlayAnimationChargingMeleeHeavy();
 	virtual void StopAnimationChargingMeleeHeavy();
 	virtual void SetTypeAttack(EAttackType at);

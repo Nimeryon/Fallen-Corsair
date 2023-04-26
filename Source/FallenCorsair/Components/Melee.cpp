@@ -88,6 +88,24 @@ void UMelee::PerformAttack()
 	}
 }
 
+bool UMelee::PerformHeavyAttack(float& eslapsedSeconds)
+{
+	if (!MeleeIsValid())
+		return false;
+
+	if (!AttackIsStarted())
+	{
+		if (eslapsedSeconds >= delayInputDepthMeleeHeavy)
+		{
+			SetTypeAttack(EAttackType::Heavy);
+			StartAttack(true);
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void UMelee::PlayAnimationChargingMeleeHeavy()
 {
 	if (!AnimWhileChargingMeleeHeavy || indexCurrentAttack > 0)
@@ -177,14 +195,14 @@ void UMelee::UpdateTypeAttack(float& eslapsedSeconds)
 		}
 		else {
 			SetTypeAttack(EAttackType::Heavy);
-			eslapsedSeconds = 0;
+			// eslapsedSeconds = 0;
 			if (!MeleeIsValid())
 			{
 				SetTypeAttack(EAttackType::Soft);
 			}
 			// SetReleased(true);
 			// StopAnimationChargingMeleeHeavy();
-			StartAttack(true);
+			// StartAttack(true);
 		}
 	}
 }
@@ -454,7 +472,7 @@ void UMelee::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 
 void UMelee::OnMontageBlendOut(UAnimMontage* Montage, bool bInterrupted)
 {
-	if (MontageToPlay == AnimWhileChargingMeleeHeavy)
+	if (MontageToPlay == AnimWhileChargingMeleeHeavy && !bInterrupted)
 	{
 		// Play Animation
 		if (OwnerCharacter->GetMesh())
@@ -463,6 +481,7 @@ void UMelee::OnMontageBlendOut(UAnimMontage* Montage, bool bInterrupted)
 			{
 				// Activer la lecture en boucle
 				AnimInstance->Montage_Play(AnimWhileChargingMeleeHeavyLoop);
+				MontageToPlay = AnimWhileChargingMeleeHeavyLoop;
 			}
 		}
 	}
@@ -717,7 +736,9 @@ void UMelee::AttackSequence()
 {
 	CharactersHited.Reset();
 
-	SetRotation();
+	if (attackType == EAttackType::Soft)
+		SetRotation();
+		
 	EnableWalk(false);
 	bMeleeEnded = false;
 

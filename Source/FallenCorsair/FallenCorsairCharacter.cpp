@@ -492,10 +492,14 @@ void AFallenCorsairCharacter::MeleeHeavyCompleted(const FInputActionValue& Value
 	if (MeleeComponent->AttackIsStarted())
 		return;
 
+	bool bPerformed = MeleeComponent->PerformHeavyAttack(Melee_TriggeredSeconds);
+	
 	Melee_IsTrigerred = false;
 	Melee_TriggeredSeconds = 0;
 	MeleeComponent->StopAnimationChargingMeleeHeavy();
-	MeleeComponent->SetOwnerModeAttack(false);
+	
+	if (!bPerformed)
+		MeleeComponent->SetOwnerModeAttack(false);
 }
 
 void AFallenCorsairCharacter::MeleeSetRotation(const FInputActionValue& Value)

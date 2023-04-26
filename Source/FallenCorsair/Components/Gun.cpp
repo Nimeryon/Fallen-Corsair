@@ -91,9 +91,6 @@ void UGun::Shoot()
 
 void UGun::StopCharge(bool bIsCancel)
 {
-
-	/// when de aiming exist bullet is delete, haveto modify this function to arrange that
-	
 	if(m_spawnBullet && !m_spawnBullet->GetIsBulletCharge() || bIsCancel)
 	{
 		if(m_spawnBullet && m_spawnBullet->GetIsBulletLaunch())
@@ -104,5 +101,6 @@ void UGun::StopCharge(bool bIsCancel)
 		m_gunAmmo -= m_ammoCost;
 		m_barrelRef->SetSlot(m_gunAmmo);
 		m_spawnBullet->LaunchBullet();
+		m_spawnBullet = nullptr;
 	}
 }

@@ -21,24 +21,16 @@ AAlienPlantBomb::AAlienPlantBomb()
 void AAlienPlantBomb::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// Récupérer un composant par sa classe
-	SphereCollisionDetection = Cast<USphereComponent>(GetComponentByClass(USphereComponent::StaticClass()));
-
-	if (SphereCollisionDetection)
-	{
-		SphereCollisionDetection->OnComponentBeginOverlap.AddDynamic(this, &AAlienPlantBomb::OnOverlapBegin);
-	}
 }
 
 // Called every frame
 void AAlienPlantBomb::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (bIsOverlapping)
+	
+	if (bIsAlive() && !bDetectedSomeone)
 	{
-
+		DetectPlayer();
 	}
 
 	if (!bDetectedSomeone)
@@ -58,8 +50,6 @@ void AAlienPlantBomb::Tick(float DeltaTime)
 			UExplosion::PerformExplosion(GetWorld(), GetOwner(), Dammage, GetOwner()->GetActorLocation(), SphereRadius, PropulsionForce, RotationAngleDegrees, NS_Explosion, Debug);
 		}
 	}
-
-	
 }
 
 // Called to bind functionality to input
@@ -86,18 +76,21 @@ float AAlienPlantBomb::TakeDamage(float DamageAmount, FDamageEvent const& Damage
     return ActualDamage;
 }
 
-	 
-
-void AAlienPlantBomb::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{	
-	if (!bIsAlive())
+void AAlienPlantBomb::DetectPlayer() {
+	if (bDetectedSomeone)
 		return;
-		
-	AFallenCorsairCharacter *FallenCorsairCharacter = Cast<AFallenCorsairCharacter>(OtherActor);
-	
-	if (FallenCorsairCharacter)
+
+	TArray<FHitResult> OutHits = MakeSphereCollision(DetectionSphereRadius);
+
+	for (auto It = OutHits.CreateIterator(); It; It++)
 	{
-		bDetectedSomeone = true;
+		AFallenCorsairCharacter *FallenCorsairCharacter = Cast<AFallenCorsairCharacter>((*It).GetActor());
+		if (FallenCorsairCharacter)
+		{
+			bDetectedSomeone = true;
+		}
 	}
 }
+
+
 

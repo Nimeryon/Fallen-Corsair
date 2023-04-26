@@ -47,3 +47,23 @@ float AAlienPlante::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
     return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
+TArray<FHitResult> AAlienPlante::MakeSphereCollision(float _SphereRadius)
+{
+	FVector Start = GetActorLocation();
+	FCollisionShape SphereShape = FCollisionShape::MakeSphere(_SphereRadius);
+	TArray<FHitResult> OutHits;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, FQuat::Identity, UEngineTypes::ConvertToTraceType(ECC_Visibility), SphereShape, QueryParams);
+
+	if (Debug)
+	{
+		FColor Color = FColor::Red;
+		if (OutHits.Num())
+			Color = FColor::Green;
+		DrawDebugSphere(GetWorld(), Start, _SphereRadius, 10, Color, false, 1, 0, 1);
+	}
+
+	return OutHits;
+}

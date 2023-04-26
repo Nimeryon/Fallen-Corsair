@@ -38,7 +38,7 @@ void ABullet::BeginPlay()
 	Super::BeginPlay();
 
 	FTimerHandle Timer;
-	GetWorld()->GetTimerManager().SetTimer(Timer, this, &ABullet::Explosion, m_lifeSpan);
+	//GetWorld()->GetTimerManager().SetTimer(Timer, this, &ABullet::Explosion, m_lifeSpan);
 }
 
 // Called every frame
@@ -47,7 +47,7 @@ void ABullet::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 #pragma region Bullet Charge
-	if(!m_bIsBulletLaunch)
+	if(!m_bIsBulletLaunch && !Explosed)
 	{
 		SetActorLocation(m_ownerRef->GetMesh()->GetSocketLocation("BulletStart"));
 		SetActorRotation(m_ownerRef->GetFollowCamera()->GetComponentRotation());
@@ -174,7 +174,10 @@ void ABullet::DammageOnHits(TArray<FHitResult> OutHits, float DammageValue, FDam
 
 bool ABullet::GetIsBulletCharge()
 {
-	return m_bIsFullyCharge;
+	if(this)
+		return m_bIsFullyCharge;
+	else
+		return false;
 }
 
 bool ABullet::GetIsBulletLaunch()

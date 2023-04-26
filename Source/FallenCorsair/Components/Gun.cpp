@@ -93,7 +93,7 @@ void UGun::StopCharge(bool bIsCancel)
 {
 	if(m_spawnBullet && !m_spawnBullet->GetIsBulletCharge() || bIsCancel)
 	{
-		if(m_spawnBullet && m_spawnBullet->GetIsBulletLaunch())
+		if(m_spawnBullet && !m_spawnBullet->GetIsBulletLaunch())
 		{
 			m_spawnBullet->Destroy();
 			m_spawnBullet = nullptr;

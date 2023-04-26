@@ -55,6 +55,7 @@ void UMelee::BeginPlay()
 		{
 			AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &UMelee::OnNotifyBeginReceived);
 			AnimInstance->OnMontageEnded.AddDynamic(this, &UMelee::OnMontageEnded);
+			AnimInstance->OnMontageBlendingOut.AddDynamic(this, &UMelee::OnMontageBlendOut);
 		}
 
 	}
@@ -106,7 +107,7 @@ void UMelee::PlayAnimationChargingMeleeHeavy()
 
 void UMelee::StopAnimationChargingMeleeHeavy()
 {
-	if (!AnimWhileChargingMeleeHeavy)
+	if (!AnimWhileChargingMeleeHeavy || !AnimWhileChargingMeleeHeavyLoop)
 		return;
 
 	// Stop Animation
@@ -115,6 +116,10 @@ void UMelee::StopAnimationChargingMeleeHeavy()
 		if (UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance())
 		{
 			if (AnimInstance->Montage_IsPlaying(AnimWhileChargingMeleeHeavy))
+			{
+				AnimInstance->StopAllMontages(0.0f);
+			}
+			else if (AnimInstance->Montage_IsPlaying(AnimWhileChargingMeleeHeavyLoop))
 			{
 				AnimInstance->StopAllMontages(0.0f);
 			}
@@ -178,6 +183,7 @@ void UMelee::UpdateTypeAttack(float& eslapsedSeconds)
 				SetTypeAttack(EAttackType::Soft);
 			}
 			// SetReleased(true);
+			// StopAnimationChargingMeleeHeavy();
 			StartAttack(true);
 		}
 	}
@@ -444,6 +450,10 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 
 void UMelee::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
+}
+
+void UMelee::OnMontageBlendOut(UAnimMontage* Montage, bool bInterrupted)
+{
 	if (MontageToPlay == AnimWhileChargingMeleeHeavy)
 	{
 		// Play Animation
@@ -451,8 +461,8 @@ void UMelee::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 		{
 			if (UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance())
 			{
+				// Activer la lecture en boucle
 				AnimInstance->Montage_Play(AnimWhileChargingMeleeHeavyLoop);
-				MontageToPlay = AnimWhileChargingMeleeHeavyLoop;
 			}
 		}
 	}

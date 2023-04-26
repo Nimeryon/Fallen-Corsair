@@ -272,7 +272,7 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 
 void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 {
-	if(m_bIsFocus)
+	if(!m_bIsFocus)
 	{
 		dashComp->DashPressed();
 		OnDodge.Broadcast();

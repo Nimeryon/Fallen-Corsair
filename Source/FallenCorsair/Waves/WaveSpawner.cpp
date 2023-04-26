@@ -103,7 +103,6 @@ void UWaveSpawner::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		m_spawnTime += DeltaTime;
 	}
 #if WITH_EDITOR
-	GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Yellow, FString::Printf(TEXT("Distance from player: %f"), FVector::Dist(m_location, GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation())));
 	GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Yellow, FString::Printf(TEXT("Should spawn: %d"), m_bShouldSpawn));
 #endif
 	// Check if we should spawn

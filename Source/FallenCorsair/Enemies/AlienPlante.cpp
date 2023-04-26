@@ -43,7 +43,6 @@ void AAlienPlante::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 float AAlienPlante::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {	
-
     return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 

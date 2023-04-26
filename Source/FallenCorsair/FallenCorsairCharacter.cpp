@@ -205,14 +205,14 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		Melee_TriggeredSeconds += DeltaTime;
 	}
 
-	if (MeleeComponent->MeleeEnded() && MeleeComponent->MeleeIsHeavy())
+	if (MeleeComponent && MeleeComponent->MeleeEnded() && MeleeComponent->MeleeIsHeavy())
 	{
 		Melee_IsTrigerred = false;
 		Melee_TriggeredSeconds = 0;
 		MeleeComponent->SetOwnerModeAttack(false);
 	}
 
-	if (MeleeTargetingComponent->TargetReached && !MeleeComponent->MeleeIsHeavy())
+	if (MeleeTargetingComponent && MeleeTargetingComponent->TargetReached && !MeleeComponent->MeleeIsHeavy())
 	{
 		MeleeTargetingComponent->TargetReached = false;
 		// Perform the first attack combo

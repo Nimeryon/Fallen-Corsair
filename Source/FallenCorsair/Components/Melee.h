@@ -164,14 +164,13 @@ public:
 	virtual void SetReleased(bool released);
 	virtual void SetOwnerModeAttack(bool ModeAttack);
 	virtual void CancelAttack();
-	virtual void CalculRotation(FVector _rot);
+	virtual void SetRotationWhileAttack(FRotator _rot);
 	virtual void ResetRotation();
 	virtual void ResetCombo();
 	virtual void ResumeAnimation();
 
 	virtual bool AttackIsStarted() const;
 	virtual bool MeleeIsValid() const;
-	virtual bool IsReleased() const;
 	virtual bool IsFirstCombo() const;
 	virtual bool IsLastCombo() const;
 	virtual bool MeleeIsHeavy() const;
@@ -206,7 +205,6 @@ private:
 	void TriggerHitWithCollisionShape();
 
 	// Character
-	virtual void SetRotation();
 	virtual void FreezeRotation(bool freeze);
 	virtual void EnableWalk(bool enable);
 
@@ -237,8 +235,6 @@ private:
 	bool bCanExecuteNextAttack = false;
 	bool bExecuteNextAttack = false;
 	bool bAttackStarted = false;
-	bool bInputReleased = false;
-	bool bIsDeleguate = false;
 	bool bMeleeEnded = false;
 	bool bFreezeAnimation = false;
 	FRotator RotatorWhileAttackStarted;

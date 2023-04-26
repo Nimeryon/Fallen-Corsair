@@ -36,20 +36,16 @@ ABullet::ABullet()
 void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
-	// UE_LOG(LogTemp, Warning, TEXT("Hit"));
-
 	if (Cast<AFallenCorsairCharacter>(OtherActor))
 		return;
 
 	AAlienBase* alien = Cast<AAlienBase>(OtherActor);
 
-	if(alien)
+	if (alien)
 	{
-		// UE_LOG(LogTemp, Warning, TEXT("Hit Bullet"));
 		const FDamageTypeEvent DamageEvent(EDamageType::Distance);
 		OtherActor->TakeDamage(m_dammage, DamageEvent, nullptr, this);
 	}
-
 	
 	Explosion();
 }

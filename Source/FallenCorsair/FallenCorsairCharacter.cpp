@@ -20,6 +20,7 @@
 #include "Player/BrutosMovementComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AFallenCorsairCharacter
@@ -428,8 +429,12 @@ void AFallenCorsairCharacter::MeleeSetRotation(const FInputActionValue& Value)
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 	FVector MovementVector3D = FVector(MovementVector.Y, MovementVector.X, 0);
-	MeleeComponent->CalculRotation(MovementVector3D);
-	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, UKismetStringLibrary::Conv_Vector2dToString(MovementVector));
+
+	FVector VRot = GetCameraBoom()->GetTargetRotation().RotateVector(MovementVector3D);
+	VRot.Normalize();
+	FRotator Rotation = UKismetMathLibrary::MakeRotFromX(VRot);
+	Rotation = FRotator(0, Rotation.Yaw, 0);
+	MeleeComponent->SetRotationWhileAttack(Rotation);
 }
 
 void AFallenCorsairCharacter::MeleeResetRotation(const FInputActionValue& Value)

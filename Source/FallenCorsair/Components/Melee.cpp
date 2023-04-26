@@ -229,11 +229,6 @@ void UMelee::ResumeAnimation()
 	}
 }
 
-void UMelee::SetReleased(bool released)
-{
-	bInputReleased = released;
-}
-
 void UMelee::CancelAttack()
 {
 	ResetCombo();
@@ -253,17 +248,9 @@ void UMelee::CancelAttack()
 	}
 }
 
-void UMelee::CalculRotation(FVector _rot)
+void UMelee::SetRotationWhileAttack(FRotator _rot)
 {
-	AFallenCorsairCharacter* c = Cast<AFallenCorsairCharacter>(OwnerCharacter);
-
-	if (!c)
-		return;
-
-	FVector rot = c->GetCameraBoom()->GetTargetRotation().RotateVector(_rot);
-	rot.Normalize();
-	FRotator rotation = UKismetMathLibrary::MakeRotFromX(rot);
-	RotatorWhileAttackStarted = FRotator(0, rotation.Yaw, 0);
+	RotatorWhileAttackStarted = _rot;
 }
 
 bool UMelee::AttackIsStarted() const
@@ -325,11 +312,6 @@ bool UMelee::MeleeIsValid() const
 	}
 }
 
-bool UMelee::IsReleased() const
-{
-	return bInputReleased;
-}
-
 bool UMelee::IsFirstCombo() const
 {
 	switch (attackType)
@@ -359,8 +341,6 @@ bool UMelee::IsLastCombo() const
 		return indexCurrentAttack == Melees.Soft.Num() - 1;
 	}
 }
-
-
 
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -500,7 +480,6 @@ void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
 			}
 
 			// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, CharacterHited->GetName());
-
 			
 			CharactersHited.Add(CharacterHited);
 
@@ -561,7 +540,6 @@ void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
 
 			DammageValue = UKismetMathLibrary::FCeil(DammageValue);
 			
-			// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, CharacterHited->GetName());
 			FDamageTypeEvent DamageEvent;
 
 			switch (attackType)
@@ -683,13 +661,6 @@ void UMelee::TriggerHitWithSockets()
 
 // Character
 
-void UMelee::SetRotation()
-{
-	OwnerCharacter->SetActorRotation(RotatorWhileAttackStarted);
-	// GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, UKismetStringLibrary::Conv_RotatorToString(RotatorWhileAttackStarted));
-
-}
-
 void UMelee::FreezeRotation(bool freeze)
 {
 	OwnerCharacter->GetCharacterMovement()->bUseControllerDesiredRotation = !freeze;
@@ -736,7 +707,7 @@ void UMelee::AttackSequence()
 	CharactersHited.Reset();
 
 	if (attackType == EAttackType::Soft)
-		SetRotation();
+		OwnerCharacter->SetActorRotation(RotatorWhileAttackStarted);
 		
 	EnableWalk(false);
 	bMeleeEnded = false;

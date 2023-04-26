@@ -46,12 +46,10 @@ void AAlienPlantSpawner::Spawn()
 		FTransform SpawnTransform(SpawnRotation, SpawnLocation);
 		if (BPClassToSpawnForAll)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("not null"));
 			SpawnActorByClass(GetWorld(), BPClassToSpawnForAll, SpawnLocation, SpawnRotation);
 		}
 		else 
 		{
-			UE_LOG(LogTemp, Warning, TEXT("null"));
 			SpawnActorByClass(GetWorld(), ActorToSpawns[i].BPClass, SpawnLocation, SpawnRotation);
 		}
 	}

@@ -17,7 +17,7 @@ public:
 	AAlienPlantBomb();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sphere radius detection")
-	float DetectionSphereRadius = 100;
+	float DetectionSphereRadius = 300;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
 	float PropulsionForce = 0;

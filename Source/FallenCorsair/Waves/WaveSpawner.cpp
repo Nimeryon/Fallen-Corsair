@@ -66,23 +66,33 @@ void UWaveSpawner::SpawnEnemy()
 		SpawnParams.Instigator = Cast<APawn>(GetOwner());
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParams.bNoFail = true;
-		
-		AAlienBase* spawnedActor = GetWorld()->SpawnActor<AAlienBase>(m_waveZoneOwner->GetAlienToSpawn(), GetSpawnLocation(), FRotator::ZeroRotator, SpawnParams);
 
-		if(m_waveTracker)
-			spawnedActor->OnDeath.AddDynamic(m_waveTracker, &UWaveTracker::OnEnemyDeath);
+		const TSubclassOf<AAlienBase> ActorToSpawn = m_waveZoneOwner->GetAlienToSpawn();
+		if(ActorToSpawn)
+		{
+			AAlienBase* SpawnedActor = GetWorld()->SpawnActor<AAlienBase>(ActorToSpawn, GetSpawnLocation(), FRotator::ZeroRotator, SpawnParams);
 
-		if(m_zoneVictoryConditions)
-			spawnedActor->OnDeathWithActor.AddDynamic(m_zoneVictoryConditions, &UVictoryConditionBase::OnEnemyDeath);
+			if(m_waveTracker)
+				SpawnedActor->OnDeath.AddDynamic(m_waveTracker, &UWaveTracker::OnEnemyDeath);
+
+			if(m_zoneVictoryConditions)
+				SpawnedActor->OnDeathWithActor.AddDynamic(m_zoneVictoryConditions, &UVictoryConditionBase::OnEnemyDeath);
+		}
+#if WITH_EDITOR
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("UWaveSpawner::SpawnEnemy - No Alien to spawn"));
+		}
+#endif
 	}
 #if WITH_EDITOR
 	else if (!m_waveZoneOwner)
 	{
-		UE_LOG(LogTemp, Error, TEXT("WaveZoneOwner not found"));
+		UE_LOG(LogTemp, Error, TEXT("UWaveSpawner::SpawnEnemy - WaveZoneOwner not found"));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("WaveTracker not found"));
+		UE_LOG(LogTemp, Error, TEXT("UWaveSpawner::SpawnEnemy - WaveTracker not found"));
 	}
 #endif
 }

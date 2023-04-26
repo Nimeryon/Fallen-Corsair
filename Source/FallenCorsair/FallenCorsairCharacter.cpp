@@ -25,6 +25,9 @@
 //////////////////////////////////////////////////////////////////////////
 // AFallenCorsairCharacter
 
+/// you can focus while you are attacking you have to fix
+
+
 AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer.SetDefaultSubobjectClass<UBrutosMovementComponent>(ACharacter::CharacterMovementComponentName))
 {

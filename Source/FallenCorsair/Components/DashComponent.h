@@ -73,7 +73,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Dash", meta = (displayName = "Durée du dash"), meta = (ClampMin = 0.2, UIMin = 0.2, ClampMax = 10, UIMax = 10))
 	float m_dashTime = 0.5f;
 
-	UPROPERTY(EditAnywhere, Category = "Dash", meta = (displayName = "Dash Angle max des pentes"), meta = (ClampMin = 0.2, UIMin = 0.2, ClampMax = 10, UIMax = 10))
+	UPROPERTY(EditAnywhere, Category = "Dash", meta = (displayName = "Dash Angle max des pentes"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 60, UIMax = 60))
 	float m_maxAngleSlope = 45.f;
 
 	/**

@@ -30,41 +30,6 @@ ABullet::ABullet()
 	projectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Component"));
 	projectileMovement->MaxSpeed = 20000.f;
 	
-	// bulletCollision->OnComponentHit.AddDynamic(this, &ABullet::OnHit);
-	// dammageCollision->OnComponentBeginOverlap.AddDynamic(this, &ABullet::ABullet::OnOverlapBegin);
-}
-
-void ABullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	FVector NormalImpulse, const FHitResult& Hit)
-{
-	// UE_LOG(LogTemp, Warning, TEXT("Hit"));
-
-	if (Cast<AFallenCorsairCharacter>(OtherActor))
-		return;
-
-	AAlienBase* alien = Cast<AAlienBase>(OtherActor);
-
-	if(alien)
-	{
-		// UE_LOG(LogTemp, Warning, TEXT("Hit Bullet"));
-		const FDamageTypeEvent DamageEvent(EDamageType::Distance);
-		OtherActor->TakeDamage(m_dammage, DamageEvent, nullptr, this);
-	}
-
-	
-	Explosion();
-}
-
-void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	AAlienBase* alien = Cast<AAlienBase>(OtherActor);
-
-	if(alien)
-	{
-		const FDamageTypeEvent DamageEvent(EDamageType::Distance);
-		OtherActor->TakeDamage(m_dammage, DamageEvent, nullptr, this);
-	}
 }
 
 // Called when the game starts or when spawned
@@ -72,8 +37,8 @@ void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//m_ownerRef = Cast<AFallenCorsairCharacter>(GetOwner());
-	
+	FTimerHandle Timer;
+	GetWorld()->GetTimerManager().SetTimer(Timer, this, &ABullet::Explosion, m_lifeSpan);
 }
 
 // Called every frame
@@ -84,7 +49,6 @@ void ABullet::Tick(float DeltaTime)
 #pragma region Bullet Charge
 	if(!m_bIsBulletLaunch)
 	{
-		//SetActorLocation(m_ownerRef->GetActorLocation() + FVector(0,0, 100) + m_ownerRef->GetActorForwardVector() * 100);
 		SetActorLocation(m_ownerRef->GetMesh()->GetSocketLocation("BulletStart"));
 		SetActorRotation(m_ownerRef->GetFollowCamera()->GetComponentRotation());
 	}
@@ -104,17 +68,14 @@ void ABullet::Tick(float DeltaTime)
 
 #pragma endregion
 	
-	if (!Explosed)
+	if (!Explosed && m_bIsBulletLaunch)
 	{
-		TArray<FHitResult> OutHits = MakeSphereCollision(BulletSphereRadius);
+		TArray<FHitResult> OutHits = MakeSphereCollision(m_bulletRadius * 32);
 
 		if (OutHits.Num())
 		{
-			DammageOnHits(OutHits, BulletDammage);
+			DammageOnHits(OutHits, m_bulletDammage);
 			Explosion();
-			// projectileMovement->StopMovementImmediately();
-			// bulletMesh->DestroyComponent();
-			// SetLifeSpan(ExplosionDuration);
 			Explosed = true;
 
 			// Niagara Explosion
@@ -130,10 +91,10 @@ void ABullet::Tick(float DeltaTime)
 			}
 		}
 	}
-	else 
+	else if(m_bIsBulletLaunch)
 	{
-		TArray<FHitResult> OutHits = MakeSphereCollision(ExplosionSphereRadius);
-		DammageOnHits(OutHits, ExplosionDammage);
+		TArray<FHitResult> OutHits = MakeSphereCollision(m_explosionRadius);
+		DammageOnHits(OutHits, m_explosionDammage);
 	}
 }
 
@@ -143,21 +104,20 @@ void ABullet::Explosion()
 	if (bulletMesh)
 		bulletMesh->DestroyComponent();
 	
-	SetLifeSpan(ExplosionDuration);
+	SetLifeSpan(m_explosionDuration);
 }
 
-void ABullet::SetBulletSetting(float bulletSpeed, int dammage, float dammageRadius, int lifeSpan, float bulletRadius, float chargeSpeed, AFallenCorsairCharacter* character)
+void ABullet::SetBulletSetting(float bulletSpeed, int dammage, int explosionDammage, float explosionRadius, float explostionDuration, int lifeSpan, float bulletRadius, float chargeSpeed, AFallenCorsairCharacter* character)
 {
-	OwnerCauser = character;
-	m_dammage = dammage;
-	m_dammageRadius = dammageRadius;
+	m_bulletDammage = dammage;
+	m_explosionDammage = explosionDammage;
+	m_explosionRadius = explosionRadius;
 	m_bulletSpeed = bulletSpeed;
 	m_bulletRadius = bulletRadius;
 	m_lifeSpan = lifeSpan;
 	m_chargeSpeed = chargeSpeed;
 	m_ownerRef = character;
-	
-
+	m_explosionDuration = explostionDuration;
 }
 
 void ABullet::LaunchBullet()
@@ -176,7 +136,7 @@ TArray<FHitResult> ABullet::MakeSphereCollision(float _SphereRadius)
 	TArray<FHitResult> OutHits;
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
-	QueryParams.AddIgnoredActor(OwnerCauser);
+	QueryParams.AddIgnoredActor(m_ownerRef);
 
 	GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, FQuat::Identity, UEngineTypes::ConvertToTraceType(ECC_Visibility), SphereShape, QueryParams);
 

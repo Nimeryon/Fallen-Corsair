@@ -69,14 +69,20 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Dégât du projectile"), meta = (ClampMin = 1, UIMin = 1))
 	int m_bulletDammage = 1;
 
+	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Dégât de l'explosion du projectile"), meta = (ClampMin = 1, UIMin = 1))
+	int m_explosionDammage = 1;
+
 	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Portée de l'explosion du projectile"))
-	float m_bulletDammageRadius = 5.f;
+	float m_bulletExplosionRadius = 5.f;
 
 	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Durée de vie du projectile"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 10, UIMax = 10))
 	int m_bulletLifeSpan = 2;
 
 	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Taille du projectile"), meta = (ClampMin = 0.5, UIMin = 0.5, ClampMax = 3, UIMax = 3))
 	float m_bulletRadius = 0.5f;
+
+	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Durée de l'explosion"), meta = (ClampMin = 1, UIMin = 1))
+	float m_explosionDuration = 1;
 	
 	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Vitesse de chargement"), meta = (ClampMin = 0.1, UIMin = 0.1, ClampMax = 10, UIMax = 10))
 	float m_ChargeSpeed = 1.f;

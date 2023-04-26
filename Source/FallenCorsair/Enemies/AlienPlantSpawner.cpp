@@ -38,7 +38,6 @@ void AAlienPlantSpawner::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 // Called to bind functionality to input
 void AAlienPlantSpawner::Spawn()
 {
-
 	for(int i = 0; i < ActorToSpawns.Num(); i++)
 	{
 		FVector OffsetPos = GetOwner()->GetActorForwardVector() * ActorToSpawns[i].OffsetLocationSpawn.X + GetOwner()->GetActorRightVector() * ActorToSpawns[i].OffsetLocationSpawn.Y + GetOwner()->GetActorUpVector() * ActorToSpawns[i].OffsetLocationSpawn.Z;
@@ -47,9 +46,12 @@ void AAlienPlantSpawner::Spawn()
 		FTransform SpawnTransform(SpawnRotation, SpawnLocation);
 		if (BPClassToSpawnForAll)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("not null"));
 			SpawnActorByClass(GetWorld(), BPClassToSpawnForAll, SpawnLocation, SpawnRotation);
 		}
-		else {
+		else 
+		{
+			UE_LOG(LogTemp, Warning, TEXT("null"));
 			SpawnActorByClass(GetWorld(), ActorToSpawns[i].BPClass, SpawnLocation, SpawnRotation);
 		}
 	}

@@ -84,6 +84,12 @@ private:
 
 	UPROPERTY()
 	bool m_bIsBulletLaunch = false;
+
+	UPROPERTY()
+	bool m_isLifeSpanDone = false;
+
+	UPROPERTY(EditAnywhere, Category = "impulse")
+	float m_impulse = 1000;
 	
 
 public:	
@@ -104,6 +110,9 @@ public:
 
 	UFUNCTION()
 	bool GetIsBulletLaunch();
+
+	UFUNCTION()
+	void IsLifeSpanDone();
 	
 	void DammageOnHits(TArray<FHitResult> OutHits, float DammageValue, FDamageTypeEvent DamageEvent = EDamageType::Default);
 

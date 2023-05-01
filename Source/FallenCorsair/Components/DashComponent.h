@@ -62,7 +62,7 @@ private:
 	float m_dashCD = 1.f;
 
 	UPROPERTY()
-	float m_groundDistance = 150.f;
+	float m_groundDistance = 200.f;
 
 	UPROPERTY(EditAnywhere, Category = "Dash", meta = (displayName = "Distance max du dash"), meta = (ClampMin = 100, UIMin = 100, ClampMax = 3000, UIMax = 3000))
 	float m_maxDistance = 300.f;

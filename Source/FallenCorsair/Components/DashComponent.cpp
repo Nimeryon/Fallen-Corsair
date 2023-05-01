@@ -32,7 +32,6 @@ void UDashComponent::BeginPlay()
 	
 }
 
-
 // Called every frame
 void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -60,6 +59,7 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 					if(CurrentDistance / m_actualDistance > m_slowMoTimePercent / 100 && m_bIsPerfectDodge)
 					{
 						m_bIsSlowMo = true;
+						m_ownerRef->EnableInput(nullptr);
 						UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1 / m_slowMoRate);
 						m_ownerRef->CustomTimeDilation = m_slowMoRate * 0.5;
 					}
@@ -73,10 +73,14 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 			}
 			else
 			{
+				m_ownerRef->EnableInput(nullptr);
 				StopDash();
-				
 			}
 		}
+	}
+	else 
+	{
+		m_ownerRef->EnableInput(nullptr);
 	}
 }
 
@@ -87,6 +91,7 @@ void UDashComponent::DashPressed()
 		if(m_bCanDash && !m_bIsSlowMo)
 		{
 			PerformDash();
+			m_ownerRef->DisableInput(nullptr);
 			m_bCanDash = false;
 			GetWorld()->GetTimerManager().SetTimer(m_dashTimer, this, &UDashComponent::DashCD, m_dashCD);
 

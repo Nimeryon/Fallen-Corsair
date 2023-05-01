@@ -163,7 +163,7 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 
 	if((m_alpha != 0) || (m_alpha != 1))
 	{
-		if(m_bIsCharge && m_bIsFocus)
+		if(m_bIsCharge && m_bIsFocus && m_alpha == 1)
 		{
 			m_alphaCharge = FMath::Clamp( m_alphaCharge + (1 / 1) * DeltaTime, 0, 1);
 			GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_A, m_distanceFromPlayer_C, m_alphaCharge, 2);

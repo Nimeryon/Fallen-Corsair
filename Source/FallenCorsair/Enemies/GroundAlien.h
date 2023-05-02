@@ -51,6 +51,8 @@ public:
 	virtual void SetState(AlienState State);
 
 	virtual void Death(EDamageType DamageType) override;
+
+	virtual bool Stun(float Time) override;
 	
 public:
 #pragma region Soul

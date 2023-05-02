@@ -7,7 +7,7 @@
 #include "VictoryConditionBase.generated.h"
 
 
-// Event dispatcher OnWaveOver
+// Event dispatcher OnZoneVictory
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FZoneVictory);
 
 UENUM()

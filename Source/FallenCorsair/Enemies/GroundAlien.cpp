@@ -5,8 +5,6 @@
 
 #include "DropSoul.h"
 #include "FallenCorsair/FallenCorsairCharacter.h"
-#include "FallenCorsair/Components/Melee.h"
-#include "FallenCorsair/Waves/WaveZone.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -112,4 +110,12 @@ void AGroundAlien::Death(EDamageType DamageType)
 		GetWorld()->SpawnActor<ADropSoul>(m_soul, GetActorLocation(), FRotator::ZeroRotator);
 	
 	Super::Death(DamageType);
+}
+
+bool AGroundAlien::Stun(float Time)
+{
+	const bool IsStunned = Super::Stun(Time);
+	
+	
+	return IsStunned;
 }

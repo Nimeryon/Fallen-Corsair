@@ -240,17 +240,17 @@ void AFallenCorsairCharacter::Landed(const FHitResult& Hit)
 
 float AFallenCorsairCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if(m_currentHealth > DamageAmount && m_bCanBeDammage)
+	if (m_bCanBeDammage)
 	{
-		m_currentHealth = m_currentHealth - DamageAmount;
+		m_currentHealth = FMath::Clamp(m_currentHealth - DamageAmount, 0, m_maxHealth);
 	}
-	else
+
+	if (m_currentHealth <= 0)
 	{
-		m_currentHealth = 0;
 		/// called death event
 	}
 
-	
+	UE_LOG(LogTemp, Warning, TEXT("Brutos life: %f"), m_currentHealth);
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }

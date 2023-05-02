@@ -14,6 +14,9 @@ void AGroundAlien::BeginPlay()
 {
 	Super::BeginPlay();
 
+	m_material = GetMesh()->CreateDynamicMaterialInstance(0, nullptr, "Stitch Material");
+	m_material->SetScalarParameterValue("AngryLevel", 1);
+
 	GetCharacterMovement()->JumpZVelocity = m_attackJumpForce;
 	m_attackTarget = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
@@ -148,7 +151,12 @@ void AGroundAlien::Death(EDamageType DamageType)
 bool AGroundAlien::Stun(float Time)
 {
 	const bool IsStunned = Super::Stun(Time);
-	
+	if (IsStunned) m_material->SetScalarParameterValue("AngryLevel", 0);
 	
 	return IsStunned;
+}
+
+void AGroundAlien::Unstunned()
+{
+	m_material->SetScalarParameterValue("AngryLevel", 1);
 }

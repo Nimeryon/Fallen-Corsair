@@ -53,11 +53,18 @@ public:
 	virtual void Death(EDamageType DamageType) override;
 
 	virtual bool Stun(float Time) override;
+
+	virtual void Unstunned() override;
 	
 public:
 #pragma region Soul
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Soul")
 	TSubclassOf<class ADropSoul> m_soul;
+#pragma endregion
+
+#pragma region Material
+	UPROPERTY()
+	class UMaterialInstanceDynamic* m_material;
 #pragma endregion
 
 #pragma region State

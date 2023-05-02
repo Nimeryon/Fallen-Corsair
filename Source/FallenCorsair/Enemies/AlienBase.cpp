@@ -98,7 +98,8 @@ bool AAlienBase::Stun(float Time)
 
 	if (OnStunned.IsBound())
 		OnStunned.Broadcast(Time);
-	
+
+	m_bStunned = true;
 	m_stunTime = Time;
 	m_currentStunTime = 0.f;
 	return true;

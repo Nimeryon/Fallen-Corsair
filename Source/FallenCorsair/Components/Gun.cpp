@@ -8,6 +8,8 @@
 #include "../FallenCorsairCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "DrawDebugHelpers.h"
+#include "Kismet/KismetStringLibrary.h"
 
 // Sets default values for this component's properties
 UGun::UGun()
@@ -45,7 +47,6 @@ void UGun::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
 
-	// ...
 }
 
 int UGun::GetAmmo()
@@ -85,16 +86,19 @@ void UGun::Shoot()
 			m_spawnBullet->SetBulletSetting(m_bulletSpeed,m_bulletDammage, m_explosionDammage, m_bulletExplosionRadius, m_explosionDuration, m_bulletLifeSpan, m_bulletRadius, m_ChargeSpeed, m_ownerRef);
 			
 		}
-		UE_LOG(LogTemp, Warning, TEXT("Shoot"));
+		// UE_LOG(LogTemp, Warning, TEXT("Shoot"));
 	}
 }
 
 void UGun::StopCharge(bool bIsCancel)
 {
+
+
 	if(m_spawnBullet && !m_spawnBullet->GetIsBulletCharge() || bIsCancel)
 	{
 		if(m_spawnBullet && !m_spawnBullet->GetIsBulletLaunch())
 		{
+			m_spawnBullet->StopChargeSound();
 			m_spawnBullet->Destroy();
 			m_spawnBullet = nullptr;
 		}
@@ -104,7 +108,56 @@ void UGun::StopCharge(bool bIsCancel)
 	{
 		m_gunAmmo -= m_ammoCost;
 		m_barrelRef->SetSlot(m_gunAmmo);
-		m_spawnBullet->LaunchBullet();
+		m_spawnBullet->StopChargeSound();
+		m_spawnBullet->LaunchBullet(GetDirectionBullet());
 		m_spawnBullet = nullptr;
 	}
+}
+
+FVector UGun::GetDirectionBullet()
+{
+	FVector ImpactLocation = GetImpactPointOnScreen();
+
+	if (ImpactLocation == FVector::Zero())
+		return FVector::Zero();
+
+	FVector Dir = ImpactLocation - m_ownerRef->GetMesh()->GetSocketLocation(m_socketLoc);;
+	Dir.Normalize();
+	return Dir;
+}
+
+// Private
+UCameraComponent* UGun::GetParentCamera()
+{
+	// Récupérer l'acteur parent
+	AActor* ParentActor = GetOwner();
+	
+	if (!ParentActor)
+		return nullptr;
+
+	UCameraComponent* ParentCamera = ParentActor->FindComponentByClass<UCameraComponent>();
+
+	return ParentCamera;
+}
+
+FVector UGun::GetImpactPointOnScreen()
+{
+	
+	UCameraComponent* ParentCamera = GetParentCamera();
+
+	if (!ParentCamera)
+		return FVector::Zero();
+
+	FHitResult HitResult;
+	FVector StartLocation = ParentCamera->GetComponentLocation();
+	FVector EndLocation =  ParentCamera->GetComponentLocation() + ParentCamera->GetForwardVector() * 10000;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(GetOwner());
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, CollisionParams);
+
+	if (bHit)
+		return FVector(HitResult.ImpactPoint.X, HitResult.ImpactPoint.Y, HitResult.ImpactPoint.Z);
+
+	return FVector::Zero();
 }

@@ -35,10 +35,11 @@ float AAlienInhibitor::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 {	
 	float ActualDamage;
 
-	ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	if (bIsAlive())
+		if (SoundGetDammaged)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundGetDammaged);
 
-	if (SoundGetDammaged)
-		UGameplayStatics::SpawnSound2D(GetWorld(), SoundGetDammaged);
+	ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	if (!bIsAlive())
 		if (SoundDeath)

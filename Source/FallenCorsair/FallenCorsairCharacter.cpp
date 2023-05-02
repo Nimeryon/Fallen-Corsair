@@ -21,6 +21,7 @@
 #include "Player/BrutosMovementComponent.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AFallenCorsairCharacter
@@ -111,6 +112,7 @@ void AFallenCorsairCharacter::BeginPlay()
 void AFallenCorsairCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 
 	if (GetCharacterMovement()->IsMovingOnGround())
 	{
@@ -221,6 +223,17 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		// Perform the first attack combo
 		MeleeComponent->ResumeAnimation();
 	}
+
+	
+	if (MeleeComponent->MeleeEnded())
+	{
+		bool bIsAcceleration = GetCharacterMovement()->GetCurrentAcceleration().Length() > 0;
+		if (bIsAcceleration)
+		{
+			MeleeComponent->CancelAttack();
+		}
+			
+	}
 #pragma endregion
 
 	//GetCameraBoom()->TargetArmLength = FMath::Clamp( GetCameraBoom()->TargetArmLength, m_distanceFromPlayer_S / 4, m_distanceFromPlayer_S);
@@ -247,6 +260,20 @@ float AFallenCorsairCharacter::TakeDamage(float DamageAmount, FDamageEvent const
 		/// called death event
 	}
 
+
+	if (m_currentHealth > 0)
+	{
+		if (SoundGetHurt)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundGetHurt);
+	}
+	else 
+	{
+		if (SoundDeath)
+		{
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundDeath);
+			SoundDeath = nullptr;
+		}
+	}	
 	
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);

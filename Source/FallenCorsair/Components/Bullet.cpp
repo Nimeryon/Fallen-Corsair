@@ -11,6 +11,9 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
+#include "Kismet/KismetMaterialLibrary.h"
 
 // Sets default values
 ABullet::ABullet()
@@ -39,6 +42,17 @@ void ABullet::BeginPlay()
 
 	FTimerHandle Timer;
 	//GetWorld()->GetTimerManager().SetTimer(Timer, this, &ABullet::Explosion, m_lifeSpan);
+
+	// Bind to OnAudioFinished delegate
+	if (SoundChargeComplete)
+	{
+		AudioComponentChargeComplete = NewObject<UAudioComponent>(this);
+		AudioComponentChargeComplete->SetSound(SoundChargeComplete);
+		// Jouer le son en boucle
+		AudioComponentChargeComplete->bAutoActivate = false; // Désactiver la lecture automatique pour éviter un délai
+		AudioComponentChargeComplete->bStopWhenOwnerDestroyed = false; // Empêcher le composant audio d'être détruit avec le propriétaire
+		SoundChargeComplete->bLooping = true; // Activer la lecture en boucle
+	}
 }
 
 // Called every frame
@@ -47,11 +61,19 @@ void ABullet::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 #pragma region Bullet Charge
+
+	if (bLoopStartedSoundChargeCompleted)
+	{
+		PlayChargeCompletedSound();
+	}
+
 	if(!m_bIsBulletLaunch && !Explosed)
 	{
 		SetActorLocation(m_ownerRef->GetMesh()->GetSocketLocation("BulletStart"));
 		SetActorRotation(m_ownerRef->GetFollowCamera()->GetComponentRotation());
+		PlayChargeSound();
 	}
+
 	
 	if(m_bIsCharging && m_ownerRef)
 	{
@@ -59,11 +81,15 @@ void ABullet::Tick(float DeltaTime)
 		{
 			m_bIsFullyCharge = true;
 			m_bIsCharging = false;
+			StopAudioComponent(AudioComponentCharge);
+			PlayChargeCompletedSound();
 		}
 		
 		FMath::Clamp(m_currentCharge = m_currentCharge + 1 / m_chargeSpeed * DeltaTime,0,1);
 		
 		bulletCollision->SetWorldScale3D(FVector(m_bulletRadius * m_currentCharge));
+
+
 	}
 
 #pragma endregion
@@ -89,6 +115,9 @@ void ABullet::Tick(float DeltaTime)
 				// Spawn the Niagara FX system at the specified location and rotation
 				UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Explosion, SpawnLocation, SpawnRotation,  Scale, true);
 			}
+
+			if (SoundSplash)
+				UGameplayStatics::SpawnSound2D(GetWorld(), SoundSplash);
 		}
 	}
 	else if(m_bIsBulletLaunch)
@@ -120,13 +149,20 @@ void ABullet::SetBulletSetting(float bulletSpeed, int dammage, int explosionDamm
 	m_explosionDuration = explostionDuration;
 }
 
-void ABullet::LaunchBullet()
+void ABullet::LaunchBullet(FVector Dir)
 {
-	projectileMovement->Velocity =  GetActorForwardVector() * m_bulletSpeed;
+	if (Dir == FVector::Zero())
+		projectileMovement->Velocity = GetActorForwardVector() * m_bulletSpeed;
+	else
+		projectileMovement->Velocity = Dir * m_bulletSpeed;
+
 	m_bIsBulletLaunch = true;
 	
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABullet::Explosion, m_lifeSpan, false);
+
+	if (SoundShoot)
+		UGameplayStatics::SpawnSound2D(GetWorld(), SoundShoot);
 }
 
 TArray<FHitResult> ABullet::MakeSphereCollision(float _SphereRadius)
@@ -183,4 +219,39 @@ bool ABullet::GetIsBulletCharge()
 bool ABullet::GetIsBulletLaunch()
 {
 	return m_bIsBulletLaunch;
+}
+
+void ABullet::PlayChargeSound()
+{
+	if (SoundCharge)
+	{
+		if (!AudioComponentCharge)
+		{
+			AudioComponentCharge = UGameplayStatics::SpawnSound2D(GetWorld(), SoundCharge);
+		}
+	}
+}
+
+void ABullet::PlayChargeCompletedSound()
+{
+	if (!AudioComponentChargeComplete->IsPlaying())
+	{
+		AudioComponentChargeComplete->Play();
+	}
+}
+
+void ABullet::StopChargeSound()
+{
+	StopAudioComponent(AudioComponentCharge);
+	StopAudioComponent(AudioComponentChargeComplete);
+}
+
+// Private
+void ABullet::StopAudioComponent(UAudioComponent* AudioComponent)
+{
+	if (!AudioComponent)
+		return;
+
+	AudioComponent->Stop();
+	AudioComponent->DestroyComponent();
 }

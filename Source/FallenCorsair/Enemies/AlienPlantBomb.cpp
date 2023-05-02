@@ -46,21 +46,7 @@ void AAlienPlantBomb::Tick(float DeltaTime)
 		CurrentCountdown = 0;
 		m_currentHealth = 0;
 
-		if (!bIsAlive() && CanEffect)
-		{
-			CanEffect = false;
-			if (SoundExplosion)
-				UGameplayStatics::SpawnSound2D(GetWorld(), SoundExplosion);
-
-			if (AudioComponentDetonator)
-			{
-				AudioComponentDetonator->Stop();
-				AudioComponentDetonator->DestroyComponent();
-				AudioComponentDetonator = nullptr;
-			}
-
-			UExplosion::PerformExplosion(GetWorld(), GetOwner(), Dammage, GetOwner()->GetActorLocation(), SphereRadius, PropulsionForce, RotationAngleDegrees, NS_Explosion, Debug);
-		}
+	
 	}
 }
 

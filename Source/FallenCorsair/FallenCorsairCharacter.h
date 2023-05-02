@@ -88,6 +88,15 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UDashComponent* dashComp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundFootStep;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundGetHurt;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundDeath;
+
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);

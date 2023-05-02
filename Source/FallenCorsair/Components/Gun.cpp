@@ -103,7 +103,7 @@ void UGun::StopCharge(bool bIsCancel)
 	else if(m_spawnBullet->GetIsBulletCharge())
 	{
 		m_gunAmmo -= m_ammoCost;
-		m_barrelRef->SetSlot(m_gunAmmo);
+		m_barrelRef->SetSlot(m_ammoCost);
 		m_spawnBullet->LaunchBullet();
 		m_spawnBullet = nullptr;
 	}

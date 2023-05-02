@@ -92,6 +92,7 @@ void AFallenCorsairCharacter::BeginPlay()
 
 	/// I place the camera lag here because it doesn't work inthje constructor dunno why **confuse smiley**
 	GetCameraBoom()->CameraLagSpeed = m_cameraLag;
+	GetCharacterMovement()->MaxWalkSpeed = m_walkSpeed;
 	
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	m_cameraManager= PlayerController->PlayerCameraManager;
@@ -133,15 +134,17 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		m_currentHealth = m_maxHealth;
 	}
 
-	if(m_currentHealth < 20)
+	if(m_currentHealth < m_lowHP)
 	{
 		m_bIsHealing = true;
 		m_bIsLowHP = true;
-		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "bIsLowHP", 1.f);
+		m_alphaDerecover = FMath::Clamp(m_alphaDerecover + (1 / m_changeSpeed) * DeltaTime, 0.f, 1.f);
+		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "bIsLowHP", m_alphaDerecover);
 		m_alphaRecover = 1.f;
 	}
 	else if(m_bIsLowHP)
 	{
+		m_alphaDerecover = 0;
 		m_alphaRecover = FMath::Clamp(m_alphaRecover - (1 / m_changeSpeed) * DeltaTime, 0.f, 1.f);
 		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "bIsLowHP", m_alphaRecover);
 		if(m_alphaRecover == 0.f)
@@ -163,13 +166,18 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 
 	if((m_alpha != 0) || (m_alpha != 1))
 	{
-		if(m_bIsCharge && m_bIsFocus && m_alpha == 1)
+		if(m_bIsCharge && m_bIsFocus && m_alpha == 1 && m_alphaCharge < 1 && barrelComp->GetSlot() > 0)
 		{
 			m_alphaCharge = FMath::Clamp( m_alphaCharge + (1 / 1) * DeltaTime, 0, 1);
 			GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_A, m_distanceFromPlayer_C, m_alphaCharge, 2);
 			GetFollowCamera()->SetFieldOfView(FMath::InterpEaseIn(m_fieldOfView_A, m_fieldOfView_C, m_alphaCharge, 2));
 			if(m_cameraShake)
 				m_cameraManager->StartCameraShake(m_cameraShake, m_alphaCharge, ECameraShakePlaySpace::CameraLocal);
+		}
+		else if(m_alphaCharge >= 1 && m_bIsFocus && m_bIsCharge)
+		{
+			if(m_cameraShake)
+				m_cameraManager->StopCameraShake(m_currentCameraShake, true);
 		}
 		else if(m_alphaCharge > 0)
 		{
@@ -185,6 +193,7 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		{
 			m_alphaCharge = 0;
 			FVector2D newLoc = FMath::InterpEaseIn(m_CameraOffset_S, m_CameraOffset_A, m_alpha, 2);
+			
 		
 			GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_S, m_distanceFromPlayer_A, m_alpha, 2);
 			GetCameraBoom()->SetRelativeLocation(FVector(0,newLoc.X,newLoc.Y));
@@ -192,7 +201,18 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 			m_cameraManager->ViewPitchMin = FMath::InterpEaseIn(m_pitchMin_S, m_pitchMin_A, m_alpha, 2);
 			m_cameraManager->ViewPitchMax = FMath::InterpEaseIn(m_pitchMax_S, m_pitchMax_A, m_alpha, 2);
 		}
-
+		if(m_bIsFocus && m_bIsCharge)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = m_chargeWalkSpeed;
+		}
+		else if(m_bIsFocus)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = m_aimWalkSpeed;
+		}
+		else
+		{
+			GetCharacterMovement()->MaxWalkSpeed = m_walkSpeed;
+		}
 		if(m_bIsFocus)
 		{
 			FRotator newRot;
@@ -225,17 +245,6 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		MeleeComponent->ResumeAnimation();
 	}
 #pragma endregion
-
-	//GetCameraBoom()->TargetArmLength = FMath::Clamp( GetCameraBoom()->TargetArmLength, m_distanceFromPlayer_S / 4, m_distanceFromPlayer_S);
-}
-
-void AFallenCorsairCharacter::Landed(const FHitResult& Hit)
-{
-	Super::Landed(Hit);
-	
-	// BrutosMovementComponent->AirControl = 0.35f;
-	// BrutosMovementComponent->DashPressed();
-	
 }
 
 float AFallenCorsairCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -257,6 +266,9 @@ float AFallenCorsairCharacter::TakeDamage(float DamageAmount, FDamageEvent const
 
 void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 {
+	if(!bIsAimAvailable)
+		return;
+	
 	OnAim.Broadcast();
 	m_bIsFocus = bIsZoom.Get<bool>();
 	GetCameraBoom()->bEnableCameraLag = !m_bIsFocus;
@@ -278,6 +290,9 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 
 void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 {
+	if(!bIsDashAvailable)
+		return;
+	
 	if(!m_bIsFocus && !MeleeComponent->AttackIsStarted() && !MeleeComponent->MeleeIsHeavy())
 	{
 		dashComp->DashPressed();
@@ -320,7 +335,7 @@ void AFallenCorsairCharacter::SetupPlayerInputComponent(class UInputComponent* P
 
 		//Melee
 		EnhancedInputComponent->BindAction(MeleeSoftAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::MeleeSoftStarted);
-		EnhancedInputComponent->BindAction(MeleeSoftAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::ShootCompleted);
+		EnhancedInputComponent->BindAction(MeleeHeavyAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::ShootCompleted);
 		EnhancedInputComponent->BindAction(MeleeHeavyAction, ETriggerEvent::Started, this, &AFallenCorsairCharacter::MeleeHeavyStarted);
 		EnhancedInputComponent->BindAction(MeleeHeavyAction, ETriggerEvent::Triggered, this, &AFallenCorsairCharacter::MeleeHeavyTriggered);
 		EnhancedInputComponent->BindAction(MeleeHeavyAction, ETriggerEvent::Completed, this, &AFallenCorsairCharacter::MeleeHeavyCompleted);
@@ -403,25 +418,14 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeSoftStarted(const FInputActionValue& Value)
 {
+	if(!bIsSoftMeleeAvailable)
+		return;
+	
 	if (IsStunned)
 		return;
 
 	if(m_bIsFocus)
-	{
-		m_bIsCharge = Value.Get<bool>();
-		gunComp->Shoot();
-		
-		if (OnShoot.IsBound())
-		{
-			OnShoot.Broadcast();
-			
-#if WITH_EDITOR
-			GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.f, FColor::Yellow, FString::Printf(TEXT("onshoot broadcast")));
-#endif
-		}
-
 		return;
-	}
 
 	if (MeleeTargetingComponent->IsMeleeTargeting())
 		return;
@@ -456,11 +460,32 @@ void AFallenCorsairCharacter::MeleeSoftStarted(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeHeavyStarted(const FInputActionValue& Value)
 {
+
+	if(!bIsHeavyMeleeAvailable)
+		return;
+	
 	if (IsStunned)
 		return;
 
-	if (m_bIsFocus)
+	if(m_bIsFocus)
+	{
+		if(!bIsShootAvailable)
+			return;
+		
+		m_bIsCharge = Value.Get<bool>();
+		gunComp->Shoot();
+		
+		if (OnShoot.IsBound())
+		{
+			OnShoot.Broadcast();
+			
+#if WITH_EDITOR
+			GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.f, FColor::Yellow, FString::Printf(TEXT("onshoot broadcast")));
+#endif
+		}
+
 		return;
+	}
 
 	if (MeleeTargetingComponent->IsMeleeTargeting())
 		return;

@@ -96,7 +96,7 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UDashComponent::DashPressed()
 {
-	if(m_barrelRef->GetSlot() > m_energyCost && m_DashCurve)
+	if(m_barrelRef->GetSlot() >= m_energyCost && m_DashCurve)
 	{
 		if(m_bCanDash && !m_bIsSlowMo)
 		{
@@ -105,7 +105,7 @@ void UDashComponent::DashPressed()
 			m_bCanDash = false;
 			GetWorld()->GetTimerManager().SetTimer(m_dashTimer, this, &UDashComponent::DashCD, m_dashCD);
 
-			m_barrelRef->SetSlot(m_barrelRef->GetSlot() - m_energyCost);
+			m_barrelRef->SetSlot(m_energyCost);
 		}
 	}
 }

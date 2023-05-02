@@ -118,8 +118,6 @@ protected:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void Landed(const FHitResult& Hit) override;
-
 	UFUNCTION(BlueprintCallable)
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
@@ -160,6 +158,25 @@ public:
 
 	UPROPERTY()
 	FOnSoulPicked OnSoulPicked;
+
+#pragma region Input Availability
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsDashAvailable = true;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsAimAvailable = true;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsShootAvailable = true;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsSoftMeleeAvailable = true;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsHeavyMeleeAvailable = true;
+
+#pragma endregion 
 
 private:
 
@@ -282,6 +299,9 @@ private:
 	float m_alphaRecover = 1.f;
 
 	UPROPERTY()
+	float m_alphaDerecover = 0;
+
+	UPROPERTY()
 	bool m_bIsHealing = false;
 	
 	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Vie du joueur"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 1000, UIMax = 1000))
@@ -305,7 +325,17 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "MPC"))
 	UMaterialParameterCollection* m_collection;
 
-#pragma endregion 
+#pragma endregion
+
+	UPROPERTY(EditAnywhere, Category = "Walk", meta = (displayName = "Normal Walk"))
+	float m_walkSpeed = 600.f;
+
+	UPROPERTY(EditAnywhere, Category = "Walk", meta = (displayName = "Aim Walk"))
+	float m_aimWalkSpeed = 600.f;
+
+	UPROPERTY(EditAnywhere, Category = "Walk", meta = (displayName = "Charge Walk"))
+	float m_chargeWalkSpeed = 600.f;
+	
 	
 };
 

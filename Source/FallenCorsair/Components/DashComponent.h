@@ -88,6 +88,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Dash", meta = (displayName = "Dash Curve"))
 	UCurveFloat* m_DashCurve;
 
+	UPROPERTY(EditAnywhere, Category = "Dash", meta = (displayName = "Dash Impulse On Ennemy"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 10000, UIMax = 10000))
+	float m_impulse = 500.f;
+
+	UPROPERTY(EditAnywhere, Category = "Dash", meta = (displayName = "Dash Impulse Z On Ennemy"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 10000, UIMax = 10000))
+	float m_impulseZ = 0.f;
+
 	/**
 	 * The Player Launch The SlowMo at the given percentage of time of the dash
 	 */
@@ -130,5 +136,8 @@ UFUNCTION()
 
 	UFUNCTION()
 	void PerfectDodge();
+
+	UFUNCTION()
+	void ImpulseEnnemy();
 		
 };

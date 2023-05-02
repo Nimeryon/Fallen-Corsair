@@ -22,7 +22,7 @@ void AAlienPlante::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!bIsAlive())
+	if (!IsAlive())
 	{
 		ReviveTimer += DeltaTime;
 	}

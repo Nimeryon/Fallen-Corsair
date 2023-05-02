@@ -25,6 +25,9 @@
 //////////////////////////////////////////////////////////////////////////
 // AFallenCorsairCharacter
 
+/// you can focus while you are attacking you have to fix
+
+
 AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer.SetDefaultSubobjectClass<UBrutosMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
@@ -133,16 +136,19 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 	if(m_currentHealth < 20)
 	{
 		m_bIsHealing = true;
+		m_bIsLowHP = true;
 		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "bIsLowHP", 1.f);
 		m_alphaRecover = 1.f;
 	}
-	else if(m_bIsHealing)
+	else if(m_bIsLowHP)
 	{
 		m_alphaRecover = FMath::Clamp(m_alphaRecover - (1 / m_changeSpeed) * DeltaTime, 0.f, 1.f);
 		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "bIsLowHP", m_alphaRecover);
 		if(m_alphaRecover == 0.f)
 			m_bIsHealing = false;
 	}
+	else
+		m_bIsLowHP = false;
 
 #pragma endregion 
 
@@ -157,7 +163,7 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 
 	if((m_alpha != 0) || (m_alpha != 1))
 	{
-		if(m_bIsCharge && m_bIsFocus)
+		if(m_bIsCharge && m_bIsFocus && m_alpha == 1)
 		{
 			m_alphaCharge = FMath::Clamp( m_alphaCharge + (1 / 1) * DeltaTime, 0, 1);
 			GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_A, m_distanceFromPlayer_C, m_alphaCharge, 2);
@@ -205,14 +211,14 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		Melee_TriggeredSeconds += DeltaTime;
 	}
 
-	if (MeleeComponent->MeleeEnded() && MeleeComponent->MeleeIsHeavy())
+	if (MeleeComponent && MeleeComponent->MeleeEnded() && MeleeComponent->MeleeIsHeavy())
 	{
 		Melee_IsTrigerred = false;
 		Melee_TriggeredSeconds = 0;
 		MeleeComponent->SetOwnerModeAttack(false);
 	}
 
-	if (MeleeTargetingComponent->TargetReached && !MeleeComponent->MeleeIsHeavy())
+	if (MeleeTargetingComponent && MeleeTargetingComponent->TargetReached && !MeleeComponent->MeleeIsHeavy())
 	{
 		MeleeTargetingComponent->TargetReached = false;
 		// Perform the first attack combo
@@ -234,17 +240,17 @@ void AFallenCorsairCharacter::Landed(const FHitResult& Hit)
 
 float AFallenCorsairCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if(m_currentHealth > DamageAmount && m_bCanBeDammage)
+	if (m_bCanBeDammage)
 	{
-		m_currentHealth = m_currentHealth - DamageAmount;
+		m_currentHealth = FMath::Clamp(m_currentHealth - DamageAmount, 0, m_maxHealth);
 	}
-	else
+
+	if (m_currentHealth <= 0)
 	{
-		m_currentHealth = 0;
 		/// called death event
 	}
 
-	
+	UE_LOG(LogTemp, Warning, TEXT("Brutos life: %f"), m_currentHealth);
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
@@ -272,7 +278,7 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 
 void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 {
-	if(!m_bIsFocus)
+	if(!m_bIsFocus && !MeleeComponent->AttackIsStarted() && !MeleeComponent->MeleeIsHeavy())
 	{
 		dashComp->DashPressed();
 		OnDodge.Broadcast();

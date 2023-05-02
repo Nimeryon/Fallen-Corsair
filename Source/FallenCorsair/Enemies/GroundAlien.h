@@ -19,9 +19,12 @@ class FALLENCORSAIR_API AGroundAlien : public AAlienBase
 	GENERATED_BODY()
 
 public:
-	AGroundAlien(const FObjectInitializer& ObjectInitializer);
-
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaSeconds) override;
+
+	UFUNCTION(BlueprintCallable)
+	virtual void PrepareAttack();
 	
 	UFUNCTION(BlueprintCallable)
 	virtual bool Attack();
@@ -32,16 +35,29 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void JumpTowardsTarget();
 	
+	UFUNCTION(BlueprintCallable)
+	virtual void SetCooldownTime(float Cooldown);
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void SetCooldownActive();
+
+	UFUNCTION(BlueprintCallable)
+	virtual bool IsInCooldown() const;
+	
 	UFUNCTION()
 	virtual AlienState GetState() const;
 	
 	UFUNCTION()
 	virtual void SetState(AlienState State);
+
+	virtual void Death(EDamageType DamageType) override;
+
+	virtual bool Stun(float Time) override;
 	
 public:
-#pragma region Components
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	class UMelee* m_meleeComponent;
+#pragma region Soul
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Soul")
+	TSubclassOf<class ADropSoul> m_soul;
 #pragma endregion
 
 #pragma region State
@@ -62,10 +78,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 	bool m_bIsInCooldown;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attack")
+	UPROPERTY(BlueprintReadOnly, Category = "Attack")
 	float m_cooldownTime;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attack")
+	UPROPERTY(BlueprintReadOnly, Category = "Attack")
 	float m_currentCooldownTime;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack", meta = (ClampMin = "0", UIMin = "0"))
@@ -82,6 +98,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 	FVector m_attackBoxOffset;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attack")
+	FVector m_attackTargetPosition;
 #pragma endregion
 
 #pragma region Hit Chance
@@ -99,7 +118,4 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack", meta = (ClampMin = "0", UIMin = "0"))
 	float m_attackJumpSpeed;
 #pragma endregion
-
-private:
-	UAnimInstance* GetAnimInstance() const;
 };

@@ -156,14 +156,13 @@ public:
 
 private:
 
-#pragma region Camera Variables
+#pragma region Melee
 
 
 	// Chrono for melee input
 	float Melee_TriggeredSeconds = 0;
 	bool Melee_IsTrigerred = false;
 #pragma endregion 
-
 
 #pragma region Camera Variables
 	UPROPERTY()
@@ -267,6 +266,9 @@ private:
 	bool m_bCanBeDammage = true;
 
 	UPROPERTY()
+	bool m_bIsLowHP = false;
+
+	UPROPERTY()
 	float m_currentHealth = 50.f;
 
 	UPROPERTY()
@@ -290,8 +292,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Vie du joueur Low"), meta = (ClampMin = 0, UIMin = 0, ClampMax = 100, UIMax = 100))
 	float m_lowHP = 20.f;
 
-	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Fade Speed"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 10, UIMax = 10))
-	float m_changeSpeed = 20.f;
+	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Fade Speed"), meta = (ClampMin = 0.1, UIMin = 0.1, ClampMax = 100, UIMax = 100))
+	float m_changeSpeed = 1.f;
 
 	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "MPC"))
 	UMaterialParameterCollection* m_collection;

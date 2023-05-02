@@ -15,7 +15,7 @@ struct FEnemies
 	TSubclassOf<class AAlienBase> Enemy;
 	
 	UPROPERTY(EditAnywhere, Category = "Enemy", meta = (ClampMin = "0.0", ClampMax = "1.0"))
-	float Ratio;
+	float Ratio = 1.f;
 };
 
 UCLASS()

@@ -44,6 +44,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (ClampMin = 0.01, UIMin = 0.01), meta = (displayName = "Vitesse de chargement en pourcentage"))
 	float m_speedCharge = 100.f;
 
+	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (displayName = "MPC"))
+	UMaterialParameterCollection* m_collection;
+
 public:
 	UFUNCTION()
 	int GetSlot();

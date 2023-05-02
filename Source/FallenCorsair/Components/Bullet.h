@@ -25,9 +25,6 @@ class FALLENCORSAIR_API ABullet : public AActor
 	
 	UPROPERTY(EditDefaultsOnly)
 	class UProjectileMovementComponent* projectileMovement;
-
-	
-
 	
 	
 public:	

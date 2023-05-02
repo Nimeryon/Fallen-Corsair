@@ -32,7 +32,6 @@ void UDashComponent::BeginPlay()
 	
 }
 
-
 // Called every frame
 void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -52,6 +51,7 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 				m_ownerRef->GetCharacterMovement()->Velocity = (m_newLoc - m_startLoc).GetSafeNormal() * m_ownerRef->GetCharacterMovement()->MaxWalkSpeed;
 				m_ownerRef->GetCharacterMovement()->AddInputVector((m_newLoc - m_startLoc).GetSafeNormal(), true);
 				
+				ImpulseEnnemy();
 
 				if(CurrentDistance / m_actualDistance > m_invicibleTimePercent / 100)
 				{
@@ -60,6 +60,7 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 					if(CurrentDistance / m_actualDistance > m_slowMoTimePercent / 100 && m_bIsPerfectDodge)
 					{
 						m_bIsSlowMo = true;
+						m_ownerRef->EnableInput(nullptr);
 						UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1 / m_slowMoRate);
 						m_ownerRef->CustomTimeDilation = m_slowMoRate * 0.5;
 					}
@@ -73,10 +74,14 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 			}
 			else
 			{
+				m_ownerRef->EnableInput(nullptr);
 				StopDash();
-				
 			}
 		}
+	}
+	else 
+	{
+		m_ownerRef->EnableInput(nullptr);
 	}
 }
 
@@ -87,6 +92,7 @@ void UDashComponent::DashPressed()
 		if(m_bCanDash && !m_bIsSlowMo)
 		{
 			PerformDash();
+			m_ownerRef->DisableInput(nullptr);
 			m_bCanDash = false;
 			GetWorld()->GetTimerManager().SetTimer(m_dashTimer, this, &UDashComponent::DashCD, m_dashCD);
 
@@ -179,5 +185,30 @@ void UDashComponent::DashSlowMoReset()
 void UDashComponent::PerfectDodge()
 {
 	m_bIsPerfectDodge = true;
+}
+
+void UDashComponent::ImpulseEnnemy()
+{
+	FVector Start = m_ownerRef->GetActorLocation();
+	const float CapsuleRadius = m_ownerRef->GetCapsuleComponent()->GetScaledCapsuleRadius() * 2;
+	const float CapsuleHalfHeight = m_ownerRef->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2;
+	FCollisionShape SphereShape = FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHeight);
+	TArray<FHitResult> OutHits;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(m_ownerRef);
+	GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, FQuat::Identity, UEngineTypes::ConvertToTraceType(ECC_Visibility), SphereShape, QueryParams);
+
+	DrawDebugCapsule(GetWorld(), m_ownerRef->GetActorLocation(), CapsuleHalfHeight, CapsuleRadius, m_ownerRef->GetActorRotation().Quaternion(), FColor::Red);
+	
+	for(auto It = OutHits.CreateIterator(); It; It++)
+	{
+		ACharacter* CharacterHited = Cast<ACharacter>((*It).GetActor());
+		if(CharacterHited)
+		{
+			FVector Impulse = (CharacterHited->GetActorLocation() - m_ownerRef->GetActorLocation()).GetSafeNormal();
+			Impulse.Z = m_impulseZ;
+			CharacterHited->GetCharacterMovement()->AddImpulse(Impulse * m_impulse, true);
+		}
+	}
 }
 

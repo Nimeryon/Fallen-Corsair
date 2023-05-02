@@ -154,9 +154,6 @@ public:
 	UPROPERTY()
 	FOnAim OnDodge;
 
-	UPROPERTY(BlueprintReadWrite)
-	float m_currentHealth = 50.f;
-
 private:
 
 #pragma region Melee
@@ -271,8 +268,8 @@ private:
 	UPROPERTY()
 	bool m_bIsLowHP = false;
 
-	// UPROPERTY()
-	// float m_currentHealth = 50.f;
+	UPROPERTY()
+	float m_currentHealth = 50.f;
 
 	UPROPERTY()
 	float m_alphaRecover = 1.f;

@@ -10,7 +10,8 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnShoot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAim);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDodge);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPerfectDodge);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSoulPicked);
 
 // Event dispatcher OnPlayerSpawn
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerSpawn);
@@ -152,7 +153,13 @@ public:
 	bool IsStunned = false;
 
 	UPROPERTY()
-	FOnAim OnDodge;
+	FOnDodge OnDodge;
+
+	UPROPERTY()
+	FOnPerfectDodge OnPerfectDodge;
+
+	UPROPERTY()
+	FOnSoulPicked OnSoulPicked;
 
 private:
 

@@ -74,6 +74,9 @@ public:
 	virtual bool Stun(float Time);
 
 	UFUNCTION()
+	virtual void Unstunned();
+
+	UFUNCTION()
 	virtual float GetDamageMultiplicator(EDamageType DamageType) const;
 
 	UFUNCTION()

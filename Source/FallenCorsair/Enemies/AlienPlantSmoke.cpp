@@ -65,7 +65,6 @@ void AAlienPlantSmoke::StunAlien()
 	for (auto It = OutHits.CreateIterator(); It; It++)
 	{
 		AAlienBase* Alien = Cast<AAlienBase>((*It).GetActor());
-
 		if (Alien)
 		{
 			Alien->Stun(StunDuration);

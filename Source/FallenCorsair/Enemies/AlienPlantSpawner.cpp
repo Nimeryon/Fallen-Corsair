@@ -71,7 +71,7 @@ float AAlienPlantSpawner::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	if (!bIsAlive() && CanEffect)
+	if (!IsAlive() && CanEffect)
 	{
 		CanEffect = false;
 		Spawn();

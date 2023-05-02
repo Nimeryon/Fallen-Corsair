@@ -75,6 +75,9 @@ public:
 
 	UFUNCTION()
 	virtual float GetDamageMultiplicator(EDamageType DamageType) const;
+
+	UFUNCTION()
+	virtual void Death(EDamageType DamageType);
 	
 	UPROPERTY()
 	FOnAlienSpawn OnSpawn;
@@ -82,11 +85,8 @@ public:
 	UPROPERTY()
 	FOnAlienDeath OnDeath;
 
-
 	UPROPERTY()
 	FOnAlienDeathWithActor OnDeathWithActor;
-
-	bool bIsAlive() const;
 	
 	UPROPERTY()
 	FOnAlienStunned OnStunned;

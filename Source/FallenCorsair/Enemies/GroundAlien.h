@@ -49,8 +49,15 @@ public:
 	
 	UFUNCTION()
 	virtual void SetState(AlienState State);
+
+	virtual void Death(EDamageType DamageType) override;
 	
 public:
+#pragma region Soul
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Soul")
+	TSubclassOf<class ADropSoul> m_soul;
+#pragma endregion
+
 #pragma region State
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	AlienState m_state = AlienState::Normal;

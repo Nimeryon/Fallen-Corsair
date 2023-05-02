@@ -3,6 +3,7 @@
 
 #include "GroundAlien.h"
 
+#include "DropSoul.h"
 #include "FallenCorsair/FallenCorsairCharacter.h"
 #include "FallenCorsair/Components/Melee.h"
 #include "FallenCorsair/Waves/WaveZone.h"
@@ -104,3 +105,11 @@ void AGroundAlien::SetCooldownActive() { m_bIsInCooldown = true; }
 AlienState AGroundAlien::GetState() const { return m_state; }
 
 void AGroundAlien::SetState(AlienState State) { m_state = State; }
+
+void AGroundAlien::Death(EDamageType DamageType)
+{
+	if (DamageType == EDamageType::MeleeHeavy || DamageType == EDamageType::MeleeSoft)
+		GetWorld()->SpawnActor<ADropSoul>(m_soul, GetActorLocation(), FRotator::ZeroRotator);
+	
+	Super::Death(DamageType);
+}

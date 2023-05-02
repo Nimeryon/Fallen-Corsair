@@ -28,7 +28,7 @@ void AAlienPlantBomb::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (bIsAlive() && !bDetectedSomeone)
+	if (IsAlive() && !bDetectedSomeone)
 	{
 		DetectPlayer();
 	}
@@ -44,7 +44,7 @@ void AAlienPlantBomb::Tick(float DeltaTime)
 		CurrentCountdown = 0;
 		m_currentHealth = 0;
 
-		if (!bIsAlive() && CanEffect)
+		if (!IsAlive() && CanEffect)
 		{
 			CanEffect = false;
 			UExplosion::PerformExplosion(GetWorld(), GetOwner(), Dammage, GetOwner()->GetActorLocation(), SphereRadius, PropulsionForce, RotationAngleDegrees, NS_Explosion, Debug);
@@ -67,7 +67,7 @@ float AAlienPlantBomb::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	if (!bIsAlive() && CanEffect)
+	if (!IsAlive() && CanEffect)
 	{
 		CanEffect = false;
 		UExplosion::PerformExplosion(GetWorld(), GetOwner(), Dammage, GetOwner()->GetActorLocation(), SphereRadius, PropulsionForce, RotationAngleDegrees, NS_Explosion, Debug);

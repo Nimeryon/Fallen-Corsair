@@ -5,6 +5,7 @@
 #include "AlienBase.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AAlienPlantSmoke::AAlienPlantSmoke()
@@ -84,6 +85,9 @@ void AAlienPlantSmoke::StunAlien()
 		// Spawn the Niagara FX system at the specified location and rotation
 		UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Smoke, SpawnLocation, SpawnRotation, Scale, true);
 	}
+
+	if (SoundSmoke)
+		UGameplayStatics::SpawnSound2D(GetWorld(), SoundSmoke);
 
 	if (Debug)
 	{

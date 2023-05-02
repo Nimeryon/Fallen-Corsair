@@ -9,6 +9,8 @@
 #include "Components/SphereComponent.h"
 #include "../FallenCorsairCharacter.h"
 #include "Components/SceneComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 AAlienPlantBomb::AAlienPlantBomb()
@@ -47,6 +49,16 @@ void AAlienPlantBomb::Tick(float DeltaTime)
 		if (!bIsAlive() && CanEffect)
 		{
 			CanEffect = false;
+			if (SoundExplosion)
+				UGameplayStatics::SpawnSound2D(GetWorld(), SoundExplosion);
+
+			if (AudioComponentDetonator)
+			{
+				AudioComponentDetonator->Stop();
+				AudioComponentDetonator->DestroyComponent();
+				AudioComponentDetonator = nullptr;
+			}
+
 			UExplosion::PerformExplosion(GetWorld(), GetOwner(), Dammage, GetOwner()->GetActorLocation(), SphereRadius, PropulsionForce, RotationAngleDegrees, NS_Explosion, Debug);
 		}
 	}
@@ -70,6 +82,17 @@ float AAlienPlantBomb::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	if (!bIsAlive() && CanEffect)
 	{
 		CanEffect = false;
+
+		if (SoundExplosion)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundExplosion);
+
+		if (AudioComponentDetonator)
+		{
+			AudioComponentDetonator->Stop();
+			AudioComponentDetonator->DestroyComponent();
+			AudioComponentDetonator = nullptr;
+		}
+
 		UExplosion::PerformExplosion(GetWorld(), GetOwner(), Dammage, GetOwner()->GetActorLocation(), SphereRadius, PropulsionForce, RotationAngleDegrees, NS_Explosion, Debug);
 	}
 
@@ -88,6 +111,20 @@ void AAlienPlantBomb::DetectPlayer() {
 		if (FallenCorsairCharacter)
 		{
 			bDetectedSomeone = true;
+
+			if (SoundDetonator)
+			{
+				if (!AudioComponentDetonator)
+				{
+					AudioComponentDetonator = UGameplayStatics::SpawnSound2D(GetWorld(), SoundDetonator);
+					if (AudioComponentDetonator)
+					{
+						AudioComponentDetonator->bAutoDestroy = false;
+						AudioComponentDetonator->bStopWhenOwnerDestroyed = false;
+						SoundDetonator->bLooping = true;
+					}
+				}
+			}
 		}
 	}
 }

@@ -2,6 +2,7 @@
 
 
 #include "AlienPlante.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AAlienPlante::AAlienPlante()
@@ -32,6 +33,8 @@ void AAlienPlante::Tick(float DeltaTime)
 		CanEffect = true;
 		m_currentHealth = m_health;
 		ReviveTimer = 0;
+		if (SoundRevive)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundRevive);
 	}
 }
 

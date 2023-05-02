@@ -112,8 +112,7 @@ private:
 #pragma endregion
 
 public:
-
-UFUNCTION()
+	UFUNCTION()
 	void DashPressed();
 	
 	UFUNCTION()
@@ -136,8 +135,20 @@ UFUNCTION()
 
 	UFUNCTION()
 	void PerfectDodge();
+	
+	UFUNCTION()
+	void SetCanPerfectDodge();
 
 	UFUNCTION()
 	void ImpulseEnnemy();
-		
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash", meta = (ClampMin = "0", UIMin = "0"))
+	float m_perfectDodgeTime;
+
+	UPROPERTY()
+	bool m_bCanPerfectDodge = false;
+	
+	UPROPERTY()
+	float m_currentPerfectDodgeTime;
 };

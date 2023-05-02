@@ -5,8 +5,7 @@
 
 #include "DropSoul.h"
 #include "FallenCorsair/FallenCorsairCharacter.h"
-#include "FallenCorsair/Components/Melee.h"
-#include "FallenCorsair/Waves/WaveZone.h"
+#include "FallenCorsair/Components/DashComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -82,9 +81,41 @@ bool AGroundAlien::Attack()
 
 bool AGroundAlien::CreateAvoidBox()
 {
-	const FVector Forward = GetActorForwardVector();
-	//UKismetSystemLibrary::DrawDebugBox(GetWorld(), GetActorLocation() + Forward * m_avoidBoxOffset, m_avoidBoxSize, FLinearColor::Blue, FRotator::ZeroRotator, 1.5, 1);
+	if (!m_attackTarget) return false;
+	
+	const FVector Position = GetActorLocation() + GetActorForwardVector() * m_avoidBoxOffset;
+	FHitResult Hit;
 
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAlienBase::StaticClass(), ActorsToIgnore);
+
+	UKismetSystemLibrary::BoxTraceSingleByProfile(
+		GetWorld(),
+		Position,
+		Position,
+		m_avoidBoxSize / 2.f,
+		GetActorRotation(),
+		"Player",
+		false,
+		ActorsToIgnore,
+		EDrawDebugTrace::ForDuration,
+		Hit,
+		true,
+		FColor::Blue,
+		FColor::Orange
+	);
+
+	if (Hit.GetActor())
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *Hit.GetActor()->GetName());
+
+	if (Hit.GetActor() == m_attackTarget)
+	{
+		AFallenCorsairCharacter* Character = Cast<AFallenCorsairCharacter>(Hit.GetActor());
+		if (Character)
+			Character->dashComp->SetCanPerfectDodge();
+	}
+	
 	return true;
 }
 
@@ -112,4 +143,12 @@ void AGroundAlien::Death(EDamageType DamageType)
 		GetWorld()->SpawnActor<ADropSoul>(m_soul, GetActorLocation(), FRotator::ZeroRotator);
 	
 	Super::Death(DamageType);
+}
+
+bool AGroundAlien::Stun(float Time)
+{
+	const bool IsStunned = Super::Stun(Time);
+	
+	
+	return IsStunned;
 }

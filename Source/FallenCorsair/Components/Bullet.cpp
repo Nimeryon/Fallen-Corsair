@@ -6,11 +6,11 @@
 #include "FallenCorsair/Enemies/AlienBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "../FallenCorsairCharacter.h"
-#include "Kismet/KismetStringLibrary.h"
-#include "FallenCorsair/Enemies/AlienBase.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ABullet::ABullet()
@@ -36,9 +36,7 @@ ABullet::ABullet()
 void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
-
-	FTimerHandle Timer;
-	//GetWorld()->GetTimerManager().SetTimer(Timer, this, &ABullet::Explosion, m_lifeSpan);
+	
 }
 
 // Called every frame
@@ -67,15 +65,25 @@ void ABullet::Tick(float DeltaTime)
 	}
 
 #pragma endregion
+
+	Explosion();
 	
+}
+
+void ABullet::Explosion()
+{
 	if (!Explosed && m_bIsBulletLaunch)
 	{
 		TArray<FHitResult> OutHits = MakeSphereCollision(m_bulletRadius * 32);
 
-		if (OutHits.Num())
+		if (OutHits.Num() || m_isLifeSpanDone)
 		{
 			DammageOnHits(OutHits, m_bulletDammage);
-			Explosion();
+			projectileMovement->StopMovementImmediately();
+			if (bulletMesh)
+				bulletMesh->DestroyComponent();
+	
+			SetLifeSpan(m_explosionDuration);
 			Explosed = true;
 
 			// Niagara Explosion
@@ -98,15 +106,6 @@ void ABullet::Tick(float DeltaTime)
 	}
 }
 
-void ABullet::Explosion()
-{
-	projectileMovement->StopMovementImmediately();
-	if (bulletMesh)
-		bulletMesh->DestroyComponent();
-	
-	SetLifeSpan(m_explosionDuration);
-}
-
 void ABullet::SetBulletSetting(float bulletSpeed, int dammage, int explosionDammage, float explosionRadius, float explostionDuration, int lifeSpan, float bulletRadius, float chargeSpeed, AFallenCorsairCharacter* character)
 {
 	m_bulletDammage = dammage;
@@ -126,7 +125,7 @@ void ABullet::LaunchBullet()
 	m_bIsBulletLaunch = true;
 	
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABullet::Explosion, m_lifeSpan, false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABullet::IsLifeSpanDone, m_lifeSpan, false);
 }
 
 TArray<FHitResult> ABullet::MakeSphereCollision(float _SphereRadius)
@@ -166,10 +165,14 @@ void ABullet::DammageOnHits(TArray<FHitResult> OutHits, float DammageValue, FDam
 				}
 				ActorHitedByExplosion.Add(CharacterHited);
 			}
-
-			CharacterHited->TakeDamage(DammageValue, DamageEvent, nullptr, GetOwner());
+			float ActualDammage = UKismetMathLibrary::MapRangeClamped(UKismetMathLibrary::Vector_Distance(GetActorLocation(), CharacterHited->GetActorLocation()), m_explosionRadius/2, m_explosionRadius, m_explosionDammage, m_explosionDammage/4);
+			FVector Impulse = (CharacterHited->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+			Impulse.Z = 200;
+			CharacterHited->GetCharacterMovement()->AddImpulse(Impulse * m_impulse, true);
+			CharacterHited->TakeDamage(ActualDammage, DamageEvent, nullptr, GetOwner());
 		}
 	}
+	
 }
 
 bool ABullet::GetIsBulletCharge()
@@ -183,4 +186,9 @@ bool ABullet::GetIsBulletCharge()
 bool ABullet::GetIsBulletLaunch()
 {
 	return m_bIsBulletLaunch;
+}
+
+void ABullet::IsLifeSpanDone()
+{
+	m_isLifeSpanDone = true;
 }

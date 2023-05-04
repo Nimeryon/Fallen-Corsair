@@ -3,8 +3,6 @@
 
 #include "Barrel.h"
 
-#include "Kismet/KismetMaterialLibrary.h"
-
 // Sets default values for this component's properties
 UBarrel::UBarrel()
 {
@@ -23,8 +21,7 @@ void UBarrel::BeginPlay()
 
 	// ...
 	m_maxSoul = 100 * m_maxSlot;
-	UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "Slot", m_maxSlot);
-	UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "GaugePercent",m_currentSoul / m_maxSlot);
+	
 }
 
 
@@ -36,7 +33,6 @@ void UBarrel::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 	if(m_slot < m_maxSlot)
 	{
 		m_currentSoul = m_currentSoul + ((m_speedCharge / 100)  * m_maxSoul * DeltaTime);
-		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "GaugePercent",m_currentSoul / m_maxSlot);
 
 		if(m_currentSoul >= (m_slot + 1) * 100)
 		{

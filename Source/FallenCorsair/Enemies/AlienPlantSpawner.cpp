@@ -5,7 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/Actor.h"
-#include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AAlienPlantSpawner::AAlienPlantSpawner()
@@ -46,15 +46,18 @@ void AAlienPlantSpawner::Spawn()
 		FTransform SpawnTransform(SpawnRotation, SpawnLocation);
 		if (BPClassToSpawnForAll)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("not null"));
+			
 			SpawnActorByClass(GetWorld(), BPClassToSpawnForAll, SpawnLocation, SpawnRotation);
 		}
 		else 
 		{
-			UE_LOG(LogTemp, Warning, TEXT("null"));
+	
 			SpawnActorByClass(GetWorld(), ActorToSpawns[i].BPClass, SpawnLocation, SpawnRotation);
 		}
 	}
+
+	if (SoundSpawn)
+		UGameplayStatics::SpawnSound2D(GetWorld(), SoundSpawn);
 }
 
 void AAlienPlantSpawner::SpawnActorByClass(UWorld* World, TSubclassOf<AActor> ClassToSpawn, const FVector& Location, const FRotator& Rotation)
@@ -71,7 +74,7 @@ float AAlienPlantSpawner::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	if (!IsAlive() && CanEffect)
+	if (!bIsAlive() && CanEffect)
 	{
 		CanEffect = false;
 		Spawn();

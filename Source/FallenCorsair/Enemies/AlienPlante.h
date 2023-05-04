@@ -29,6 +29,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Collider Sphere")
 	bool Debug = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundRevive;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundDestroy;
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -48,4 +54,6 @@ public:
 
 private:
 	float ReviveTimer = 0;
+
+	bool bCanPlaySoundDestroy = true;
 };

@@ -13,6 +13,14 @@ AAlienBase::AAlienBase()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+// Public
+
+bool AAlienBase::bIsAlive() const
+{
+	return m_currentHealth > 0;
+}
+
+// Proteceted
 void AAlienBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -66,7 +74,16 @@ float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	UE_LOG(LogTemp, Warning, TEXT("%d"), m_currentHealth);
 
 	if (m_currentHealth <= 0)
-		Death(damageType);
+	{
+		if (OnDeath.IsBound())
+			OnDeath.Broadcast();
+
+		if (OnDeathWithActor.IsBound())
+			OnDeathWithActor.Broadcast(this);
+		
+		if (m_destroyOnDeath)
+			Destroy();
+	}
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
@@ -117,16 +134,4 @@ float AAlienBase::GetDamageMultiplicator(EDamageType DamageType) const
 		return m_attackExplosionMultiplicator;
 	default: return 1.f;
 	}
-}
-
-void AAlienBase::Death(EDamageType DamageType)
-{
-	if (OnDeath.IsBound())
-		OnDeath.Broadcast();
-
-	if (OnDeathWithActor.IsBound())
-		OnDeathWithActor.Broadcast(this);
-		
-	if (m_destroyOnDeath)
-		Destroy();
 }

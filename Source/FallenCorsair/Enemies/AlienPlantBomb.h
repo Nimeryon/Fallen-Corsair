@@ -31,6 +31,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX Explosion")
 	class UNiagaraSystem* NS_Explosion;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundDetonator;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* SoundExplosion;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -44,18 +50,13 @@ public:
 	
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-	// UFUNCTION()
-	// virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
 private:
 	bool bDetectedSomeone = false;
 	float CurrentCountdown = 0;
-
-	class USphereComponent* SphereCollisionDetection;
 
 	bool bIsOverlapping;
 
 	virtual void DetectPlayer();
 
-
+	UAudioComponent* AudioComponentDetonator;
 };

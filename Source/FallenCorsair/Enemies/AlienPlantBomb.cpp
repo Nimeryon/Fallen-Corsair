@@ -9,6 +9,8 @@
 #include "Components/SphereComponent.h"
 #include "../FallenCorsairCharacter.h"
 #include "Components/SceneComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 AAlienPlantBomb::AAlienPlantBomb()
@@ -28,7 +30,7 @@ void AAlienPlantBomb::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (IsAlive() && !bDetectedSomeone)
+	if (bIsAlive() && !bDetectedSomeone)
 	{
 		DetectPlayer();
 	}
@@ -44,11 +46,7 @@ void AAlienPlantBomb::Tick(float DeltaTime)
 		CurrentCountdown = 0;
 		m_currentHealth = 0;
 
-		if (!IsAlive() && CanEffect)
-		{
-			CanEffect = false;
-			UExplosion::PerformExplosion(GetWorld(), GetOwner(), Dammage, GetOwner()->GetActorLocation(), SphereRadius, PropulsionForce, RotationAngleDegrees, NS_Explosion, Debug);
-		}
+	
 	}
 }
 
@@ -67,9 +65,20 @@ float AAlienPlantBomb::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	if (!IsAlive() && CanEffect)
+	if (!bIsAlive() && CanEffect)
 	{
 		CanEffect = false;
+
+		if (SoundExplosion)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundExplosion);
+
+		if (AudioComponentDetonator)
+		{
+			AudioComponentDetonator->Stop();
+			AudioComponentDetonator->DestroyComponent();
+			AudioComponentDetonator = nullptr;
+		}
+
 		UExplosion::PerformExplosion(GetWorld(), GetOwner(), Dammage, GetOwner()->GetActorLocation(), SphereRadius, PropulsionForce, RotationAngleDegrees, NS_Explosion, Debug);
 	}
 
@@ -88,6 +97,20 @@ void AAlienPlantBomb::DetectPlayer() {
 		if (FallenCorsairCharacter)
 		{
 			bDetectedSomeone = true;
+
+			if (SoundDetonator)
+			{
+				if (!AudioComponentDetonator)
+				{
+					AudioComponentDetonator = UGameplayStatics::SpawnSound2D(GetWorld(), SoundDetonator);
+					if (AudioComponentDetonator)
+					{
+						AudioComponentDetonator->bAutoDestroy = false;
+						AudioComponentDetonator->bStopWhenOwnerDestroyed = false;
+						SoundDetonator->bLooping = true;
+					}
+				}
+			}
 		}
 	}
 }

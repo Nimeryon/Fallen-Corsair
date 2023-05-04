@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AlienInhibitor.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AAlienInhibitor::AAlienInhibitor()
@@ -34,7 +35,15 @@ float AAlienInhibitor::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 {	
 	float ActualDamage;
 
+	if (bIsAlive())
+		if (SoundGetDammaged)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundGetDammaged);
+
 	ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (!bIsAlive())
+		if (SoundDeath)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundDeath);
 
     return ActualDamage;
 }

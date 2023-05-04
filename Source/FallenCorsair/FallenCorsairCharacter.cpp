@@ -21,12 +21,10 @@
 #include "Player/BrutosMovementComponent.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AFallenCorsairCharacter
-
-/// you can focus while you are attacking you have to fix
-
 
 AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer.SetDefaultSubobjectClass<UBrutosMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -115,6 +113,7 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
 	if (GetCharacterMovement()->IsMovingOnGround())
 	{
 		IsStunned = false;
@@ -163,7 +162,7 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 
 	if((m_alpha != 0) || (m_alpha != 1))
 	{
-		if(m_bIsCharge && m_bIsFocus && m_alpha == 1)
+		if(m_bIsCharge && m_bIsFocus)
 		{
 			m_alphaCharge = FMath::Clamp( m_alphaCharge + (1 / 1) * DeltaTime, 0, 1);
 			GetCameraBoom()->TargetArmLength = FMath::InterpEaseIn(m_distanceFromPlayer_A, m_distanceFromPlayer_C, m_alphaCharge, 2);
@@ -224,6 +223,17 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		// Perform the first attack combo
 		MeleeComponent->ResumeAnimation();
 	}
+
+	
+	if (MeleeComponent->MeleeEnded())
+	{
+		bool bIsAcceleration = GetCharacterMovement()->GetCurrentAcceleration().Length() > 0;
+		if (bIsAcceleration)
+		{
+			MeleeComponent->CancelAttack();
+		}
+			
+	}
 #pragma endregion
 
 	//GetCameraBoom()->TargetArmLength = FMath::Clamp( GetCameraBoom()->TargetArmLength, m_distanceFromPlayer_S / 4, m_distanceFromPlayer_S);
@@ -240,17 +250,31 @@ void AFallenCorsairCharacter::Landed(const FHitResult& Hit)
 
 float AFallenCorsairCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (m_bCanBeDammage)
+	if(m_currentHealth > DamageAmount && m_bCanBeDammage)
 	{
-		m_currentHealth = FMath::Clamp(m_currentHealth - DamageAmount, 0, m_maxHealth);
+		m_currentHealth = m_currentHealth - DamageAmount;
 	}
-
-	if (m_currentHealth <= 0)
+	else
 	{
+		m_currentHealth = 0;
 		/// called death event
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Brutos life: %f"), m_currentHealth);
+
+	if (m_currentHealth > 0)
+	{
+		if (SoundGetHurt)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundGetHurt);
+	}
+	else 
+	{
+		if (SoundDeath)
+		{
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundDeath);
+			SoundDeath = nullptr;
+		}
+	}	
+	
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
@@ -465,6 +489,10 @@ void AFallenCorsairCharacter::MeleeHeavyStarted(const FInputActionValue& Value)
 	if (MeleeTargetingComponent->IsMeleeTargeting())
 		return;
 
+
+	if (MeleeComponent->AttackIsStarted())
+		return;
+
 	if (!MeleeComponent->MeleeIsValid())
 		return;
 
@@ -487,6 +515,9 @@ void AFallenCorsairCharacter::MeleeHeavyTriggered(const FInputActionValue& Value
 	if (MeleeTargetingComponent->IsMeleeTargeting())
 		return;
 
+	if (MeleeComponent->AttackIsStarted())
+		return;
+
 	if (!MeleeComponent->MeleeIsValid())
 		return;
 		
@@ -498,6 +529,7 @@ void AFallenCorsairCharacter::MeleeHeavyCompleted(const FInputActionValue& Value
 	if (MeleeComponent->AttackIsStarted())
 		return;
 
+
 	bool bPerformed = MeleeComponent->PerformHeavyAttack(Melee_TriggeredSeconds);
 	
 	Melee_IsTrigerred = false;
@@ -505,7 +537,9 @@ void AFallenCorsairCharacter::MeleeHeavyCompleted(const FInputActionValue& Value
 	MeleeComponent->StopAnimationChargingMeleeHeavy();
 	
 	if (!bPerformed)
+	{
 		MeleeComponent->SetOwnerModeAttack(false);
+	}
 }
 
 void AFallenCorsairCharacter::MeleeSetRotation(const FInputActionValue& Value)

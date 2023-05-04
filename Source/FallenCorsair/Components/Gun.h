@@ -15,7 +15,7 @@ class FALLENCORSAIR_API UGun : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UGun();
-
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -23,6 +23,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 
 private:
 
@@ -60,6 +61,8 @@ private:
 	UPROPERTY()
 	class AFallenCorsairCharacter* m_ownerRef;
 
+	
+
 	UPROPERTY()
 	class UBarrel* m_barrelRef;
 
@@ -90,7 +93,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Gun|Bullet", meta = (displayName = "Socket spawn location"))
 	FName m_socketLoc;
 
-#pragma endregion 
+
+
+#pragma endregion
 	
 public:
 	UFUNCTION()
@@ -104,5 +109,12 @@ public:
 
 	UFUNCTION()
 	void StopCharge(bool bIsCancel);
+
+	UFUNCTION()
+	FVector GetDirectionBullet();
+
+private:
+	FVector GetImpactPointOnScreen();
+	class UCameraComponent* GetParentCamera();
 	
 };

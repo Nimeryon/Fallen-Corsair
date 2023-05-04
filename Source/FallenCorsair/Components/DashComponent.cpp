@@ -38,6 +38,15 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	if (m_bCanPerfectDodge)
+	{
+		m_currentPerfectDodgeTime += DeltaTime;
+		if (m_currentPerfectDodgeTime >= m_perfectDodgeTime)
+		{
+			m_bCanPerfectDodge = false;
+			m_currentPerfectDodgeTime = 0;
+		}
+	}
 
 	if(m_bIsEdge)
 	{
@@ -62,7 +71,7 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 						m_bIsSlowMo = true;
 						m_ownerRef->EnableInput(nullptr);
 						UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1 / m_slowMoRate);
-						m_ownerRef->CustomTimeDilation = m_slowMoRate * 0.5;
+						m_ownerRef->CustomTimeDilation = m_slowMoRate;
 					}
 				}
 				else if(m_bHasIFrames)
@@ -87,7 +96,7 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UDashComponent::DashPressed()
 {
-	if(m_barrelRef->GetSlot() > m_energyCost && m_DashCurve)
+	if(m_barrelRef->GetSlot() >= m_energyCost && m_DashCurve)
 	{
 		if(m_bCanDash && !m_bIsSlowMo)
 		{
@@ -96,7 +105,7 @@ void UDashComponent::DashPressed()
 			m_bCanDash = false;
 			GetWorld()->GetTimerManager().SetTimer(m_dashTimer, this, &UDashComponent::DashCD, m_dashCD);
 
-			m_barrelRef->SetSlot(m_barrelRef->GetSlot() - m_energyCost);
+			m_barrelRef->SetSlot(m_energyCost);
 		}
 	}
 }
@@ -124,6 +133,9 @@ void UDashComponent::PerformDash()
 	}
 
 	m_bIsEdge = true;
+
+	// if (m_bCanPerfectDodge)
+	//	PerfectDodge();
 }
 
 void UDashComponent::StartDash()
@@ -185,6 +197,11 @@ void UDashComponent::DashSlowMoReset()
 void UDashComponent::PerfectDodge()
 {
 	m_bIsPerfectDodge = true;
+}
+
+void UDashComponent::SetCanPerfectDodge()
+{
+	m_bCanPerfectDodge = true;
 }
 
 void UDashComponent::ImpulseEnnemy()

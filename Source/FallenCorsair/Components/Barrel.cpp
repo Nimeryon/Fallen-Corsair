@@ -23,8 +23,9 @@ void UBarrel::BeginPlay()
 
 	// ...
 	m_maxSoul = 100 * m_maxSlot;
+	m_currentSoul = 100 * m_slot;
 	UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "Slot", m_maxSlot);
-	UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "GaugePercent",m_currentSoul / m_maxSlot);
+	UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "GaugePercent", m_maxSoul / m_maxSlot);
 }
 
 
@@ -56,8 +57,9 @@ int UBarrel::GetSlot()
 }
 void UBarrel::SetSlot(int newSlot)
 {
-	m_slot = newSlot;
-	m_currentSoul = newSlot * 100;
+	m_slot = m_slot - newSlot;
+	//m_currentSoul = newSlot * 100;
+	m_currentSoul = m_currentSoul - newSlot * 100;
 }
 int UBarrel::GetMaxSlot()
 {

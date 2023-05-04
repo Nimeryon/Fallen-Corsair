@@ -11,8 +11,7 @@
 			"AdditionalDependencies": [
 				"Engine",
 				"AIModule",
-				"DeveloperSettings",
-				"CoreUObject"
+				"DeveloperSettings"
 			]
 		}
 	],

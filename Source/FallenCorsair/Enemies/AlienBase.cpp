@@ -36,6 +36,7 @@ void AAlienBase::Tick(float DeltaTime)
 		{
 			m_bStunned = false;
 			m_currentStunTime = 0;
+			Unstunned();
 		}
 	}
 }
@@ -97,11 +98,14 @@ bool AAlienBase::Stun(float Time)
 
 	if (OnStunned.IsBound())
 		OnStunned.Broadcast(Time);
-	
+
+	m_bStunned = true;
 	m_stunTime = Time;
 	m_currentStunTime = 0.f;
 	return true;
 }
+
+void AAlienBase::Unstunned() {}
 
 float AAlienBase::GetDamageMultiplicator(EDamageType DamageType) const
 {

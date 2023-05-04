@@ -112,6 +112,9 @@ void UDashComponent::DashPressed()
 
 void UDashComponent::PerformDash()
 {
+	// Play dash animation
+	m_ownerRef->GetMesh()->GetAnimInstance()->Montage_Play(m_montage);
+	
 	m_startLoc = m_ownerRef->GetActorLocation();
 	m_newLoc = m_startLoc + (m_ownerRef->GetActorForwardVector() * m_maxDistance);
 	const float CapsuleRadius = m_ownerRef->GetCapsuleComponent()->GetScaledCapsuleRadius();
@@ -146,7 +149,6 @@ void UDashComponent::StartDash()
 	FVector startTrace = m_ownerRef->GetActorLocation();
 	FVector endTrace = startTrace + (m_ownerRef->GetActorForwardVector() * 50);
 	FHitResult Hit;
-
 	
 	UKismetSystemLibrary::SphereTraceSingleByProfile(GetWorld(), startTrace, endTrace, 30.f, TEXT("Visibility"), false, m_ownerRef->SetIgnoreCharacterActors(), EDrawDebugTrace::None, Hit, true);
 	
@@ -160,7 +162,7 @@ void UDashComponent::StopDash()
 {
 	m_bIsDashing = false;
 	m_bIsEdge = false;
-	m_ownerRef->GetCharacterMovement()->MaxWalkSpeed = 500;
+	m_ownerRef->GetCharacterMovement()->MaxWalkSpeed = m_ownerRef->m_walkSpeed;
 	m_ownerRef->GetCharacterMovement()->Velocity = FVector(0,0,0);
 	m_ownerRef->GetCharacterMovement()->StopMovementImmediately();
 

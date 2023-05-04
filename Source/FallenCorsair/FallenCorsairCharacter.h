@@ -178,8 +178,6 @@ public:
 
 #pragma endregion 
 
-private:
-
 #pragma region Melee
 
 

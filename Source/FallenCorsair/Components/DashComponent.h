@@ -146,6 +146,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash", meta = (ClampMin = "0", UIMin = "0"))
 	float m_perfectDodgeTime;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
+	class UAnimMontage* m_montage;
+
 	UPROPERTY()
 	bool m_bCanPerfectDodge = false;
 	

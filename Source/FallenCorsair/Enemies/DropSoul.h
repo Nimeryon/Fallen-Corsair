@@ -20,11 +20,7 @@ class FALLENCORSAIR_API ADropSoul : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ADropSoul();
-
-	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -32,7 +28,16 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Soul, meta = (ClampMin = "0", UIMin = "0"))
+	float m_pickupTime;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Soul, meta = (ClampMin = "0", UIMin = "0"))
+	float m_destroyTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Soul, meta = (ClampMin = "0", UIMin = "0"))
+	float m_pickupDistance;
+	
 private:
 
 	UPROPERTY()
@@ -49,6 +54,18 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Soul", meta = (ClampMin = 1, UIMin = 1, ClampMax = 2000, UIMax = 2000), meta = (displayName = "Vitesse d'attraction"))
 	float m_speed = 300.f;
+	
+	UPROPERTY(EditAnywhere, Category = Soul)
+	bool m_bCanBePickedUp = false;
+	
+	UPROPERTY(EditAnywhere, Category = Soul)
+	bool m_bPickedUp = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = Soul)
+	float m_currentPickupTime = 0;
+
+	UPROPERTY(EditDefaultsOnly, Category = Soul)
+	float m_currentDestroyTime = 0;
 
 public:
 	UFUNCTION()

@@ -57,11 +57,11 @@ EBTNodeResult::Type UBTTask_GetAngledRandomTo::ExecuteTask(UBehaviorTreeComponen
 
 FVector UBTTask_GetAngledRandomTo::GetNextRandomPosition(const AActor* Actor, const FVector& TargetPosition)
 {
-	/*const float DistanceToPoint = FVector::Distance(Actor->GetActorLocation(), TargetPosition);
+	/* const float DistanceToPoint = FVector::Distance(Actor->GetActorLocation(), TargetPosition);
 	if (DistanceToPoint < MaxSegmentLength)
 	{
 		return TargetPosition;
-	}*/
+	} */
 
 	const FVector Direction = (TargetPosition - Actor->GetActorLocation()).GetSafeNormal2D();
 	const float RandomAngle = UKismetMathLibrary::RandomFloatInRange(-AngleRange, AngleRange);

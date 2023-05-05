@@ -47,7 +47,7 @@ void ABullet::Tick(float DeltaTime)
 #pragma region Bullet Charge
 	if(!m_bIsBulletLaunch && !Explosed)
 	{
-		SetActorLocation(m_ownerRef->GetMesh()->GetSocketLocation("BulletStart"));
+		SetActorLocation(m_ownerRef->GetMesh()->GetSocketLocation("BulletStartSocket"));
 		SetActorRotation(m_ownerRef->GetFollowCamera()->GetComponentRotation());
 	}
 	
@@ -172,7 +172,6 @@ void ABullet::DammageOnHits(TArray<FHitResult> OutHits, float DammageValue, FDam
 			CharacterHited->TakeDamage(ActualDammage, DamageEvent, nullptr, GetOwner());
 		}
 	}
-	
 }
 
 bool ABullet::GetIsBulletCharge()

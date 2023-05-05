@@ -187,7 +187,7 @@ public:
 #pragma endregion 
 
 #pragma region Camera Variables
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	bool m_bIsFocus = false;
 
 	UPROPERTY()

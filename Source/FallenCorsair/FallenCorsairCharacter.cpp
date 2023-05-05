@@ -201,6 +201,7 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 			m_cameraManager->ViewPitchMin = FMath::InterpEaseIn(m_pitchMin_S, m_pitchMin_A, m_alpha, 2);
 			m_cameraManager->ViewPitchMax = FMath::InterpEaseIn(m_pitchMax_S, m_pitchMax_A, m_alpha, 2);
 		}
+		
 		if(m_bIsFocus && m_bIsCharge)
 		{
 			GetCharacterMovement()->MaxWalkSpeed = m_chargeWalkSpeed;
@@ -213,12 +214,13 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		{
 			GetCharacterMovement()->MaxWalkSpeed = m_walkSpeed;
 		}
+		
 		if(m_bIsFocus)
 		{
 			FRotator newRot;
 			newRot.Roll = GetActorRotation().Roll;
 			newRot.Pitch = GetActorRotation().Pitch;
-			newRot.Yaw = GetCameraBoom()->GetTargetRotation().Yaw;
+			newRot.Yaw = GetCameraBoom()->GetTargetRotation().Yaw - 45;
 			SetActorRotation(newRot);
 		}
 	}

@@ -75,9 +75,7 @@ FVector UBTTask_GetAngledRandomTo::GetNextRandomPosition(const AActor* Actor, co
 	NavSys->ProjectPointToNavigation(Position, NavPosition, FVector::ZeroVector);
 
 	if (DrawDebugPoint)
-	{
 		UKismetSystemLibrary::DrawDebugPoint(GetWorld(), NavPosition.Location, 8, FLinearColor::Red, 2);
-	}
 	
 	return NavPosition.Location;
 }

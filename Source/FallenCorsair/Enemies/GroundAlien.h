@@ -55,8 +55,27 @@ public:
 	virtual bool Stun(float Time) override;
 
 	virtual void Unstunned() override;
+
+	UFUNCTION()
+	virtual void PlayStunMontage();
 	
 public:
+#pragma region Animations
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	class UAnimMontage* m_stunMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
+	class UAnimMontage* m_deathMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations, meta = (ClampMin = "0", UIMin = "0"))
+	float m_blendTime = 0.1f;
+#pragma endregion
+
+#pragma region Rotations
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Rotations, meta = (ClampMin = "0", UIMin = "0"))
+	float m_rotationSpeed;
+#pragma endregion
+
 #pragma region Soul
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Soul")
 	TSubclassOf<class ADropSoul> m_soul;

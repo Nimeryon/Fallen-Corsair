@@ -3,7 +3,9 @@
 
 #include "GroundAlien.h"
 
+#include "AIController.h"
 #include "DropSoul.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "FallenCorsair/FallenCorsairCharacter.h"
 #include "FallenCorsair/Components/DashComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -18,6 +20,7 @@ void AGroundAlien::BeginPlay()
 	m_material->SetScalarParameterValue("AngryLevel", 1);
 
 	GetCharacterMovement()->JumpZVelocity = m_attackJumpForce;
+	GetCharacterMovement()->RotationRate.Yaw = m_rotationSpeed;
 	m_attackTarget = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
@@ -144,6 +147,9 @@ void AGroundAlien::Death(EDamageType DamageType)
 {
 	if (DamageType == EDamageType::MeleeHeavy || DamageType == EDamageType::MeleeSoft)
 		GetWorld()->SpawnActor<ADropSoul>(m_soul, GetActorLocation(), FRotator::ZeroRotator);
+
+	m_material->SetScalarParameterValue("AngryLevel", 0);
+	Cast<AAIController>(GetController())->GetBlackboardComponent()->SetValueAsBool(FName("InstantAbort"), true);
 	
 	Super::Death(DamageType);
 }
@@ -152,11 +158,30 @@ bool AGroundAlien::Stun(float Time)
 {
 	const bool IsStunned = Super::Stun(Time);
 	if (IsStunned) m_material->SetScalarParameterValue("AngryLevel", 0);
-	
+
+	GetCharacterMovement()->MaxWalkSpeed = 0;
+	GetCharacterMovement()->RotationRate.Yaw = 0;
+	GetCharacterMovement()->Velocity = FVector::ZeroVector;
+	GetCharacterMovement()->StopMovementImmediately();
+
+	PlayStunMontage();
+
 	return IsStunned;
 }
 
 void AGroundAlien::Unstunned()
 {
 	m_material->SetScalarParameterValue("AngryLevel", 1);
+
+	GetCharacterMovement()->MaxWalkSpeed = m_movementSpeed;
+	GetCharacterMovement()->RotationRate.Yaw = m_rotationSpeed;
+	
+	GetMesh()->GetAnimInstance()->Montage_Stop(m_blendTime);
+}
+
+void AGroundAlien::PlayStunMontage()
+{
+	FAlphaBlendArgs BlendArgs;
+	BlendArgs.BlendTime = m_blendTime;
+	GetMesh()->GetAnimInstance()->Montage_PlayWithBlendIn(m_stunMontage, BlendArgs);
 }

@@ -26,6 +26,10 @@ public:
 
 	
 private:
+
+	UPROPERTY()
+    class AFallenCorsairCharacter* m_ownerRef;
+	
 	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (ClampMin = 3, UIMin = 3), meta = (displayName = "Nombre max de slot"))
 	int m_maxSlot = 3;
 
@@ -47,6 +51,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Bombonne", meta = (displayName = "MPC"))
 	UMaterialParameterCollection* m_collection;
 
+	UPROPERTY(EditAnywhere, Category = "Bombonne|FX")
+	class UNiagaraSystem* m_sparkParticle;
+	
+	UPROPERTY(EditAnywhere, Category = "Bombonne|FX", meta = (displayName = "Socket spawn location"))
+	FName m_socketLoc;
+	
 public:
 	UFUNCTION()
 	int GetSlot();

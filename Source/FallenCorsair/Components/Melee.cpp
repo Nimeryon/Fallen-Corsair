@@ -461,9 +461,7 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	else if (NotifyName == "Recovery")
 	{
 		bMeleeEnded = true;
-
-		ResetCombo();
-		StartAttack(false);
+		SetOwnerModeAttack(false);
 	}
 	else if (NotifyName == "HitSound")
 	{

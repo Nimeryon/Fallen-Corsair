@@ -185,6 +185,10 @@ void UMelee::StartAttack(bool start, bool _bFreezeAnimation)
 	{
 		PerformAttack();
 	}
+	
+	if (!start){
+		attackType = EAttackType::Soft;
+	}
 }
 
 void UMelee::UpdateTypeAttack(float& eslapsedSeconds)

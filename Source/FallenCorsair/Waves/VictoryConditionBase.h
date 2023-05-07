@@ -62,6 +62,7 @@ public:
 	// Sets default values for this component's properties
 	UVictoryConditionBase();
 
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Victory Condition")
 	FZoneVictory OnZoneVictory;
 
 protected:

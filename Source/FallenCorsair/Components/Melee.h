@@ -143,9 +143,6 @@ public:
 	UAnimMontage* AnimWhileChargingMeleeHeavyLoop;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	class USoundBase* SoundCharge;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	bool CanAirAttack = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
@@ -173,7 +170,6 @@ public:
 	virtual void ResetRotation();
 	virtual void ResetCombo();
 	virtual void ResumeAnimation();
-	virtual void PlaySoundCharge();
 
 	virtual bool AttackIsStarted() const;
 	virtual bool MeleeIsValid() const;

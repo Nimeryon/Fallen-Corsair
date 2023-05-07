@@ -145,6 +145,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	class USoundBase* SoundCharge;
 
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	class UNiagaraSystem* FX_MeleeHeavy;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	UParticleSystem* PS_MeleeHeavyOnChargeCompleted;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
+	UParticleSystem* PS_MeleeHeavyOnHit;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	bool CanAirAttack = false;
 
@@ -220,6 +229,7 @@ private:
 	virtual void PropulseOwner();
 	virtual void ResetVelocity();
 	virtual void IncrementCurrentAttack();
+	virtual void SpawnFX(UParticleSystem* PS);
 	virtual FAttackData& GetCurrentMelee();
 
 
@@ -246,6 +256,7 @@ private:
 	bool bIsDeleguate = false;
 	bool bMeleeEnded = false;
 	bool bFreezeAnimation = false;
+	bool bMeleeHeavyChargeCompleted = false;
 	FRotator RotatorWhileAttackStarted;
 
 	UAnimMontage* MontageToPlay;

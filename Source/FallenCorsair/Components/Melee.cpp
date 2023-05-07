@@ -14,7 +14,8 @@
 #include "Animation/AnimInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "FallenCorsair/Enemies/AlienBase.h"
-
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
 
 // Sets default values for this component's properties
 UMelee::UMelee()
@@ -198,17 +199,20 @@ void UMelee::UpdateTypeAttack(float& eslapsedSeconds)
 		if (eslapsedSeconds <= delayInputDepthMeleeHeavy)
 		{
 			// SetTypeAttack(EAttackType::Soft);
+			bMeleeHeavyChargeCompleted = false;
 		}
 		else {
 			SetTypeAttack(EAttackType::Heavy);
-			// eslapsedSeconds = 0;
+
+			if (!bMeleeHeavyChargeCompleted)
+				SpawnFX(PS_MeleeHeavyOnChargeCompleted);
+
+			bMeleeHeavyChargeCompleted = true;
+
 			if (!MeleeIsValid())
 			{
 				SetTypeAttack(EAttackType::Soft);
 			}
-			// SetReleased(true);
-			// StopAnimationChargingMeleeHeavy();
-			// StartAttack(true);
 		}
 	}
 }
@@ -423,6 +427,9 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	{
 		if (!GetCurrentMelee().CollisionWithSockets)
 			TriggerHitWithCollisionShape();
+
+		if (attackType == EAttackType::Heavy)
+			SpawnFX(PS_MeleeHeavyOnHit);
 	}	 
 	else if (NotifyName == "CanCombo")
 	{
@@ -461,9 +468,7 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	else if (NotifyName == "Recovery")
 	{
 		bMeleeEnded = true;
-
-		ResetCombo();
-		StartAttack(false);
+		SetOwnerModeAttack(false);
 	}
 	else if (NotifyName == "HitSound")
 	{
@@ -835,6 +840,24 @@ void UMelee::IncrementCurrentAttack()
 		indexCurrentAttack %= Melees.Soft.Num();
 	}
 }
+
+void UMelee::SpawnFX(UParticleSystem* FX)
+{
+	FVector SpawnLocation = GetOwner()->GetActorLocation();
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+	FTransform SpawnTransform(SpawnRotation, SpawnLocation);
+	FVector Scale = FVector(1, 1, 1);
+
+	// Niagara FX
+	// if (FX)
+	// 	UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), FX, SpawnLocation, SpawnRotation,  Scale, true);
+
+	// Cascade particule system
+	if (FX)
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FX, SpawnTransform, true);
+}
+
+
 
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

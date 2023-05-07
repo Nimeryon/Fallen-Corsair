@@ -65,7 +65,7 @@ bool AGroundAlien::Attack()
 		"Player",
 		false,
 		ActorsToIgnore,
-		EDrawDebugTrace::ForDuration,
+		EDrawDebugTrace::None,
 		Hit,
 		true
 	);

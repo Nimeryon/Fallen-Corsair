@@ -144,4 +144,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float m_movementSpeed;
 #pragma endregion
+
+#pragma region FX
+
+	UPROPERTY(EditAnywhere, Category = "FX")
+	class UNiagaraSystem* m_hurtParticle;
+
+	UPROPERTY(EditAnywhere, Category = "FX")
+	class UNiagaraSystem* m_deathParticle;
+
+#pragma endregion 
+	
 };

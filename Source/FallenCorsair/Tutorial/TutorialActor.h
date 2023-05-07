@@ -20,6 +20,7 @@ public:
 	// Sets default values for this actor's properties
 	ATutorialActor();
 
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Tutorial")
 	FTutorialComplete OnTutorialComplete;
 
 	UPROPERTY()

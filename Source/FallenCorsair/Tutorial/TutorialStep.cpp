@@ -58,7 +58,7 @@ void UTutorialStep::Initialize(class ATutorialActor* tutorial, AFallenCorsairCha
 			player->MeleeComponent->DeleguateMeleeHeavy.AddDynamic(this, &UTutorialStep::CheckStepComplete);
 			break;
 		case ETutorialActionType::SoulPickup:
-			//player->OnSoulPickup.AddDynamic(this, &UTutorialStep::CheckStepComplete);
+			player->OnSoulPicked.AddDynamic(this, &UTutorialStep::CheckStepComplete);
 			break;
 		case ETutorialActionType::Shoot:
 			player->OnShoot.AddDynamic(this, &UTutorialStep::CheckStepComplete);

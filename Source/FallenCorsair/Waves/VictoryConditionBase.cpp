@@ -42,28 +42,31 @@ void UVictoryConditionBase::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UVictoryConditionBase::CheckConditions()
 {
-	m_bAllConditionsMet = true;
-	if(m_victoryConditions.IsEmpty())
+	if(!m_bAllConditionsMet)
 	{
-		return;
-	}
-	for (auto& VictoryCondition : m_victoryConditions)
-	{
-		if(!VictoryCondition.bIsConditionMet)
+		m_bAllConditionsMet = true;
+		if(m_victoryConditions.IsEmpty())
 		{
-			if (VictoryCondition.Count >= VictoryCondition.Goal)
+			return;
+		}
+		for (auto& VictoryCondition : m_victoryConditions)
+		{
+			if(!VictoryCondition.bIsConditionMet)
 			{
-				VictoryCondition.bIsConditionMet = true; 
-			}
-			else 
-			{
-				m_bAllConditionsMet = false;
+				if (VictoryCondition.Count >= VictoryCondition.Goal)
+				{
+					VictoryCondition.bIsConditionMet = true; 
+				}
+				else 
+				{
+					m_bAllConditionsMet = false;
+				}
 			}
 		}
-	}
-	if (m_bAllConditionsMet)
-	{
-		OnZoneVictory.Broadcast();
+		if (m_bAllConditionsMet)
+		{
+			OnZoneVictory.Broadcast();
+		}
 	}
 }
 

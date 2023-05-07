@@ -57,7 +57,7 @@ protected:
 	UPROPERTY()
 	bool m_bIsPlayerInZone;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UWaveTracker* m_waveTracker;
 
 	UPROPERTY(EditDefaultsOnly)

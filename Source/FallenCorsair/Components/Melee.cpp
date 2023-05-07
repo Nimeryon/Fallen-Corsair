@@ -76,9 +76,11 @@ void UMelee::PerformAttack()
 	if (!MeleeIsValid())
 		return;
 
+
 	if (bCanAttack)
 	{
 		bCanAttack = false;
+
 		SetOwnerModeAttack(true);
 		AttackSequence();
 	}
@@ -183,6 +185,10 @@ void UMelee::StartAttack(bool start, bool _bFreezeAnimation)
 	{
 		PerformAttack();
 	}
+	
+	if (!start){
+		attackType = EAttackType::Soft;
+	}
 }
 
 void UMelee::UpdateTypeAttack(float& eslapsedSeconds)
@@ -238,6 +244,7 @@ void UMelee::CancelAttack()
 {
 	ResetCombo();
 	SetOwnerModeAttack(false);
+	StartAttack(false);
 	bMeleeEnded = false;
 
 	if (OwnerCharacter->GetMesh())
@@ -264,6 +271,12 @@ void UMelee::CalculRotation(FVector _rot)
 	rot.Normalize();
 	FRotator rotation = UKismetMathLibrary::MakeRotFromX(rot);
 	RotatorWhileAttackStarted = FRotator(0, rotation.Yaw, 0);
+}
+
+void UMelee::PlaySoundCharge()
+{
+	if (SoundCharge)
+		UGameplayStatics::SpawnSound2D(GetWorld(), SoundCharge);
 }
 
 bool UMelee::AttackIsStarted() const
@@ -408,7 +421,6 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	}
 	else if (NotifyName == "Hit")
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hit"));
 		if (!GetCurrentMelee().CollisionWithSockets)
 			TriggerHitWithCollisionShape();
 	}	 
@@ -443,10 +455,13 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 			StartAttack(false);
 			SetReleased(true);
 		}
+
+		bMeleeEnded = true;
 	}	
 	else if (NotifyName == "Recovery")
 	{
 		bMeleeEnded = true;
+
 		ResetCombo();
 		StartAttack(false);
 	}
@@ -463,6 +478,9 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 		{
 			UGameplayStatics::PlaySound2D(GetWorld(), GetCurrentMelee().PlayerVoiceSound, 1, 1, 0);
 		}
+
+		if (attackType == EAttackType::Heavy)
+			PlaySoundCharge();
 	}
 }
 
@@ -472,7 +490,7 @@ void UMelee::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 
 void UMelee::OnMontageBlendOut(UAnimMontage* Montage, bool bInterrupted)
 {
-	if (MontageToPlay == AnimWhileChargingMeleeHeavy && !bInterrupted)
+	if ((MontageToPlay == AnimWhileChargingMeleeHeavy && !bInterrupted))
 	{
 		// Play Animation
 		if (OwnerCharacter->GetMesh())

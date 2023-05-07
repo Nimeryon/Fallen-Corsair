@@ -78,7 +78,7 @@ private:
 
 
 	// To avoid any bug while melee targeting
-	float MaxTimeTargeting = 3; // Secondes
+	float MaxTimeTargeting = 0.5; // Secondes
 	float CurrentTimeTargeting = 0;
 
 };

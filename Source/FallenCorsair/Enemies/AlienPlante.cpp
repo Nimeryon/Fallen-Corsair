@@ -2,6 +2,7 @@
 
 
 #include "AlienPlante.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AAlienPlante::AAlienPlante()
@@ -30,8 +31,11 @@ void AAlienPlante::Tick(float DeltaTime)
 	if (ReviveTimer >= ReviveCooldown)
 	{
 		CanEffect = true;
+		bCanPlaySoundDestroy = true;
 		m_currentHealth = m_health;
 		ReviveTimer = 0;
+		if (SoundRevive)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundRevive);
 	}
 }
 
@@ -43,7 +47,16 @@ void AAlienPlante::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 float AAlienPlante::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {	
-    return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	float ActualDammage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+    
+	if (!IsAlive() && bCanPlaySoundDestroy)
+	{
+		bCanPlaySoundDestroy = false;
+		if (SoundDestroy)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundDestroy);
+	}
+
+	return ActualDammage;
 }
 
 TArray<FHitResult> AAlienPlante::MakeSphereCollision(float _SphereRadius)

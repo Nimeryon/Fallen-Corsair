@@ -67,6 +67,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Soul)
 	float m_currentDestroyTime = 0;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundAbsorbtionSoul;
+
 public:
 	UFUNCTION()
 	void ResetLifeSpan();

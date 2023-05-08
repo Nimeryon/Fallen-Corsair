@@ -67,7 +67,11 @@ void ADropSoul::Tick(float DeltaTime)
 	{
 		m_currentDestroyTime += DeltaTime;
 		if (m_currentDestroyTime >= m_destroyTime)
+		{
+		if (SoundAbsorbtionSoul)
+				UGameplayStatics::SpawnSound2D(GetWorld(), SoundAbsorbtionSoul);
 			Destroy();
+		}
 	}
 }
 

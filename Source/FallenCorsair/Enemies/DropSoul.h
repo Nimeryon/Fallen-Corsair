@@ -37,6 +37,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Soul, meta = (ClampMin = "0", UIMin = "0"))
 	float m_pickupDistance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundAbsorbtionSoul;
 	
 private:
 
@@ -67,8 +70,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Soul)
 	float m_currentDestroyTime = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-	USoundWave* SoundAbsorbtionSoul;
 
 public:
 	UFUNCTION()

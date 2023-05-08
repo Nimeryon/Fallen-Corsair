@@ -38,6 +38,28 @@ void AGroundAlien::Tick(float DeltaSeconds)
 	}
 }
 
+float AGroundAlien::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float ActualDammage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
+	if (IsAlive())
+	{
+		if (SoundGetHurt)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundGetHurt);
+	}
+	else
+	{
+		if (SoundDeath)
+		{
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundDeath);
+			SoundDeath = nullptr;
+		}
+	}
+
+	return ActualDammage;
+}
+
+
 void AGroundAlien::PrepareAttack()
 {
 	if (!m_attackTarget) return;
@@ -48,6 +70,9 @@ void AGroundAlien::PrepareAttack()
 bool AGroundAlien::Attack()
 {
 	if (!m_attackTarget) return false;
+
+	if (SoundAttack)
+		UGameplayStatics::SpawnSound2D(GetWorld(), SoundAttack);
 
 	const FVector Position = GetActorLocation() + GetActorForwardVector() * m_attackBoxOffset;
 	FHitResult Hit;
@@ -131,6 +156,9 @@ void AGroundAlien::JumpTowardsTarget()
 	
 	GetCharacterMovement()->AddImpulse(Direction * m_attackJumpSpeed, true);
 	Jump();
+
+	if (SoundJump)
+		UGameplayStatics::SpawnSound2D(GetWorld(), SoundJump);
 }
 
 bool AGroundAlien::IsInCooldown() const { return m_bIsInCooldown; }

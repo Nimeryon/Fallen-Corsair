@@ -49,12 +49,17 @@ void AAlienPlantBomb::Tick(float DeltaTime)
 		if (!IsAlive() && CanEffect)
 		{
 			CanEffect = false;
-				if (AudioComponentDetonator)
-		{
-			AudioComponentDetonator->Stop();
-			AudioComponentDetonator->DestroyComponent();
-			AudioComponentDetonator = nullptr;
-		}
+
+			if (SoundExplosion)
+				UGameplayStatics::SpawnSound2D(GetWorld(), SoundExplosion);
+
+	
+			if (AudioComponentDetonator)
+			{
+				AudioComponentDetonator->Stop();
+				AudioComponentDetonator->DestroyComponent();
+				AudioComponentDetonator = nullptr;
+			}
 			UExplosion::PerformExplosion(GetWorld(), GetOwner(), Dammage, GetOwner()->GetActorLocation(), SphereRadius, PropulsionForce, RotationAngleDegrees, NS_Explosion, Debug);
 		}
 	}

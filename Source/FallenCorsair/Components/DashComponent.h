@@ -113,7 +113,7 @@ private:
 
 public:
 	UFUNCTION()
-	void DashPressed();
+	bool DashPressed();
 	
 	UFUNCTION()
 	void PerformDash();

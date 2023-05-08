@@ -313,10 +313,12 @@ void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 	
 	if(!m_bIsFocus && !MeleeComponent->AttackIsStarted() && !MeleeComponent->MeleeIsHeavy())
 	{
-		dashComp->DashPressed();
+		bool bDashSuccessed = dashComp->DashPressed();
 		OnDodge.Broadcast();
-		if (SoundDash)
-			UGameplayStatics::SpawnSound2D(GetWorld(), SoundDash);
+
+		if (bDashSuccessed)
+			if (SoundDash)
+				UGameplayStatics::SpawnSound2D(GetWorld(), SoundDash);
 	}
 }
 

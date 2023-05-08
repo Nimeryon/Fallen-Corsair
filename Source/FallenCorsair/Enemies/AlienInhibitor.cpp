@@ -43,7 +43,10 @@ float AAlienInhibitor::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 	if (!IsAlive())
 		if (SoundDeath)
+		{
 			UGameplayStatics::SpawnSound2D(GetWorld(), SoundDeath);
+			SoundDeath = nullptr;
+		}
 
     return ActualDamage;
 }

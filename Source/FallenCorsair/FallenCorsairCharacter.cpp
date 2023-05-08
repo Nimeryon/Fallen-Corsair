@@ -261,6 +261,7 @@ float AFallenCorsairCharacter::TakeDamage(float DamageAmount, FDamageEvent const
 	if (m_currentHealth <= 0)
 	{
 		/// called death event
+		PlayerDeath();
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Brutos life: %f"), m_currentHealth);
@@ -317,6 +318,10 @@ TArray<AActor*> AFallenCorsairCharacter::SetIgnoreCharacterActors()
 void AFallenCorsairCharacter::SetCanBeDamage(bool bCanBeDammage)
 {
 	m_bCanBeDammage = bCanBeDammage;
+}
+
+void AFallenCorsairCharacter::PlayerDeath()
+{
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -141,6 +141,9 @@ public:
 
 	UFUNCTION()
 	void SetCanBeDamage(bool bCanBeDammage);
+	
+	UFUNCTION(BlueprintCallable)
+	void PlayerDeath();
 
 	UPROPERTY()
 	FOnShoot OnShoot;

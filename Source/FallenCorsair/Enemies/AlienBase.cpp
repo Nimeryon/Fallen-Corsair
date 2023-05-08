@@ -6,6 +6,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AAlienBase::AAlienBase()
@@ -18,6 +19,7 @@ void AAlienBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	m_movementSpeed = UKismetMathLibrary::RandomFloatInRange(m_minMovementSpeed, m_maxMovementSpeed);
 	GetCharacterMovement()->MaxWalkSpeed = m_movementSpeed;
 	m_currentHealth = m_health;
 

@@ -142,6 +142,12 @@ public:
 	
 #pragma region Movement
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float m_minMovementSpeed = 800;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float m_maxMovementSpeed = 1000;
+
+	UPROPERTY(BlueprintReadOnly)
 	float m_movementSpeed;
 #pragma endregion
 

@@ -7,7 +7,11 @@ public class FallenCorsair : ModuleRules
 	public FallenCorsair(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "EnhancedInput", "NavigationSystem", "GameplayTasks", "Niagara" });
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
+			"Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "EnhancedInput", "NavigationSystem", "GameplayTasks", "Niagara",
+			"Slate", "UMG"
+		});
 		PublicDefinitions.AddRange(
 		new string[]
 		{

@@ -144,15 +144,25 @@ void AAlienBase::Death(EDamageType DamageType)
 		OnDeathWithActor.Broadcast(this);
 		
 	if (m_destroyOnDeath)
-	{
-		if(m_deathParticle)
-		{
-			FVector SpawnLocation = GetActorLocation();
-			FVector Scale = FVector(1, 1, 1);
-			FRotator SpawnRotation = FRotator::ZeroRotator;
-			// Spawn the Niagara FX system at the specified location and rotation
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_deathParticle, SpawnLocation, SpawnRotation,  Scale, true);	
-		}
 		Destroy();
-	}
+}
+
+void AAlienBase::PlayDeathFX()
+{
+	if(!m_deathParticle) return;
+	
+	const FVector SpawnLocation = GetActorLocation();
+	const FVector Scale = FVector(1, 1, 1);
+	const FRotator SpawnRotation = FRotator::ZeroRotator;
+	
+	// Spawn the Niagara FX system at the specified location and rotation
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_deathParticle, SpawnLocation, SpawnRotation,  Scale, true);	
+}
+
+void AAlienBase::FellOutOfWorld(const UDamageType& dmgType)
+{
+	Super::FellOutOfWorld(dmgType);
+
+	Death(EDamageType::Default);
+	Destroy();
 }

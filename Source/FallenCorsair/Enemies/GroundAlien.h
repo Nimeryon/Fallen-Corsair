@@ -56,8 +56,16 @@ public:
 
 	virtual void Unstunned() override;
 
+	void PlayDeathFX() override;
+
 	UFUNCTION()
 	virtual void PlayStunMontage();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void AttachAttackFX();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void DetachAttackFX();
 	
 public:
 #pragma region Animations
@@ -92,6 +100,9 @@ public:
 #pragma endregion
 
 #pragma region Attack
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+	TArray<FName> m_attackSocketsName;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack", meta = (ClampMin = "0", UIMin = "0"))
 	float m_attackDamage;
 
@@ -155,6 +166,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump Attack", meta = (ClampMin = "0", UIMin = "0"))
 	float m_attackMaxJumpDistance = 600;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump Attack", meta = (ClampMin = "0", UIMin = "0", ClampMax = "1", UIMax = "1"))
+	float m_attackAngleVariationChance = 0.25f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump Attack", meta = (ClampMin = "0", UIMin = "0"))
 	float m_attackRandomAngleVariation = 15;
@@ -170,4 +184,20 @@ public:
 	UPROPERTY()
 	float m_scaleVariation;
 #pragma endregion
+
+#pragma region Color
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Color")
+	bool m_bmulticolor = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Color", meta = (ClampMin = "0", UIMin = "0"))
+	float m_hueShiftSpeed = 1;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Color", meta = (ClampMin = "0", UIMin = "0", ClampMax = "100", UIMax = "100"))
+	float m_hueColor = 0;
+#pragma endregion
+	
+#pragma region FX
+	UPROPERTY(EditAnywhere, Category = "FX")
+	class UNiagaraSystem* m_attackParticle;
+#pragma endregion 
 };

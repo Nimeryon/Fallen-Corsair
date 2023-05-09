@@ -235,8 +235,8 @@ void ABullet::PlayChargeCompletedSound()
 
 void ABullet::StopChargeSound()
 {
-	// StopAudioComponent(AudioComponentCharge);
-	// StopAudioComponent(AudioComponentChargeComplete);
+	StopAudioComponent(AudioComponentCharge);
+	StopAudioComponent(AudioComponentChargeComplete);
 }
 
 // Private

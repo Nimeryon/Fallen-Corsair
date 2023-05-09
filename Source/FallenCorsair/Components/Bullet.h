@@ -102,6 +102,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "impulse")
 	float m_impulse = 1000;
+
+	UPROPERTY()
+	FName m_socketLoc;
 	
 
 public:	
@@ -112,7 +115,7 @@ public:
 	void Explosion();
 
 	UFUNCTION()
-	void SetBulletSetting(float bulletSpeed, int dammage, int explosionDammage, float explosionRadius, float explostionDuration, int lifeSpan, float bulletRadius, float chargeSpeed, AFallenCorsairCharacter* character);
+	void SetBulletSetting(float bulletSpeed, int dammage, int explosionDammage, float explosionRadius, float explostionDuration, int lifeSpan, float bulletRadius, float chargeSpeed, AFallenCorsairCharacter* character, FName socketLoc);
 
 	UFUNCTION()
 	void LaunchBullet(FVector Dir = FVector::Zero());

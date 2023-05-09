@@ -125,7 +125,7 @@ void UWaveSpawner::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		&& m_timeActive > m_timeToFirstSpawn
 		&& (!m_bTimedLastSpawn || m_timeActive < m_timeToLastSpawn)
 		&& (!m_player || !m_bMaxDistance || m_distanceFromPlayer > FVector::Dist(m_location, m_player->GetActorLocation()))
-		&& (!m_bShouldBeInZone || !m_waveZoneOwner || m_waveZoneOwner->IsPlayerInZone())
+		&& (!m_bShouldBeInZone || !m_waveZoneOwner || (m_waveZoneOwner->IsPlayerInZone() && m_waveZoneOwner->m_bIsActive))
 	)
 	{
 		m_spawnTime = 0.0f;

@@ -111,6 +111,9 @@ private:
 
 #pragma endregion
 
+	UPROPERTY(EditAnywhere)
+	TEnumAsByte<ECollisionChannel> AlienChannel;
+
 public:
 	UFUNCTION()
 	bool DashPressed();

@@ -142,6 +142,23 @@ public:
 	
 #pragma region Movement
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float m_minMovementSpeed = 800;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float m_maxMovementSpeed = 1000;
+
+	UPROPERTY(BlueprintReadOnly)
 	float m_movementSpeed;
 #pragma endregion
+
+#pragma region FX
+
+	UPROPERTY(EditAnywhere, Category = "FX")
+	class UNiagaraSystem* m_hurtParticle;
+
+	UPROPERTY(EditAnywhere, Category = "FX")
+	class UNiagaraSystem* m_deathParticle;
+
+#pragma endregion 
+	
 };

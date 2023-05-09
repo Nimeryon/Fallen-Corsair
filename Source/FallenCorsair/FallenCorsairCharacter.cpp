@@ -24,6 +24,7 @@
 #include "Player/BrutosMovementComponent.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AFallenCorsairCharacter
@@ -264,6 +265,16 @@ float AFallenCorsairCharacter::TakeDamage(float DamageAmount, FDamageEvent const
 	if (m_currentHealth <= 0)
 	{
 		PlayerDeath();
+		if (SoundDeath)
+		{
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundDeath);
+			SoundDeath = nullptr;
+		}
+	}
+	else
+	{
+		if (SoundGetHurt)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundGetHurt);
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Brutos life: %f"), m_currentHealth);
@@ -302,8 +313,12 @@ void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 	
 	if(!m_bIsFocus && !MeleeComponent->AttackIsStarted() && !MeleeComponent->MeleeIsHeavy())
 	{
-		dashComp->DashPressed();
+		bool bDashSuccessed = dashComp->DashPressed();
 		OnDodge.Broadcast();
+
+		if (bDashSuccessed)
+			if (SoundDash)
+				UGameplayStatics::SpawnSound2D(GetWorld(), SoundDash);
 	}
 }
 

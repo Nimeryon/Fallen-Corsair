@@ -17,6 +17,12 @@ public:
 	// Sets default values for this character's properties
 	AAlienPlante();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+    UStaticMeshComponent* SM_PlanteAlive;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+    UStaticMeshComponent* SM_PlanteUnlive;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Plant Revive")
 	float ReviveCooldown = 60;
 
@@ -28,6 +34,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Collider Sphere")
 	bool Debug = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundRevive;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundDestroy;
 
 
 protected:
@@ -48,4 +60,5 @@ public:
 
 private:
 	float ReviveTimer = 0;
+	bool bCanPlaySoundDestroy = true;
 };

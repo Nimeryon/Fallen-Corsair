@@ -49,11 +49,29 @@ float AGroundAlien::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	}
 	else
 	{
-		if (SoundDeath)
+		const FDamageTypeEvent* Damage = static_cast<const FDamageTypeEvent*>(&DamageEvent);
+
+		if (Damage->DamageType == EDamageType::Explosion)
 		{
-			UGameplayStatics::SpawnSound2D(GetWorld(), SoundDeath);
-			SoundDeath = nullptr;
+			// Sound death by explosion
+			if (SoundDeathByExplosion)
+			{
+				UGameplayStatics::SpawnSound2D(GetWorld(), SoundDeathByExplosion);
+				SoundDeathByExplosion = nullptr;
+				SoundDeath = nullptr;
+			}
 		}
+		else {
+			// Sound death by hit
+			if (SoundDeath)
+			{
+				UGameplayStatics::SpawnSound2D(GetWorld(), SoundDeath);
+				SoundDeathByExplosion = nullptr;
+				SoundDeath = nullptr;
+			}
+		}
+
+	
 	}
 
 	return ActualDammage;

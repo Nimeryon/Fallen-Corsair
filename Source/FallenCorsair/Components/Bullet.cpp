@@ -13,6 +13,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "FallenCorsair/Enemies/AlienBase.h"
 
 // Sets default values
 ABullet::ABullet()
@@ -116,7 +117,9 @@ void ABullet::Explosion()
 	else if(m_bIsBulletLaunch)
 	{
 		TArray<FHitResult> OutHits = MakeSphereCollision(m_explosionRadius);
-		DammageOnHits(OutHits, m_explosionDammage);
+		FDamageTypeEvent DamageEvent;
+		DamageEvent.DamageType = EDamageType::Explosion;
+		DammageOnHits(OutHits, m_explosionDammage, DamageEvent);
 	}
 }
 
@@ -235,8 +238,8 @@ void ABullet::PlayChargeCompletedSound()
 
 void ABullet::StopChargeSound()
 {
-	StopAudioComponent(AudioComponentCharge);
-	StopAudioComponent(AudioComponentChargeComplete);
+	//StopAudioComponent(AudioComponentCharge);
+	//StopAudioComponent(AudioComponentChargeComplete);
 }
 
 // Private

@@ -35,6 +35,10 @@ public:
 	UFUNCTION()
 	virtual void OnWaveOver();
 
+	// Set to false to disable the spawner
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	bool m_bIsActive = true;
+
 protected:
 	// The maximum distance from the spawner to spawn the enemy
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn", meta = (Units="cm"))
@@ -77,9 +81,7 @@ protected:
 	UPROPERTY()
 	bool m_bShouldSpawn;
 
-	// Set to false to disable the spawner
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
-	bool m_bIsActive = true;
+
 
 	// Set to false to have a set number of waves
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn|Conditions|NumberOfWaves")

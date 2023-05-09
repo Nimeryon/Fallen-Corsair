@@ -6,6 +6,8 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
+
 
 // Sets default values
 AAlienPlantSmoke::AAlienPlantSmoke()
@@ -27,6 +29,26 @@ void AAlienPlantSmoke::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bIsSmoking)
+	{
+		CollisionStunAlien();
+
+		CurrentSmokingDuration += DeltaTime;
+
+		if (CurrentSmokingDuration >= SmokingDuration) 
+		{
+			if (NiagaraComponentSmoke)
+			{
+	
+				NiagaraComponentSmoke->DestroyComponent();
+				NiagaraComponentSmoke = nullptr;
+			}
+
+			CurrentSmokingDuration = 0;
+			bIsSmoking = false;
+		}
+	}
+
 }
 
 // Called to bind functionality to input
@@ -46,6 +68,7 @@ float AAlienPlantSmoke::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	if (!IsAlive() && CanEffect)
 	{
 		CanEffect = false;
+		bIsSmoking = true;
 		StunAlien(); // Stun all aliens at proximity
 	}
 
@@ -53,6 +76,28 @@ float AAlienPlantSmoke::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 }
 
 void AAlienPlantSmoke::StunAlien()
+{
+	CollisionStunAlien();
+
+	// Niagara Smoke
+	if (NS_Smoke)
+	{
+		// Check if the Niagara FX asset was loaded successfully
+		// Set up the spawn parameters
+		FVector SpawnLocation = GetActorLocation();
+		FVector Scale = FVector(1, 1, 1);
+		FRotator SpawnRotation = FRotator::ZeroRotator;
+
+		// Spawn the Niagara FX system at the specified location and rotation
+		NiagaraComponentSmoke = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Smoke, SpawnLocation, SpawnRotation, Scale, true);
+	}
+
+	if (SoundSmoke)
+		UGameplayStatics::SpawnSound2D(GetWorld(), SoundSmoke);
+
+}
+
+void AAlienPlantSmoke::CollisionStunAlien()
 {
 	// Make explosion smoke that will stun aliens hited
 	FCollisionShape SphereShape = FCollisionShape::MakeSphere(SphereRadius);
@@ -72,23 +117,7 @@ void AAlienPlantSmoke::StunAlien()
 			Alien->Stun(StunDuration);
 		}
 	}
-
-	// Niagara Smoke
-	if (NS_Smoke)
-	{
-		// Check if the Niagara FX asset was loaded successfully
-		// Set up the spawn parameters
-		FVector SpawnLocation = GetActorLocation();
-		FVector Scale = FVector(1, 1, 1);
-		FRotator SpawnRotation = FRotator::ZeroRotator;
-
-		// Spawn the Niagara FX system at the specified location and rotation
-		UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Smoke, SpawnLocation, SpawnRotation, Scale, true);
-	}
-
-	if (SoundSmoke)
-		UGameplayStatics::SpawnSound2D(GetWorld(), SoundSmoke);
-
+	
 	if (Debug)
 	{
 		FColor Color = FColor::Red;
@@ -96,5 +125,6 @@ void AAlienPlantSmoke::StunAlien()
 			Color = FColor::Green;
 		DrawDebugSphere(GetWorld(), Origin, SphereRadius, 10, Color, false, 1, 0, 1);
 	}
+
 }
 

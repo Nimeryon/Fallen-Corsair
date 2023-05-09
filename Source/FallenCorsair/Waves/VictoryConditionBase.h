@@ -104,6 +104,6 @@ public:
 	UFUNCTION()
 	virtual void OnWaveOver();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void OnEnemyDeath(AAlienBase* Alien);
 };

@@ -90,19 +90,19 @@ public:
 
 	virtual void FellOutOfWorld(const UDamageType& dmgType) override;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintAssignable)
 	FOnAlienSpawn OnSpawn;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintAssignable)
 	FOnAlienDeath OnDeath;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintAssignable)
 	FOnAlienDeathWithActor OnDeathWithActor;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintAssignable)
 	FOnAlienStunned OnStunned;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintAssignable)
 	FOnAlienDamaged OnDamaged;
 	
 public:

@@ -7,6 +7,8 @@
 #include "NavigationSystem.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/Character.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -36,26 +38,68 @@ EBTNodeResult::Type UBTTask_GetRandomPointInRadius::ExecuteTask(UBehaviorTreeCom
 {
 	const float Distance = UKismetMathLibrary::RandomFloatInRange(MinDistance, MaxDistance);
 	const FVector Direction = OwnerComp.GetAIOwner()->GetPawn()->GetActorForwardVector().GetSafeNormal2D();
-	const FVector RandomDirection = Direction.RotateAngleAxis(UKismetMathLibrary::RandomFloatInRange(0, 360), FVector::UpVector);
 	FVector Position;
 	
 	UBlackboardComponent* BlackBoard = OwnerComp.GetBlackboardComponent();
-
-	if (GenerateAroundTarget)
-	{
-		AActor* TargetActor = Cast<AActor>(BlackBoard->GetValue<UBlackboardKeyType_Object>(BBKTarget.SelectedKeyName));
-		if (TargetActor)
-			Position = TargetActor->GetActorLocation() + RandomDirection * Distance;
-	}
-	else Position = OwnerComp.GetAIOwner()->GetPawn()->GetActorLocation() + RandomDirection * Distance;
-	
-	FNavLocation NavPosition;
 	UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
-	NavSys->ProjectPointToNavigation(Position, NavPosition, FVector::ZeroVector);
-	
+	ACharacter* Actor = OwnerComp.GetAIOwner()->GetCharacter();
+	AActor* TargetActor = Cast<AActor>(BlackBoard->GetValue<UBlackboardKeyType_Object>(BBKTarget.SelectedKeyName));
+
+	Position = GetRandomPositionInRadius(Actor, TargetActor, NavSys, Distance, Direction, Position, MaxIteration);
 	BlackBoard->SetValueAsVector(BBKTargetPosition.SelectedKeyName, Position);
 	if (DrawDebugPoint)
-		UKismetSystemLibrary::DrawDebugPoint(GetWorld(), NavPosition.Location, 8, FLinearColor::Red, 2);
+		UKismetSystemLibrary::DrawDebugPoint(GetWorld(), Position, 8, FLinearColor::Red, 2);
 	
 	return Super::ExecuteTask(OwnerComp, NodeMemory);
+}
+
+FVector UBTTask_GetRandomPointInRadius::GetRandomPositionInRadius(
+	ACharacter* Character,
+	AActor* Target,
+	UNavigationSystemV1* NavSys,
+	float Distance,
+	FVector Direction,
+	FVector& Position,
+	int Iteration
+)
+{
+	const FVector RandomDirection = Direction.RotateAngleAxis(UKismetMathLibrary::RandomFloatInRange(0, 360), FVector::UpVector);
+	if (GenerateAroundTarget)
+	{
+		if (Target)
+			Position = Target->GetActorLocation() + RandomDirection * Distance;
+	}
+	else Position = Character->GetActorLocation() + RandomDirection * Distance;
+	
+	FNavLocation NavPosition;
+	NavSys->ProjectPointToNavigation(Position, NavPosition, FVector::ZeroVector);
+
+	TArray<FHitResult> Hits;
+	const  TArray<AActor*> ActorsToIgnore = {};
+	UKismetSystemLibrary::CapsuleTraceMultiByProfile(
+		GetWorld(),
+		Character->GetActorLocation(),
+		NavPosition.Location,
+		Character->GetCapsuleComponent()->GetScaledCapsuleRadius() * 2.f,
+		Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight(),
+		"Player",
+		false,
+		ActorsToIgnore,
+		EDrawDebugTrace::None,
+		Hits,
+		true
+	);
+
+	for (FHitResult& Hit : Hits)
+	{
+		if (Hit.GetActor() == Target)
+		{
+			if (Iteration <= 0)
+				return NavPosition.Location;
+			
+			return GetRandomPositionInRadius(Character, Target, NavSys, Distance, Direction, Position, --Iteration);
+		}
+	}
+	
+	return NavPosition.Location;
 }

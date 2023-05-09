@@ -7,6 +7,7 @@
 #include "DropSoul.h"
 #include "NiagaraFunctionLibrary.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "FallenCorsair/FallenCorsairCharacter.h"
 #include "FallenCorsair/Components/DashComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -149,6 +150,8 @@ void AGroundAlien::JumpTowardsTarget()
 {
 	const FVector Direction = (m_attackTargetPosition - GetActorLocation()).GetSafeNormal();
 
+	GetCapsuleComponent()->SetCollisionProfileName("AlienAttack");
+	
 	if (UKismetMathLibrary::RandomFloat() >= m_attackAngleVariationChance)
 	{
 		const FVector RandomDirection = Direction.RotateAngleAxis(UKismetMathLibrary::RandomFloatInRange(-m_attackRandomAngleVariation, m_attackRandomAngleVariation), FVector::UpVector);
@@ -174,7 +177,9 @@ void AGroundAlien::Death(EDamageType DamageType)
 		GetWorld()->SpawnActor<ADropSoul>(m_soul, GetActorLocation(), FRotator::ZeroRotator);
 
 	m_material->SetScalarParameterValue("AngryLevel", 0);
-	Cast<AAIController>(GetController())->GetBlackboardComponent()->SetValueAsBool(FName("InstantAbort"), true);
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (AIController)
+		AIController->GetBlackboardComponent()->SetValueAsBool(FName("InstantAbort"), true);
 	
 	Super::Death(DamageType);
 }
@@ -232,6 +237,11 @@ void AGroundAlien::AttachAttackFX()
 			);
 		}
 	}
+}
+
+void AGroundAlien::ResetCollisionPresset()
+{
+	GetCapsuleComponent()->SetCollisionProfileName("AlienGround");
 }
 
 void AGroundAlien::PlayDeathFX()

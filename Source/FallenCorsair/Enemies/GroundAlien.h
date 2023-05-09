@@ -63,9 +63,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AttachAttackFX();
-
+	
 	UFUNCTION(BlueprintCallable)
-	virtual void DetachAttackFX();
+	virtual void ResetCollisionPresset();
 	
 public:
 #pragma region Animations

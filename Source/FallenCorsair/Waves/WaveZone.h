@@ -49,6 +49,9 @@ public:
 
 	UFUNCTION()
 	TSubclassOf<class AAlienBase> GetAlienToSpawn() const;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool m_bIsActive = true;
 
 protected:
 	UPROPERTY()

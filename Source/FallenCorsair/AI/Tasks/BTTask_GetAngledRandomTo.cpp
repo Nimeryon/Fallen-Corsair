@@ -68,14 +68,17 @@ FVector UBTTask_GetAngledRandomTo::GetNextRandomPosition(const AActor* Actor, co
 	const FVector RandomAngledDirection = Direction.RotateAngleAxis(RandomAngle, FVector::UpVector);
 	const float Length = UKismetMathLibrary::RandomFloatInRange(MinSegmentLength, MaxSegmentLength);
 
-	const FVector Position = Actor->GetActorLocation() + RandomAngledDirection * Length;
-
+	FVector Position = Actor->GetActorLocation() + RandomAngledDirection * Length;
+	Position.Z = TargetPosition.Z;
+		
 	FNavLocation NavPosition;
 	UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
 	NavSys->ProjectPointToNavigation(Position, NavPosition, FVector::ZeroVector);
 
 	if (DrawDebugPoint)
 		UKismetSystemLibrary::DrawDebugPoint(GetWorld(), NavPosition.Location, 8, FLinearColor::Red, 2);
+
+	UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), Position.X, Position.Y, Position.Z);
 	
 	return NavPosition.Location;
 }

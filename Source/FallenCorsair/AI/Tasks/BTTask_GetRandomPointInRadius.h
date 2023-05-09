@@ -30,6 +30,10 @@ class FALLENCORSAIR_API UBTTask_GetRandomPointInRadius : public UBTTaskNode
 	UPROPERTY(Category = Node, EditAnywhere)
 	bool DrawDebugPoint = true;
 
+	/** max iteration count for generating random point */
+	UPROPERTY(Category = Node, EditAnywhere)
+	int MaxIteration = 100;
+
 protected:
 	/** Target Blackboard Key */
 	UPROPERTY(EditAnywhere, Category = Blackboard)
@@ -43,4 +47,6 @@ public:
 	virtual void OnGameplayTaskActivated(UGameplayTask& Task) override;
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+	virtual FVector GetRandomPositionInRadius(ACharacter* Character, AActor* Target, class UNavigationSystemV1* NavSys, float Distance, FVector Direction, FVector& Position, int Iteration);
 };

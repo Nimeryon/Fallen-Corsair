@@ -81,6 +81,11 @@ public:
 
 	UFUNCTION()
 	virtual void Death(EDamageType DamageType);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void PlayDeathFX();
+
+	virtual void FellOutOfWorld(const UDamageType& dmgType) override;
 	
 	UPROPERTY()
 	FOnAlienSpawn OnSpawn;

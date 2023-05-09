@@ -5,7 +5,9 @@
 
 #include "AIController.h"
 #include "DropSoul.h"
+#include "NiagaraFunctionLibrary.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "FallenCorsair/FallenCorsairCharacter.h"
 #include "FallenCorsair/Components/DashComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -19,6 +21,7 @@ void AGroundAlien::BeginPlay()
 
 	m_material = GetMesh()->CreateDynamicMaterialInstance(0, nullptr, "Stitch Material");
 	m_material->SetScalarParameterValue("AngryLevel", 1);
+	m_material->SetScalarParameterValue("Shift", m_hueColor);
 
 	AAIController* AIController = Cast<AAIController>(GetController());
 	UBlackboardComponent* BlackBoard = AIController->GetBlackboardComponent();
@@ -44,6 +47,15 @@ void AGroundAlien::Tick(float DeltaSeconds)
 	{
 		m_bIsInCooldown = false;
 		m_currentCooldownTime = 0;
+	}
+
+	if (m_bmulticolor)
+	{
+		m_hueColor += m_hueShiftSpeed * DeltaSeconds;
+		if (m_hueColor >= 100)
+			m_hueColor = 0;
+
+		m_material->SetScalarParameterValue("Shift", m_hueColor);
 	}
 }
 
@@ -137,9 +149,15 @@ bool AGroundAlien::CreateAvoidBox()
 void AGroundAlien::JumpTowardsTarget()
 {
 	const FVector Direction = (m_attackTargetPosition - GetActorLocation()).GetSafeNormal();
-	const FVector RandomDirection = Direction.RotateAngleAxis(UKismetMathLibrary::RandomFloatInRange(-m_attackRandomAngleVariation, m_attackRandomAngleVariation), FVector::UpVector);
+
+	GetCapsuleComponent()->SetCollisionProfileName("AlienAttack");
 	
-	GetCharacterMovement()->AddImpulse(RandomDirection * UKismetMathLibrary::RandomFloatInRange(m_attackMinJumpSpeed, m_attackMaxJumpSpeed), true);
+	if (UKismetMathLibrary::RandomFloat() >= m_attackAngleVariationChance)
+	{
+		const FVector RandomDirection = Direction.RotateAngleAxis(UKismetMathLibrary::RandomFloatInRange(-m_attackRandomAngleVariation, m_attackRandomAngleVariation), FVector::UpVector);
+		GetCharacterMovement()->AddImpulse(RandomDirection * UKismetMathLibrary::RandomFloatInRange(m_attackMinJumpSpeed, m_attackMaxJumpSpeed), true);
+	}
+	else GetCharacterMovement()->AddImpulse(Direction * UKismetMathLibrary::RandomFloatInRange(m_attackMinJumpSpeed, m_attackMaxJumpSpeed), true);
 	Jump();
 }
 
@@ -159,7 +177,9 @@ void AGroundAlien::Death(EDamageType DamageType)
 		GetWorld()->SpawnActor<ADropSoul>(m_soul, GetActorLocation(), FRotator::ZeroRotator);
 
 	m_material->SetScalarParameterValue("AngryLevel", 0);
-	Cast<AAIController>(GetController())->GetBlackboardComponent()->SetValueAsBool(FName("InstantAbort"), true);
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (AIController)
+		AIController->GetBlackboardComponent()->SetValueAsBool(FName("InstantAbort"), true);
 	
 	Super::Death(DamageType);
 }
@@ -194,4 +214,38 @@ void AGroundAlien::PlayStunMontage()
 	FAlphaBlendArgs BlendArgs;
 	BlendArgs.BlendTime = m_blendTime;
 	GetMesh()->GetAnimInstance()->Montage_PlayWithBlendIn(m_stunMontage, BlendArgs);
+}
+
+void AGroundAlien::AttachAttackFX()
+{
+	if (!m_attackParticle) return;
+	
+	for (const FName& SocketName : m_attackSocketsName)
+	{
+		if (GetMesh()->DoesSocketExist(SocketName))
+		{
+			const FVector SpawnLocation = GetMesh()->GetSocketLocation(SocketName);
+			UNiagaraFunctionLibrary::SpawnSystemAttached(
+				m_attackParticle,
+				GetRootComponent(),
+				SocketName,
+				SpawnLocation,
+				FRotator::ZeroRotator,
+				EAttachLocation::KeepWorldPosition,
+				true,
+				true
+			);
+		}
+	}
+}
+
+void AGroundAlien::ResetCollisionPresset()
+{
+	GetCapsuleComponent()->SetCollisionProfileName("AlienGround");
+}
+
+void AGroundAlien::PlayDeathFX()
+{
+	GetMesh()->DestroyComponent();
+	Super::PlayDeathFX();
 }

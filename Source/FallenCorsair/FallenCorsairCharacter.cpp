@@ -125,6 +125,7 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 		IsStunned = false;
 	}
 
+
 	float BrutosOpacity = UKismetMathLibrary::MapRangeClamped(FVector::Distance(GetFollowCamera()->GetComponentLocation(), GetActorLocation()), m_opacityDistanceMin, m_opacityDistanceMax, 0, 1);
 	UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "Opacity", BrutosOpacity);
 

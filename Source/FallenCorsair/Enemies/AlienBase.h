@@ -76,11 +76,14 @@ public:
 	UFUNCTION()
 	virtual void Unstunned();
 
+	UFUNCTION(BlueprintCallable)
+	virtual void Kill();
+
 	UFUNCTION()
 	virtual float GetDamageMultiplicator(EDamageType DamageType) const;
 
-	UFUNCTION()
-	virtual void Death(EDamageType DamageType);
+	UFUNCTION(BlueprintCallable)
+	virtual void Death(EDamageType DamageType = EDamageType::Default);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void PlayDeathFX();

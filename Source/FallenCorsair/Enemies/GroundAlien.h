@@ -47,6 +47,9 @@ public:
 	UFUNCTION()
 	virtual AlienState GetState() const;
 	
+	UFUNCTION(BlueprintCallable)
+	virtual void ForceDeath();
+	
 	UFUNCTION()
 	virtual void SetState(AlienState State);
 
@@ -56,7 +59,7 @@ public:
 
 	virtual void Unstunned() override;
 
-	void PlayDeathFX() override;
+	virtual void PlayDeathFX() override;
 
 	UFUNCTION()
 	virtual void PlayStunMontage();

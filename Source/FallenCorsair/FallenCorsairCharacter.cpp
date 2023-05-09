@@ -17,6 +17,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "VectorUtil.h"
 #include "Blueprint/UserWidget.h"
+
 #include "Camera/CameraShakeBase.h"
 #include "Materials/MaterialParameterCollection.h"
 #include "Kismet/KismetStringLibrary.h"
@@ -323,11 +324,11 @@ void AFallenCorsairCharacter::SetCanBeDamage(bool bCanBeDammage)
 
 void AFallenCorsairCharacter::PlayerDeath()
 {
-	// if(m_deathHUD)
-	// {
-	// 	UUserWidget* Widget = Cast<UUserWidget>(CreateWidget(GetWorld()->GetFirstPlayerController(), m_deathHUD));
-	// 	Widget->AddToViewport();
-	// }
+	if(m_deathHUD)
+	{
+		UUserWidget* Widget = Cast<UUserWidget>(CreateWidget(GetWorld()->GetFirstPlayerController(), m_deathHUD));
+		Widget->AddToViewport();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -343,8 +343,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Walk", meta = (displayName = "Charge Walk"))
 	float m_chargeWalkSpeed = 600.f;
 	
-	// UPROPERTY(EditAnywhere, Category = "Vie")
-	// TSubclassOf<UUserWidget> m_deathHUD;
+	UPROPERTY(EditAnywhere, Category = "Death", meta = (displayName = "Death HUD"))
+	TSubclassOf<UUserWidget> m_deathHUD;
 	
 	
 };

@@ -14,12 +14,6 @@ AAlienNexus::AAlienNexus()
 	MeshShield->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
-// Called when the game starts or when spawned
-void AAlienNexus::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 // Called every frame
 void AAlienNexus::Tick(float DeltaTime)
 {
@@ -44,13 +38,6 @@ void AAlienNexus::Tick(float DeltaTime)
 	else {
 		CurrentTimeAutoRegeneration = 0;
 	}
-}
-
-// Called to bind functionality to input
-void AAlienNexus::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 float AAlienNexus::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -80,7 +67,6 @@ float AAlienNexus::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 
 
 // Private
-
 void AAlienNexus::AutoRegeneration()
 {
 	if (CurrentTimeAutoRegeneration >= AutoRegenerationCooldown)

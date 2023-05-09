@@ -15,13 +15,6 @@ AAlienPlantSpawner::AAlienPlantSpawner()
 }
 
 // Called to bind functionality to input
-void AAlienPlantSpawner::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
-// Called to bind functionality to input
 void AAlienPlantSpawner::Spawn()
 {
 	const int SpawnCount = UKismetMathLibrary::RandomIntegerInRange(MinSpawnCount, MaxSpawnCount);

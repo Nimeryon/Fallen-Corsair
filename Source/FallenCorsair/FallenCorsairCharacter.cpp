@@ -45,8 +45,7 @@ AFallenCorsairCharacter::AFallenCorsairCharacter(const FObjectInitializer& Objec
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw =  false;
 	bUseControllerRotationRoll = false;
-
-
+	
 	// Configure character movement
 
 	GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...
@@ -124,8 +123,7 @@ void AFallenCorsairCharacter::Tick(float DeltaTime)
 	{
 		IsStunned = false;
 	}
-
-
+	
 	float BrutosOpacity = UKismetMathLibrary::MapRangeClamped(FVector::Distance(GetFollowCamera()->GetComponentLocation(), GetActorLocation()), m_opacityDistanceMin, m_opacityDistanceMax, 0, 1);
 	UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "Opacity", BrutosOpacity);
 
@@ -303,7 +301,6 @@ void AFallenCorsairCharacter::Aim(const FInputActionValue& bIsZoom)
 			gunComp->StopCharge(true);
 			m_direction = -1.f;
 		}
-		
 	}
 }
 
@@ -431,14 +428,11 @@ void AFallenCorsairCharacter::Look(const FInputActionValue& Value)
 			yawSensibility = m_mouseYawSensitivity_S;
 			pitchSensibility = m_mousePitchSensitivity_S;
 		}
+		
 		if(m_cameraCurve)
 		{
-
-			// AddControllerYawInput(m_cameraCurve->GetFloatValue(LookAxisVector.X) * yawSensibility);
-			// AddControllerPitchInput(m_cameraCurve->GetFloatValue(LookAxisVector.Y) * pitchSensibility);
-
-			AddControllerYawInput(LookAxisVector.X * yawSensibility);
-			AddControllerPitchInput(LookAxisVector.Y * pitchSensibility);
+			AddControllerYawInput(m_cameraCurve->GetFloatValue(LookAxisVector.X) * yawSensibility);
+			AddControllerPitchInput(m_cameraCurve->GetFloatValue(LookAxisVector.Y) * pitchSensibility);
 		}
 	}
 }

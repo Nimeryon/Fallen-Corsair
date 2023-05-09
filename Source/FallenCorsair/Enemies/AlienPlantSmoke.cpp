@@ -17,13 +17,6 @@ AAlienPlantSmoke::AAlienPlantSmoke()
 
 }
 
-// Called when the game starts or when spawned
-void AAlienPlantSmoke::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
 // Called every frame
 void AAlienPlantSmoke::Tick(float DeltaTime)
 {
@@ -32,7 +25,6 @@ void AAlienPlantSmoke::Tick(float DeltaTime)
 	if (bIsSmoking)
 	{
 		CollisionStunAlien();
-
 		CurrentSmokingDuration += DeltaTime;
 
 		if (CurrentSmokingDuration >= SmokingDuration) 
@@ -48,14 +40,6 @@ void AAlienPlantSmoke::Tick(float DeltaTime)
 			bIsSmoking = false;
 		}
 	}
-
-}
-
-// Called to bind functionality to input
-void AAlienPlantSmoke::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 float AAlienPlantSmoke::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

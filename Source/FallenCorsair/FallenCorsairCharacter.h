@@ -311,7 +311,7 @@ public:
 	UPROPERTY()
 	bool m_bIsLowHP = false;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float m_currentHealth = 50.f;
 
 	UPROPERTY()
@@ -323,7 +323,7 @@ public:
 	UPROPERTY()
 	bool m_bIsHealing = false;
 	
-	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "Vie du joueur"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 1000, UIMax = 1000))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Vie", meta = (displayName = "Vie du joueur"), meta = (ClampMin = 1, UIMin = 1, ClampMax = 1000, UIMax = 1000))
 	float m_maxHealth = 50.f;
 
 	/**

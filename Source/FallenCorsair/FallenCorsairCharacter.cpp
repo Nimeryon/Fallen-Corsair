@@ -16,6 +16,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "VectorUtil.h"
+#include "Blueprint/UserWidget.h"
+
+#include "Camera/CameraShakeBase.h"
 #include "Materials/MaterialParameterCollection.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Player/BrutosMovementComponent.h"
@@ -260,7 +263,6 @@ float AFallenCorsairCharacter::TakeDamage(float DamageAmount, FDamageEvent const
 
 	if (m_currentHealth <= 0)
 	{
-		/// called death event
 		PlayerDeath();
 	}
 
@@ -322,6 +324,11 @@ void AFallenCorsairCharacter::SetCanBeDamage(bool bCanBeDammage)
 
 void AFallenCorsairCharacter::PlayerDeath()
 {
+	if(m_deathHUD)
+	{
+		UUserWidget* Widget = Cast<UUserWidget>(CreateWidget(GetWorld()->GetFirstPlayerController(), m_deathHUD));
+		Widget->AddToViewport();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

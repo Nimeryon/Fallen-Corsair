@@ -142,7 +142,7 @@ public:
 	UFUNCTION()
 	void SetCanBeDamage(bool bCanBeDammage);
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void PlayerDeath();
 
 	UPROPERTY()
@@ -206,7 +206,7 @@ public:
 	float m_direction = 0.f;
 
 	UPROPERTY()
-	APlayerCameraManager* m_cameraManager;
+	class APlayerCameraManager* m_cameraManager;
 	
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Default", meta = (displayName = "Camera Pitch"), meta = (ClampMin = -90, UIMin = -90, ClampMax = 90, UIMax = 90))
 	float m_pitchAngle = 0;
@@ -278,7 +278,7 @@ public:
 	UCurveFloat* m_cameraCurve;
 
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Default", meta = (displayName = "Camera Shake"))
-	TSubclassOf<UCameraShakeBase> m_cameraShake;
+	TSubclassOf<class UCameraShakeBase> m_cameraShake;
 	
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Opacity", meta = (displayName = "Opacity Distance Max"))
     float m_opacityDistanceMax = 160;
@@ -330,7 +330,7 @@ public:
 	float m_changeSpeed = 1.f;
 
 	UPROPERTY(EditAnywhere, Category = "Vie", meta = (displayName = "MPC"))
-	UMaterialParameterCollection* m_collection;
+	class UMaterialParameterCollection* m_collection;
 
 #pragma endregion
 
@@ -342,6 +342,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Walk", meta = (displayName = "Charge Walk"))
 	float m_chargeWalkSpeed = 600.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Death", meta = (displayName = "Death HUD"))
+	TSubclassOf<UUserWidget> m_deathHUD;
 	
 	
 };

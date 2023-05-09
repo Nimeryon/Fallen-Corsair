@@ -214,6 +214,13 @@ void AGroundAlien::SetCooldownActive() { m_bIsInCooldown = true; }
 
 AlienState AGroundAlien::GetState() const { return m_state; }
 
+void AGroundAlien::ForceDeath()
+{
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (AIController)
+		AIController->GetBlackboardComponent()->SetValueAsBool(FName("InstantAbort"), true);
+}
+
 void AGroundAlien::SetState(AlienState State) { m_state = State; }
 
 void AGroundAlien::Death(EDamageType DamageType)

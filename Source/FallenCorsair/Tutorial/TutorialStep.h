@@ -33,10 +33,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial Step")
 	class AFallenCorsairCharacter* m_player;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tutorial Step")
+	UPROPERTY(EditAnywhere, Category = "Tutorial Step")
 	FString m_name = "step";
 	
-	UPROPERTY(EditAnywhere, Category = "Tutorial Step")
+	UPROPERTY(EditAnywhere, Category = "Tutorial Step", meta = (EditCondition = "ConditionType == EConditionType::ActionPerformed", EditConditionHides))
 	ETutorialActionType m_actionPerformed = ETutorialActionType::LightAttack;
 
 	UPROPERTY(VisibleAnywhere, Category = "Tutorial Step")

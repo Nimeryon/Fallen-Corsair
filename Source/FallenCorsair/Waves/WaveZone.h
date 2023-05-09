@@ -49,9 +49,6 @@ public:
 
 	UFUNCTION()
 	TSubclassOf<class AAlienBase> GetAlienToSpawn() const;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool m_bIsActive = true;
 
 protected:
 	UPROPERTY()
@@ -60,7 +57,7 @@ protected:
 	UPROPERTY()
 	bool m_bIsPlayerInZone;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	class UWaveTracker* m_waveTracker;
 
 	UPROPERTY(EditDefaultsOnly)

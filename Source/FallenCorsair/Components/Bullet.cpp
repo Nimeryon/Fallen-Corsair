@@ -2,9 +2,6 @@
 
 
 #include "Bullet.h"
-
-#include <filesystem>
-
 #include "Components/SphereComponent.h"
 #include "FallenCorsair/Enemies/AlienBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -58,7 +55,7 @@ void ABullet::Tick(float DeltaTime)
 
 	if(!m_bIsBulletLaunch && !Explosed)
 	{
-		SetActorLocation(m_ownerRef->GetMesh()->GetSocketLocation(m_socketLoc));
+		SetActorLocation(m_ownerRef->GetMesh()->GetSocketLocation("BulletStartSocket"));
 		SetActorRotation(m_ownerRef->GetFollowCamera()->GetComponentRotation());
 		PlayChargeSound();
 	}
@@ -109,7 +106,7 @@ void ABullet::Explosion()
 				FVector Scale = FVector(1, 1, 1);
 				FRotator SpawnRotation = FRotator::ZeroRotator;
 				// Spawn the Niagara FX system at the specified location and rotation
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Explosion, SpawnLocation, SpawnRotation,  Scale, true);
+				UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Explosion, SpawnLocation, SpawnRotation,  Scale, true);
 			}
 
 			if (SoundSplash)
@@ -123,7 +120,7 @@ void ABullet::Explosion()
 	}
 }
 
-void ABullet::SetBulletSetting(float bulletSpeed, int dammage, int explosionDammage, float explosionRadius, float explostionDuration, int lifeSpan, float bulletRadius, float chargeSpeed, AFallenCorsairCharacter* character, FName socketLoc)
+void ABullet::SetBulletSetting(float bulletSpeed, int dammage, int explosionDammage, float explosionRadius, float explostionDuration, int lifeSpan, float bulletRadius, float chargeSpeed, AFallenCorsairCharacter* character)
 {
 	m_bulletDammage = dammage;
 	m_explosionDammage = explosionDammage;
@@ -134,7 +131,6 @@ void ABullet::SetBulletSetting(float bulletSpeed, int dammage, int explosionDamm
 	m_chargeSpeed = chargeSpeed;
 	m_ownerRef = character;
 	m_explosionDuration = explostionDuration;
-	m_socketLoc = socketLoc;
 }
 
 void ABullet::LaunchBullet(FVector Dir)

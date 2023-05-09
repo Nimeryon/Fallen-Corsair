@@ -48,17 +48,6 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 		}
 	}
 
-	if(m_bIsDashing)
-	{
-		m_ownerRef->GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		ImpulseEnnemy();
-	}
-	else
-	{
-		m_ownerRef->GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	}
-
-	
 	if(m_bIsEdge)
 	{
 		DetectEdge();
@@ -70,6 +59,8 @@ void UDashComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 				m_ownerRef->GetCharacterMovement()->MaxWalkSpeed = m_maxDistance / m_dashTime * m_DashCurve->GetFloatValue(CurrentDistance / m_actualDistance);
 				m_ownerRef->GetCharacterMovement()->Velocity = (m_newLoc - m_startLoc).GetSafeNormal() * m_ownerRef->GetCharacterMovement()->MaxWalkSpeed;
 				m_ownerRef->GetCharacterMovement()->AddInputVector((m_newLoc - m_startLoc).GetSafeNormal(), true);
+				
+				ImpulseEnnemy();
 
 				if(CurrentDistance / m_actualDistance > m_invicibleTimePercent / 100)
 				{
@@ -198,7 +189,6 @@ void UDashComponent::DetectEdge()
 void UDashComponent::DashCD()
 {
 	m_bCanDash = true;
-	StopDash();
 }
 
 void UDashComponent::DashSlowMoReset()
@@ -221,14 +211,14 @@ void UDashComponent::SetCanPerfectDodge()
 
 void UDashComponent::ImpulseEnnemy()
 {
-	FVector Start = m_ownerRef->GetActorLocation() + m_ownerRef->GetActorForwardVector() * 100;
+	FVector Start = m_ownerRef->GetActorLocation();
 	const float CapsuleRadius = m_ownerRef->GetCapsuleComponent()->GetScaledCapsuleRadius() * 2;
 	const float CapsuleHalfHeight = m_ownerRef->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2;
 	FCollisionShape SphereShape = FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHeight);
 	TArray<FHitResult> OutHits;
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(m_ownerRef);
-	GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, FQuat::Identity, UEngineTypes::ConvertToTraceType(AlienChannel), SphereShape, QueryParams);
+	GetWorld()->SweepMultiByObjectType(OutHits, Start, Start, FQuat::Identity, UEngineTypes::ConvertToTraceType(ECC_Visibility), SphereShape, QueryParams);
 
 	DrawDebugCapsule(GetWorld(), m_ownerRef->GetActorLocation(), CapsuleHalfHeight, CapsuleRadius, m_ownerRef->GetActorRotation().Quaternion(), FColor::Red);
 	

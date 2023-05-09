@@ -2,8 +2,6 @@
 
 
 #include "Barrel.h"
-#include "NiagaraFunctionLibrary.h"
-#include "../FallenCorsairCharacter.h"
 
 #include "Kismet/KismetMaterialLibrary.h"
 
@@ -24,7 +22,6 @@ void UBarrel::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	m_ownerRef = Cast<AFallenCorsairCharacter>(GetOwner());
 	m_maxSoul = 100 * m_maxSlot;
 	m_currentSoul = 100 * m_slot;
 	UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), m_collection, "Slot", m_maxSlot);
@@ -60,15 +57,8 @@ int UBarrel::GetSlot()
 }
 void UBarrel::SetSlot(int newSlot)
 {
-	if(m_sparkParticle && m_ownerRef->GetMesh()->DoesSocketExist(m_socketLoc))
-	{
-		FVector SpawnLocation = m_ownerRef->GetMesh()->GetSocketLocation(m_socketLoc);
-		FRotator SpawnRotation = FRotator::ZeroRotator;
-		UNiagaraFunctionLibrary::SpawnSystemAttached(m_sparkParticle, m_ownerRef->GetRootComponent(), m_socketLoc, SpawnLocation, SpawnRotation,EAttachLocation::KeepWorldPosition, true, true);
-		
-	}
-	
 	m_slot = m_slot - newSlot;
+	//m_currentSoul = newSlot * 100;
 	m_currentSoul = m_currentSoul - newSlot * 100;
 }
 int UBarrel::GetMaxSlot()

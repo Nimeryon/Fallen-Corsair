@@ -153,9 +153,6 @@ public:
 
 	UFUNCTION()
 	void SetCanBeDamage(bool bCanBeDammage);
-	
-	UFUNCTION(BlueprintCallable)
-	void PlayerDeath();
 
 	UPROPERTY()
 	FOnShoot OnShoot;
@@ -291,12 +288,6 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Camera Option|Default", meta = (displayName = "Camera Shake"))
 	TSubclassOf<UCameraShakeBase> m_cameraShake;
-	
-	UPROPERTY(EditAnywhere, Category = "Camera Option|Opacity", meta = (displayName = "Opacity Distance Max"))
-    float m_opacityDistanceMax = 160;
-    
-    UPROPERTY(EditAnywhere, Category = "Camera Option|Opacity", meta = (displayName = "Opacity Distance Min"))
-	float m_opacityDistanceMin = 80;
 	
 	UPROPERTY()
 	UCameraShakeBase* m_currentCameraShake;

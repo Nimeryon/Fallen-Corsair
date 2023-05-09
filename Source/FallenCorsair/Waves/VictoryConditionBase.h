@@ -14,7 +14,6 @@ UENUM()
 enum class EConditionType
 {
 	EnemiesKilled,
-	EnemiesRemaining,
 	WavesCleared,
 	//Timer,
 	ActionPerformed,
@@ -43,11 +42,11 @@ struct FVictoryCondition
 	UPROPERTY(EditAnywhere, meta = (EditCondition = "ConditionType == EConditionType::ActionPerformed", EditConditionHides))
 	EActionType ActionPerformed;
 
-	UPROPERTY(VisibleAnywhere, meta = (EditCondition = "ConditionType != EConditionType::EnemiesRemaining"))
-	int32 Count=0;
+	UPROPERTY(VisibleAnywhere)
+	int32 Count;
 
-	UPROPERTY(EditAnywhere, meta = (EditCondition = "ConditionType != EConditionType::EnemiesRemaining"))
-	int32 Goal=1;
+	UPROPERTY(EditAnywhere)
+	int32 Goal;
 
 	UPROPERTY(EditAnywhere)
 	bool bIsConditionMet;
@@ -63,7 +62,6 @@ public:
 	// Sets default values for this component's properties
 	UVictoryConditionBase();
 
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Victory Condition")
 	FZoneVictory OnZoneVictory;
 
 protected:
@@ -76,11 +74,8 @@ protected:
 	UPROPERTY()
 	class UWaveTracker* m_waveTracker;
 
-	UPROPERTY(VisibleAnywhere)
-	bool m_bAllConditionsMet = false;
-
 	UPROPERTY()
-	bool m_killAll = false;
+	bool m_bAllConditionsMet = false;
 	
 public:	
 	// Called every frame

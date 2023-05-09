@@ -3,10 +3,8 @@
 
 #include "AlienBase.h"
 
-#include "NiagaraFunctionLibrary.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AAlienBase::AAlienBase()
@@ -19,7 +17,6 @@ void AAlienBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	m_movementSpeed = UKismetMathLibrary::RandomFloatInRange(m_minMovementSpeed, m_maxMovementSpeed);
 	GetCharacterMovement()->MaxWalkSpeed = m_movementSpeed;
 	m_currentHealth = m_health;
 
@@ -71,15 +68,6 @@ float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 
 	if (m_currentHealth <= 0)
 		Death(damageType);
-
-	if(m_hurtParticle)
-	{
-		FVector SpawnLocation = GetActorLocation();
-		FVector Scale = FVector(1, 1, 1);
-		FRotator SpawnRotation = FRotator::ZeroRotator;
-		// Spawn the Niagara FX system at the specified location and rotation
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_hurtParticle, SpawnLocation, SpawnRotation,  Scale, true);	
-	}
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
@@ -144,15 +132,5 @@ void AAlienBase::Death(EDamageType DamageType)
 		OnDeathWithActor.Broadcast(this);
 		
 	if (m_destroyOnDeath)
-	{
-		if(m_deathParticle)
-		{
-			FVector SpawnLocation = GetActorLocation();
-			FVector Scale = FVector(1, 1, 1);
-			FRotator SpawnRotation = FRotator::ZeroRotator;
-			// Spawn the Niagara FX system at the specified location and rotation
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_deathParticle, SpawnLocation, SpawnRotation,  Scale, true);	
-		}
 		Destroy();
-	}
 }

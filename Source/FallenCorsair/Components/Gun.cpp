@@ -82,7 +82,7 @@ void UGun::Shoot()
 		if(m_bullet)
 		{
 			m_spawnBullet = GetWorld()->SpawnActor<ABullet>(m_bullet, start, m_ownerRef->GetFollowCamera()->GetComponentRotation(), SpawnInfo);
-			m_spawnBullet->SetBulletSetting(m_bulletSpeed,m_bulletDammage, m_explosionDammage, m_bulletExplosionRadius, m_explosionDuration, m_bulletLifeSpan, m_bulletRadius, m_ChargeSpeed, m_ownerRef, m_socketLoc);
+			m_spawnBullet->SetBulletSetting(m_bulletSpeed,m_bulletDammage, m_explosionDammage, m_bulletExplosionRadius, m_explosionDuration, m_bulletLifeSpan, m_bulletRadius, m_ChargeSpeed, m_ownerRef);
 			
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Shoot"));

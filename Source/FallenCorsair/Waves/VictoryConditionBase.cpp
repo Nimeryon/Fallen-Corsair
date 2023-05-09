@@ -30,15 +30,6 @@ void UVictoryConditionBase::BeginPlay()
 	player->OnShoot.AddDynamic(this, &UVictoryConditionBase::OnShootPerformed);
 	player->MeleeComponent->DeleguateMeleeSoft.AddDynamic(this, &UVictoryConditionBase::OnLightAttackPerformed);
 	player->MeleeComponent->DeleguateMeleeHeavy.AddDynamic(this, &UVictoryConditionBase::OnHeavyAttackPerformed);
-	
-	for (auto& VictoryCondition : m_victoryConditions)
-	{
-		if (VictoryCondition.ConditionType == EConditionType::EnemiesRemaining)
-		{
-			m_killAll = true;
-			VictoryCondition.bIsConditionMet = true;
-		}
-	}
 }
 
 
@@ -51,44 +42,28 @@ void UVictoryConditionBase::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UVictoryConditionBase::CheckConditions()
 {
-	if(!m_bAllConditionsMet || m_killAll)
+	m_bAllConditionsMet = true;
+	if(m_victoryConditions.IsEmpty())
 	{
-		m_bAllConditionsMet = true;
-		if(m_victoryConditions.IsEmpty())
+		return;
+	}
+	for (auto& VictoryCondition : m_victoryConditions)
+	{
+		if(!VictoryCondition.bIsConditionMet)
 		{
-			return;
-		}
-		for (auto& VictoryCondition : m_victoryConditions)
-		{
-			if(!VictoryCondition.bIsConditionMet)
+			if (VictoryCondition.Count >= VictoryCondition.Goal)
 			{
-				if (VictoryCondition.Count >= VictoryCondition.Goal)
-				{
-					VictoryCondition.bIsConditionMet = true; 
-				}
-				else 
-				{
-					m_bAllConditionsMet = false;
-				}
+				VictoryCondition.bIsConditionMet = true; 
+			}
+			else 
+			{
+				m_bAllConditionsMet = false;
 			}
 		}
-		if (m_bAllConditionsMet)
-		{
-			if(m_killAll)
-			{
-				m_waveTracker->m_maxEnemies = 0;
-				m_waveTracker->m_minEnemies = 0;
-				if (m_waveTracker->m_enemiesAlive == 0)
-				{
-					OnZoneVictory.Broadcast();
-					m_killAll = false;
-				}
-			}
-			else
-			{
-				OnZoneVictory.Broadcast();
-			}
-		}
+	}
+	if (m_bAllConditionsMet)
+	{
+		OnZoneVictory.Broadcast();
 	}
 }
 

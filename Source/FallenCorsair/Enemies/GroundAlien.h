@@ -82,18 +82,18 @@ public:
 #pragma endregion
 
 #pragma region Animations
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 	class UAnimMontage* m_stunMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 	class UAnimMontage* m_deathMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations", meta = (ClampMin = "0", UIMin = "0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations, meta = (ClampMin = "0", UIMin = "0"))
 	float m_blendTime = 0.1f;
 #pragma endregion
 
 #pragma region Rotations
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rotations", meta = (ClampMin = "0", UIMin = "0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Rotations, meta = (ClampMin = "0", UIMin = "0"))
 	float m_rotationSpeed;
 #pragma endregion
 
@@ -159,36 +159,10 @@ public:
 #pragma endregion
 
 #pragma region Jump Attack
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump Attack", meta = (ClampMin = "0", UIMin = "0"))
-	float m_attackMinJumpForce = 300;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack", meta = (ClampMin = "0", UIMin = "0"))
+	float m_attackJumpForce;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump Attack", meta = (ClampMin = "0", UIMin = "0"))
-	float m_attackMaxJumpForce = 500;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump Attack", meta = (ClampMin = "0", UIMin = "0"))
-	float m_attackMinJumpSpeed = 1000;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump Attack", meta = (ClampMin = "0", UIMin = "0"))
-	float m_attackMaxJumpSpeed = 1400;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump Attack", meta = (ClampMin = "0", UIMin = "0"))
-	float m_attackMinJumpDistance = 400;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump Attack", meta = (ClampMin = "0", UIMin = "0"))
-	float m_attackMaxJumpDistance = 600;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump Attack", meta = (ClampMin = "0", UIMin = "0"))
-	float m_attackRandomAngleVariation = 15;
-#pragma endregion
-
-#pragma region Scale
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scale", meta = (ClampMin = "-1", UIMin = "-1", ClampMax = "1", UIMax = "1"))
-	float m_minScaleVariation = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scale", meta = (ClampMin = "-1", UIMin = "-1", ClampMax = "1", UIMax = "1"))
-	float m_maxScaleVariation = 0.15f;
-
-	UPROPERTY()
-	float m_scaleVariation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack", meta = (ClampMin = "0", UIMin = "0"))
+	float m_attackJumpSpeed;
 #pragma endregion
 };

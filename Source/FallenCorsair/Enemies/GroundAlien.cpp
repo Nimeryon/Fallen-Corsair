@@ -10,7 +10,6 @@
 #include "FallenCorsair/Components/DashComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 void AGroundAlien::BeginPlay()
@@ -20,15 +19,7 @@ void AGroundAlien::BeginPlay()
 	m_material = GetMesh()->CreateDynamicMaterialInstance(0, nullptr, "Stitch Material");
 	m_material->SetScalarParameterValue("AngryLevel", 1);
 
-	AAIController* AIController = Cast<AAIController>(GetController());
-	UBlackboardComponent* BlackBoard = AIController->GetBlackboardComponent();
-	BlackBoard->SetValueAsFloat("MinAttackJumpDistance", m_attackMinJumpDistance);
-	BlackBoard->SetValueAsFloat("MaxAttackJumpDistance", m_attackMaxJumpDistance);
-
-	m_scaleVariation = UKismetMathLibrary::RandomFloatInRange(m_minScaleVariation, m_maxScaleVariation);
-	SetActorRelativeScale3D(GetActorScale() + FVector(m_scaleVariation));
-	
-	GetCharacterMovement()->JumpZVelocity = UKismetMathLibrary::RandomFloatInRange(m_attackMinJumpForce, m_attackMaxJumpForce);
+	GetCharacterMovement()->JumpZVelocity = m_attackJumpForce;
 	GetCharacterMovement()->RotationRate.Yaw = m_rotationSpeed;
 	m_attackTarget = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
@@ -99,7 +90,7 @@ bool AGroundAlien::Attack()
 		"Player",
 		false,
 		ActorsToIgnore,
-		EDrawDebugTrace::None,
+		EDrawDebugTrace::ForDuration,
 		Hit,
 		true
 	);
@@ -162,9 +153,8 @@ bool AGroundAlien::CreateAvoidBox()
 void AGroundAlien::JumpTowardsTarget()
 {
 	const FVector Direction = (m_attackTargetPosition - GetActorLocation()).GetSafeNormal();
-	const FVector RandomDirection = Direction.RotateAngleAxis(UKismetMathLibrary::RandomFloatInRange(-m_attackRandomAngleVariation, m_attackRandomAngleVariation), FVector::UpVector);
 	
-	GetCharacterMovement()->AddImpulse(RandomDirection * UKismetMathLibrary::RandomFloatInRange(m_attackMinJumpSpeed, m_attackMaxJumpSpeed), true);
+	GetCharacterMovement()->AddImpulse(Direction * m_attackJumpSpeed, true);
 	Jump();
 
 	if (SoundJump)

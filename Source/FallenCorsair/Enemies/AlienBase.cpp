@@ -119,6 +119,11 @@ bool AAlienBase::Stun(float Time)
 
 void AAlienBase::Unstunned() {}
 
+void AAlienBase::Kill()
+{
+	m_currentHealth = 0;
+}
+
 float AAlienBase::GetDamageMultiplicator(EDamageType DamageType) const
 {
 	switch (DamageType)

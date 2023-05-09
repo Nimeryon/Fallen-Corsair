@@ -76,30 +76,33 @@ public:
 	UFUNCTION()
 	virtual void Unstunned();
 
+	UFUNCTION(BlueprintCallable)
+	virtual void Kill();
+
 	UFUNCTION()
 	virtual float GetDamageMultiplicator(EDamageType DamageType) const;
 
-	UFUNCTION()
-	virtual void Death(EDamageType DamageType);
+	UFUNCTION(BlueprintCallable)
+	virtual void Death(EDamageType DamageType = EDamageType::Default);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void PlayDeathFX();
 
 	virtual void FellOutOfWorld(const UDamageType& dmgType) override;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintAssignable)
 	FOnAlienSpawn OnSpawn;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintAssignable)
 	FOnAlienDeath OnDeath;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintAssignable)
 	FOnAlienDeathWithActor OnDeathWithActor;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintAssignable)
 	FOnAlienStunned OnStunned;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintAssignable)
 	FOnAlienDamaged OnDamaged;
 	
 public:

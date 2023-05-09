@@ -28,8 +28,8 @@ void AAlienPlantSpawner::Spawn()
 	for (int i = 0; i < SpawnCount; ++i)
 	{
 		const FVector SpawnOffset = FVector(
-			FMath::Cos(UKismetMathLibrary::RandomFloat()) * SpawnRadius,
-			FMath::Sin(UKismetMathLibrary::RandomFloat()) * SpawnRadius,
+			FMath::Cos(UKismetMathLibrary::RandomFloat()) * UKismetMathLibrary::RandomFloatInRange(-SpawnRadius, SpawnRadius),
+			FMath::Sin(UKismetMathLibrary::RandomFloat()) * UKismetMathLibrary::RandomFloatInRange(-SpawnRadius, SpawnRadius),
 			UKismetMathLibrary::RandomFloatInRange(GetActorLocation().Z, GetActorLocation().Z + MaxSpawnHeight)
 		);
 		const FVector SpawnLocation = GetActorLocation() + SpawnOffset;

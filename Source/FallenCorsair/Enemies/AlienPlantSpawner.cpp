@@ -55,6 +55,9 @@ void AAlienPlantSpawner::Spawn()
 			SpawnActorByClass(GetWorld(), ActorToSpawns[i].BPClass, SpawnLocation, SpawnRotation);
 		}
 	}
+
+	if (SoundSpawn)
+		UGameplayStatics::SpawnSound2D(GetWorld(), SoundSpawn);
 }
 
 void AAlienPlantSpawner::SpawnActorByClass(UWorld* World, TSubclassOf<AActor> ClassToSpawn, const FVector& Location, const FRotator& Rotation)

@@ -22,6 +22,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX Smoke")
 	class UNiagaraSystem* NS_Smoke;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundSmoke;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

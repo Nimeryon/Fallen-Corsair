@@ -2,6 +2,7 @@
 
 
 #include "AlienNexus.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AAlienNexus::AAlienNexus()
@@ -10,14 +11,13 @@ AAlienNexus::AAlienNexus()
 	PrimaryActorTick.bCanEverTick = true;
 
 	MeshShield = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshShield"));
-    RootComponent = MeshShield;
+	MeshShield->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 // Called when the game starts or when spawned
 void AAlienNexus::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -26,7 +26,15 @@ void AAlienNexus::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (bAllAliensAreDestroyed())
+	{
 		MeshShield->SetVisibility(false);
+		if (bCanPlayBarrierDisparition)
+		{
+			bCanPlayBarrierDisparition = false;
+			if (SoundBarrierDisparition)
+				UGameplayStatics::SpawnSound2D(GetWorld(), SoundBarrierDisparition);
+		}
+	}
 
 	if (m_currentHealth < m_health)
 	{
@@ -49,10 +57,23 @@ float AAlienNexus::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 {	
 	float ActualDamage;
 
+	if (IsAlive())
+	{
+		if (SoundBarrierHitPlayer)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundBarrierHitPlayer);
+	}
+
 	if (!bAllAliensAreDestroyed())
 		DamageAmount *= DammageReductionWhileShield;
 
 	ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (!IsAlive() && bCanPlaySoundDeath)
+	{
+		bCanPlaySoundDeath = false;
+		if (SoundNoyauDeath)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundNoyauDeath);
+	}
 
     return ActualDamage;
 }

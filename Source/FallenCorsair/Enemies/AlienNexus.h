@@ -32,6 +32,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dammage Reduction while Shield")
 	float DammageReductionWhileShield = 0.25;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* SoundBarrierDisparition;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* SoundBarrierHitPlayer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* SoundBarrierNoise;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* SoundNoyauDeath;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -52,4 +64,7 @@ private:
 	virtual bool bAllAliensAreDestroyed() const;
 
 	float CurrentTimeAutoRegeneration;
+
+	bool bCanPlaySoundDeath = true;
+	bool bCanPlayBarrierDisparition = true;
 };

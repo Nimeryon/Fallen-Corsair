@@ -2,9 +2,6 @@
 
 
 #include "Bullet.h"
-
-#include <filesystem>
-
 #include "Components/SphereComponent.h"
 #include "FallenCorsair/Enemies/AlienBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -14,6 +11,9 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/AudioComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "FallenCorsair/Enemies/AlienBase.h"
 
 // Sets default values
 ABullet::ABullet()
@@ -48,10 +48,17 @@ void ABullet::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 #pragma region Bullet Charge
+
+	if (bLoopStartedSoundChargeCompleted)
+	{
+		PlayChargeCompletedSound();
+	}
+
 	if(!m_bIsBulletLaunch && !Explosed)
 	{
-		SetActorLocation(m_ownerRef->GetMesh()->GetSocketLocation(m_socketLoc));
+		SetActorLocation(m_ownerRef->GetMesh()->GetSocketLocation("BulletStartSocket"));
 		SetActorRotation(m_ownerRef->GetFollowCamera()->GetComponentRotation());
+		PlayChargeSound();
 	}
 	
 	if(m_bIsCharging && m_ownerRef)
@@ -60,6 +67,8 @@ void ABullet::Tick(float DeltaTime)
 		{
 			m_bIsFullyCharge = true;
 			m_bIsCharging = false;
+			StopAudioComponent(AudioComponentCharge);
+			PlayChargeCompletedSound();
 		}
 		
 		FMath::Clamp(m_currentCharge = m_currentCharge + 1 / m_chargeSpeed * DeltaTime,0,1);
@@ -98,18 +107,23 @@ void ABullet::Explosion()
 				FVector Scale = FVector(1, 1, 1);
 				FRotator SpawnRotation = FRotator::ZeroRotator;
 				// Spawn the Niagara FX system at the specified location and rotation
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Explosion, SpawnLocation, SpawnRotation,  Scale, true);
+				UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Explosion, SpawnLocation, SpawnRotation,  Scale, true);
 			}
+
+			if (SoundSplash)
+				UGameplayStatics::SpawnSound2D(GetWorld(), SoundSplash);
 		}
 	}
 	else if(m_bIsBulletLaunch)
 	{
 		TArray<FHitResult> OutHits = MakeSphereCollision(m_explosionRadius);
-		DammageOnHits(OutHits, m_explosionDammage);
+		FDamageTypeEvent DamageEvent;
+		DamageEvent.DamageType = EDamageType::Explosion;
+		DammageOnHits(OutHits, m_explosionDammage, DamageEvent);
 	}
 }
 
-void ABullet::SetBulletSetting(float bulletSpeed, int dammage, int explosionDammage, float explosionRadius, float explostionDuration, int lifeSpan, float bulletRadius, float chargeSpeed, AFallenCorsairCharacter* character, FName socketLoc)
+void ABullet::SetBulletSetting(float bulletSpeed, int dammage, int explosionDammage, float explosionRadius, float explostionDuration, int lifeSpan, float bulletRadius, float chargeSpeed, AFallenCorsairCharacter* character)
 {
 	m_bulletDammage = dammage;
 	m_explosionDammage = explosionDammage;
@@ -120,16 +134,22 @@ void ABullet::SetBulletSetting(float bulletSpeed, int dammage, int explosionDamm
 	m_chargeSpeed = chargeSpeed;
 	m_ownerRef = character;
 	m_explosionDuration = explostionDuration;
-	m_socketLoc = socketLoc;
 }
 
-void ABullet::LaunchBullet()
+void ABullet::LaunchBullet(FVector Dir)
 {
-	projectileMovement->Velocity =  GetActorForwardVector() * m_bulletSpeed;
+	if (Dir == FVector::Zero())
+		projectileMovement->Velocity = GetActorForwardVector() * m_bulletSpeed;
+	else
+		projectileMovement->Velocity = Dir * m_bulletSpeed;
+
 	m_bIsBulletLaunch = true;
 	
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABullet::IsLifeSpanDone, m_lifeSpan, false);
+	
+	if (SoundShoot)
+		UGameplayStatics::SpawnSound2D(GetWorld(), SoundShoot);
 }
 
 TArray<FHitResult> ABullet::MakeSphereCollision(float _SphereRadius)
@@ -194,4 +214,41 @@ bool ABullet::GetIsBulletLaunch()
 void ABullet::IsLifeSpanDone()
 {
 	m_isLifeSpanDone = true;
+}
+
+
+void ABullet::PlayChargeSound()
+{
+	if (SoundCharge)
+	{
+		if (!AudioComponentCharge)
+		{
+			AudioComponentCharge = UGameplayStatics::SpawnSound2D(GetWorld(), SoundCharge);
+		}
+	}
+}
+
+void ABullet::PlayChargeCompletedSound()
+{
+	// if (!AudioComponentChargeComplete->IsPlaying())
+	// {
+	// 	AudioComponentChargeComplete->Play();
+	// }
+}
+
+void ABullet::StopChargeSound()
+{
+	//StopAudioComponent(AudioComponentCharge);
+	//StopAudioComponent(AudioComponentChargeComplete);
+}
+
+// Private
+void ABullet::StopAudioComponent(UAudioComponent* AudioComponent)
+{
+	if (!AudioComponent)
+		return;
+
+	AudioComponent->Stop();
+	AudioComponent->DestroyComponent();
+	
 }

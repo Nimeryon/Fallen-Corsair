@@ -2,12 +2,23 @@
 
 
 #include "AlienPlante.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 AAlienPlante::AAlienPlante()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	// Créer le composant Static Mesh
+    SM_PlanteAlive = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SM_PlanteAlive"));
+    SM_PlanteUnlive = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SM_PlanteUnlive"));
+
+	SM_PlanteUnlive->SetVisibility(false);
+
+	SM_PlanteAlive->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	SM_PlanteUnlive->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
 }
 
@@ -30,8 +41,14 @@ void AAlienPlante::Tick(float DeltaTime)
 	if (ReviveTimer >= ReviveCooldown)
 	{
 		CanEffect = true;
+		bCanPlaySoundDestroy = true;
 		m_currentHealth = m_health;
 		ReviveTimer = 0;
+		if (SoundRevive)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundRevive);
+
+		SM_PlanteAlive->SetVisibility(true);
+		SM_PlanteUnlive->SetVisibility(false);
 	}
 }
 
@@ -43,7 +60,18 @@ void AAlienPlante::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 float AAlienPlante::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {	
-    return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	float ActualDammage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+    
+	if (!IsAlive() && bCanPlaySoundDestroy)
+	{
+		bCanPlaySoundDestroy = false;
+		if (SoundDestroy)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundDestroy);
+		SM_PlanteAlive->SetVisibility(false);
+		SM_PlanteUnlive->SetVisibility(true);
+	}
+
+	return ActualDammage;
 }
 
 TArray<FHitResult> AAlienPlante::MakeSphereCollision(float _SphereRadius)

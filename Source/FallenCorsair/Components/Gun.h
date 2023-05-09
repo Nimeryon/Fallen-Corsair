@@ -104,5 +104,15 @@ public:
 
 	UFUNCTION()
 	void StopCharge(bool bIsCancel);
+
+	UFUNCTION()
+	FVector GetDirectionBullet();
+
+	
+private:
+	FVector GetImpactPointOnScreen();
+	class UCameraComponent* GetParentCamera();
+
+	bool shooted = false;
 	
 };

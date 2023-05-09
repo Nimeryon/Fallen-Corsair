@@ -59,6 +59,45 @@ void AGroundAlien::Tick(float DeltaSeconds)
 	}
 }
 
+float AGroundAlien::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float ActualDammage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
+	if (IsAlive())
+	{
+		if (SoundGetHurt)
+			UGameplayStatics::SpawnSound2D(GetWorld(), SoundGetHurt);
+	}
+	else
+	{
+		const FDamageTypeEvent* Damage = static_cast<const FDamageTypeEvent*>(&DamageEvent);
+
+		if (Damage->DamageType == EDamageType::Explosion)
+		{
+			// Sound death by explosion
+			if (SoundDeathByExplosion)
+			{
+				UGameplayStatics::SpawnSound2D(GetWorld(), SoundDeathByExplosion);
+				SoundDeathByExplosion = nullptr;
+				SoundDeath = nullptr;
+			}
+		}
+		else {
+			// Sound death by hit
+			if (SoundDeath)
+			{
+				UGameplayStatics::SpawnSound2D(GetWorld(), SoundDeath);
+				SoundDeathByExplosion = nullptr;
+				SoundDeath = nullptr;
+			}
+		}
+
+	
+	}
+
+	return ActualDammage;
+}
+
 void AGroundAlien::PrepareAttack()
 {
 	if (!m_attackTarget) return;
@@ -69,6 +108,9 @@ void AGroundAlien::PrepareAttack()
 bool AGroundAlien::Attack()
 {
 	if (!m_attackTarget) return false;
+
+	if (SoundAttack)
+		UGameplayStatics::SpawnSound2D(GetWorld(), SoundAttack);
 
 	const FVector Position = GetActorLocation() + GetActorForwardVector() * m_attackBoxOffset;
 	FHitResult Hit;
@@ -159,6 +201,9 @@ void AGroundAlien::JumpTowardsTarget()
 	}
 	else GetCharacterMovement()->AddImpulse(Direction * UKismetMathLibrary::RandomFloatInRange(m_attackMinJumpSpeed, m_attackMaxJumpSpeed), true);
 	Jump();
+
+	if (SoundJump)
+		UGameplayStatics::SpawnSound2D(GetWorld(), SoundJump);
 }
 
 bool AGroundAlien::IsInCooldown() const { return m_bIsInCooldown; }

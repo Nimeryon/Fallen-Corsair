@@ -17,45 +17,46 @@ public:
 	AAlienPlantBomb();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sphere radius detection")
-	float DetectionSphereRadius = 300;
+		float DetectionSphereRadius = 300;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
-	float PropulsionForce = 0;
+		float PropulsionForce = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
-	float RotationAngleDegrees = 0;
+		float RotationAngleDegrees = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Explosion")
-	float CountdownBeforeExplosion = 5;
+		float CountdownBeforeExplosion = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX Explosion")
-	class UNiagaraSystem* NS_Explosion;
+		class UNiagaraSystem* NS_Explosion;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+		USoundWave* SoundDetonator;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+		USoundBase* SoundExplosion;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-	// UFUNCTION()
-	// virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 private:
 	bool bDetectedSomeone = false;
 	float CurrentCountdown = 0;
 
-	class USphereComponent* SphereCollisionDetection;
-
 	bool bIsOverlapping;
 
 	virtual void DetectPlayer();
 
-
+	UAudioComponent* AudioComponentDetonator;
 };

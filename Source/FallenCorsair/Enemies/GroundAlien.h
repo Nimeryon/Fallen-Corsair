@@ -23,6 +23,8 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 	UFUNCTION(BlueprintCallable)
 	virtual void PrepareAttack();
 	
@@ -71,6 +73,30 @@ public:
 	virtual void ResetCollisionPresset();
 	
 public:
+
+#pragma region Sound
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundFootStep;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundJump;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundGetHurt;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundDeath;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundWave* SoundDeathByExplosion;
+
+#pragma endregion
+
+
 #pragma region Animations
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animations")
 	class UAnimMontage* m_stunMontage;

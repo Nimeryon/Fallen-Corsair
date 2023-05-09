@@ -6,26 +6,12 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/Actor.h"
 #include "Engine/World.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AAlienPlantSpawner::AAlienPlantSpawner()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
-}
-
-// Called when the game starts or when spawned
-void AAlienPlantSpawner::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-// Called every frame
-void AAlienPlantSpawner::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 // Called to bind functionality to input
@@ -38,33 +24,28 @@ void AAlienPlantSpawner::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 // Called to bind functionality to input
 void AAlienPlantSpawner::Spawn()
 {
-	for(int i = 0; i < ActorToSpawns.Num(); i++)
+	const int SpawnCount = UKismetMathLibrary::RandomIntegerInRange(MinSpawnCount, MaxSpawnCount);
+	for (int i = 0; i < SpawnCount; ++i)
 	{
-		FVector OffsetPos = GetOwner()->GetActorForwardVector() * ActorToSpawns[i].OffsetLocationSpawn.X + GetOwner()->GetActorRightVector() * ActorToSpawns[i].OffsetLocationSpawn.Y + GetOwner()->GetActorUpVector() * ActorToSpawns[i].OffsetLocationSpawn.Z;
-		FVector SpawnLocation = GetActorLocation() + OffsetPos;
-		FRotator SpawnRotation(0.f, 0.f, 0.f);
-		FTransform SpawnTransform(SpawnRotation, SpawnLocation);
-		if (BPClassToSpawnForAll)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("not null"));
-			SpawnActorByClass(GetWorld(), BPClassToSpawnForAll, SpawnLocation, SpawnRotation);
-		}
-		else 
-		{
-			UE_LOG(LogTemp, Warning, TEXT("null"));
-			SpawnActorByClass(GetWorld(), ActorToSpawns[i].BPClass, SpawnLocation, SpawnRotation);
-		}
-	}
+		const FVector SpawnOffset = FVector(
+			FMath::Cos(UKismetMathLibrary::RandomFloat()) * UKismetMathLibrary::RandomFloatInRange(-SpawnRadius, SpawnRadius),
+			FMath::Sin(UKismetMathLibrary::RandomFloat()) * UKismetMathLibrary::RandomFloatInRange(-SpawnRadius, SpawnRadius),
+			UKismetMathLibrary::RandomFloatInRange(GetActorLocation().Z, GetActorLocation().Z + MaxSpawnHeight)
+		);
+		const FVector SpawnLocation = GetActorLocation() + SpawnOffset;
 
+		SpawnActorByClass(GetWorld(), SpawnClass, SpawnLocation);
+	}
+	
 	if (SoundSpawn)
 		UGameplayStatics::SpawnSound2D(GetWorld(), SoundSpawn);
 }
 
-void AAlienPlantSpawner::SpawnActorByClass(UWorld* World, TSubclassOf<AActor> ClassToSpawn, const FVector& Location, const FRotator& Rotation)
+void AAlienPlantSpawner::SpawnActorByClass(UWorld* World, TSubclassOf<AActor> ClassToSpawn, const FVector& Location)
 {
     if (!World || !ClassToSpawn) return;
 
-    World->SpawnActor<AActor>(ClassToSpawn, Location, Rotation);
+    World->SpawnActor<AActor>(ClassToSpawn, Location, FRotator::ZeroRotator);
 }
 
 float AAlienPlantSpawner::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

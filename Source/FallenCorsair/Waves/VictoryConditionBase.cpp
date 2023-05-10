@@ -148,7 +148,7 @@ void UVictoryConditionBase::OnEnemyDeath(AAlienBase* Alien)
 	{
 		if (
 			VictoryCondition.ConditionType == EConditionType::EnemiesKilled
-			&& Alien->IsA(VictoryCondition.AlienType)
+			&& Alien && Alien->IsA(VictoryCondition.AlienType)
 			)
 		{
 			VictoryCondition.Count++;

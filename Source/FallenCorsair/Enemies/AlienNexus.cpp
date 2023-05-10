@@ -60,6 +60,8 @@ float AAlienNexus::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 		bCanPlaySoundDeath = false;
 		if (SoundNoyauDeath)
 			UGameplayStatics::SpawnSound2D(GetWorld(), SoundNoyauDeath);
+
+		Death();
 	}
 
     return ActualDamage;

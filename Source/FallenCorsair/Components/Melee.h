@@ -145,9 +145,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	class USoundBase* SoundCharge;
 
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
-	class UNiagaraSystem* FX_MeleeHeavy;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "")
 	UParticleSystem* PS_MeleeHeavyOnChargeCompleted;
 
@@ -165,6 +162,12 @@ public:
 
 	// Functions
 	//UFUNCTION(BlueprintCallable, Category = Properties)
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
+	FName FX_HeavySocketName;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FX")
+	class UNiagaraSystem* FX_MeleeHeavy;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void PerformAttack();
@@ -228,10 +231,8 @@ private:
 	virtual void IncrementCurrentAttack();
 	virtual void SpawnFX(UParticleSystem* PS);
 	virtual FAttackData& GetCurrentMelee();
-
-
+	
 	// Vars
-
 	class ACharacter* OwnerCharacter;
 
 	// To avoid multiple hit while TriggerWithSokect
@@ -243,8 +244,7 @@ private:
 	int indexCurrentAttack = 0;
 
 	EAttackType attackType = EAttackType::Soft;
-
-
+	
 	bool bCanAttack = true;
 	bool bCanExecuteNextAttack = false;
 	bool bExecuteNextAttack = false;
@@ -257,5 +257,4 @@ private:
 	FRotator RotatorWhileAttackStarted;
 
 	UAnimMontage* MontageToPlay;
-
 };

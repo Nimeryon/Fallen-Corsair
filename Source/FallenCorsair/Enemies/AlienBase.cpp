@@ -44,12 +44,6 @@ void AAlienBase::Tick(float DeltaTime)
 	}
 }
 
-// Called to bind functionality to input
-void AAlienBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-}
-
 float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,AActor* DamageCauser)
 {
 	if (!m_bCanTakeDamage)
@@ -69,8 +63,11 @@ float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	m_currentHealth = FMath::Clamp(m_currentHealth - DamageAmount, 0.f, m_health);
 	UE_LOG(LogTemp, Warning, TEXT("%d"), m_currentHealth);
 
-	if (m_currentHealth <= 0)
+	if (!m_isDead && m_currentHealth <= 0)
+	{
+		m_isDead = true;
 		Death(damageType);
+	}
 
 	if(m_hurtParticle)
 	{

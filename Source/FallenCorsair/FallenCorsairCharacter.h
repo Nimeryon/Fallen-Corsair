@@ -174,6 +174,11 @@ public:
 	UPROPERTY()
 	FOnSoulPicked OnSoulPicked;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool Hurt = false;
+
+	bool SpawnedDeathWidget = false;
+
 #pragma region Input Availability
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -194,11 +199,11 @@ public:
 #pragma endregion 
 
 #pragma region Melee
-
-
 	// Chrono for melee input
 	float Melee_TriggeredSeconds = 0;
+	
 	bool Melee_IsTrigerred = false;
+
 #pragma endregion 
 
 #pragma region Camera Variables

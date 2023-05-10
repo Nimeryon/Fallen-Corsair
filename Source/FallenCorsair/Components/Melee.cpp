@@ -91,6 +91,24 @@ bool UMelee::PerformHeavyAttack(float& eslapsedSeconds)
 	{
 		if (eslapsedSeconds >= delayInputDepthMeleeHeavy)
 		{
+			// FX
+			if (FX_MeleeHeavy && OwnerCharacter->GetMesh()->DoesSocketExist(FX_HeavySocketName))
+			{
+				const FVector SpawnLocation = OwnerCharacter->GetMesh()->GetSocketLocation(FX_HeavySocketName);
+				const FRotator SpawnRotation = OwnerCharacter->GetActorRotation();
+				
+				UNiagaraFunctionLibrary::SpawnSystemAttached(
+					FX_MeleeHeavy,
+					OwnerCharacter->GetRootComponent(),
+					FX_HeavySocketName,
+					SpawnLocation,
+					SpawnRotation,
+					EAttachLocation::KeepWorldPosition,
+					true,
+					true
+				);
+			}
+			
 			SetTypeAttack(EAttackType::Heavy);
 			StartAttack(true);
 			return true;

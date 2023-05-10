@@ -259,6 +259,7 @@ float AFallenCorsairCharacter::TakeDamage(float DamageAmount, FDamageEvent const
 	if (m_bCanBeDammage)
 	{
 		m_currentHealth = FMath::Clamp(m_currentHealth - DamageAmount, 0, m_maxHealth);
+		Hurt = true;
 	}
 
 	if (m_currentHealth <= 0)
@@ -337,10 +338,12 @@ void AFallenCorsairCharacter::SetCanBeDamage(bool bCanBeDammage)
 
 void AFallenCorsairCharacter::PlayerDeath()
 {
-	if(m_deathHUD)
+	if(!SpawnedDeathWidget && m_deathHUD)
 	{
 		UUserWidget* Widget = Cast<UUserWidget>(CreateWidget(GetWorld()->GetFirstPlayerController(), m_deathHUD));
 		Widget->AddToViewport();
+
+		SpawnedDeathWidget = true;
 	}
 }
 

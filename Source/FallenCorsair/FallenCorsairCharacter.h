@@ -174,6 +174,11 @@ public:
 	UPROPERTY()
 	FOnSoulPicked OnSoulPicked;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool Hurt = false;
+
+	bool SpawnedDeathWidget = false;
+
 #pragma region Input Availability
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

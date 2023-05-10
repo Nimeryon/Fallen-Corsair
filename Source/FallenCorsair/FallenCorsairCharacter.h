@@ -83,7 +83,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UBarrel* barrelComp;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UGun* gunComp;
 
 	UPROPERTY(EditDefaultsOnly)

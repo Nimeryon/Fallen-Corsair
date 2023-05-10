@@ -14,6 +14,15 @@ enum class EMeleeCollisionShape
 	Capsule
 };
 
+UENUM()
+enum class EAttackMode
+{
+	Normal,
+	NoMove,
+	NoRotation,
+	None
+};
+
 
 USTRUCT(BlueprintType)
 struct FAttackData
@@ -179,7 +188,7 @@ public:
 	virtual void StartAttack(bool start, bool _bFreezeAnimation = false);
 	virtual void UpdateTypeAttack(float& eslapsedSeconds);
 	virtual void SetReleased(bool released);
-	virtual void SetOwnerModeAttack(bool ModeAttack);
+	virtual void SetOwnerModeAttack(EAttackMode ModeAttack);
 	virtual void CancelAttack();
 	virtual void CalculRotation(FVector _rot);
 	virtual void ResetRotation();

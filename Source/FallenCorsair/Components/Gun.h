@@ -104,11 +104,11 @@ public:
 	UFUNCTION()
 	FVector GetDirectionBullet();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool shooted = false;
 	
 private:
 	FVector GetImpactPointOnScreen();
 	class UCameraComponent* GetParentCamera();
-
-	bool shooted = false;
 	
 };

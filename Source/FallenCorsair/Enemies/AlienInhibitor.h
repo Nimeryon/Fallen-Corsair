@@ -16,8 +16,11 @@ public:
 	AAlienInhibitor();
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spline")
+	AActor* SplineMesh;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnerToDisabled")
-	AActor *ASpawner;
+	AActor* ASpawner;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundWave* SoundGetDammaged;
@@ -32,4 +35,6 @@ public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
 	virtual void DisabledSpawner();
+
+	virtual void Death(EDamageType DamageType) override;
 };

@@ -54,3 +54,13 @@ void AAlienInhibitor::DisabledSpawner()
 	
 	WS->m_bIsActive = false;
 }
+
+void AAlienInhibitor::Death(EDamageType DamageType)
+{
+	PlayDeathFX();
+	if (SplineMesh)
+		SplineMesh->Destroy();
+
+	Super::Death(DamageType);
+}
+

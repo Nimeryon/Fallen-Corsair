@@ -86,7 +86,6 @@ void UGun::StopCharge(bool bIsCancel)
 			m_spawnBullet->Destroy();
 			m_spawnBullet = nullptr;
 		}
-			
 	}
 	else if(m_spawnBullet->GetIsBulletCharge())
 	{
@@ -95,6 +94,8 @@ void UGun::StopCharge(bool bIsCancel)
 		m_barrelRef->SetSlot(m_ammoCost);
 		m_spawnBullet->LaunchBullet(GetDirectionBullet());
 		m_spawnBullet = nullptr;
+
+		shooted = true;
 	}
 }
 

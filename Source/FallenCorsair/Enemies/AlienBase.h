@@ -159,7 +159,9 @@ public:
 #pragma endregion
 
 #pragma region FX
-
+	UPROPERTY(EditAnywhere, Category = "FX")
+	FVector m_fxOffset;
+	
 	UPROPERTY(EditAnywhere, Category = "FX")
 	class UNiagaraSystem* m_hurtParticle;
 

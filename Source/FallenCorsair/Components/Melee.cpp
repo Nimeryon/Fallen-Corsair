@@ -67,13 +67,12 @@ void UMelee::PerformAttack()
 {
 	if (!MeleeIsValid())
 		return;
-
-
+	
 	if (bCanAttack)
 	{
 		bCanAttack = false;
 
-		SetOwnerModeAttack(true);
+		SetOwnerModeAttack(EAttackMode::None);
 		AttackSequence();
 	}
 	else if (!IsLastCombo())
@@ -165,25 +164,35 @@ void UMelee::SetTypeAttack(EAttackType at)
 	}
 }
 
-void UMelee::SetOwnerModeAttack(bool ModeAttack)
+void UMelee::SetOwnerModeAttack(EAttackMode ModeAttack)
 {
 	if (!MeleeIsValid())
 		return;
-		
-	if (ModeAttack)
+
+	switch (ModeAttack)
 	{
-		FreezeRotation(true);
-		EnableWalk(false);
-	}
-	else {
+	case EAttackMode::Normal:
 		FreezeRotation(false);
 		EnableWalk(true);
 		ResetCombo();
 		StartAttack(false);
+		break;
+		
+	case EAttackMode::NoMove:
+		EnableWalk(false);
+		break;
+		
+	case EAttackMode::NoRotation:
+		FreezeRotation(true);
+		break;
+		
+	case EAttackMode::None:
+		FreezeRotation(true);
+		EnableWalk(false);
+		break;
 	}
-
+	
 	bMeleeEnded = false;
-
 }
 
 void UMelee::StartAttack(bool start, bool _bFreezeAnimation)
@@ -256,7 +265,7 @@ void UMelee::SetReleased(bool released)
 void UMelee::CancelAttack()
 {
 	ResetCombo();
-	SetOwnerModeAttack(false);
+	SetOwnerModeAttack(EAttackMode::Normal);
 	StartAttack(false);
 	bMeleeEnded = false;
 
@@ -475,7 +484,7 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	else if (NotifyName == "Recovery")
 	{
 		bMeleeEnded = true;
-		SetOwnerModeAttack(false);
+		SetOwnerModeAttack(EAttackMode::Normal);
 	}
 	else if (NotifyName == "HitSound")
 	{

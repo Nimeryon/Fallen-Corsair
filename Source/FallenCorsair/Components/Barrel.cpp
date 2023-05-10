@@ -63,7 +63,6 @@ void UBarrel::SetSlot(int newSlot)
 		FVector SpawnLocation = m_ownerRef->GetMesh()->GetSocketLocation(m_socketLoc);
 		FRotator SpawnRotation = FRotator::ZeroRotator;
 		UNiagaraFunctionLibrary::SpawnSystemAttached(m_sparkParticle, m_ownerRef->GetRootComponent(), m_socketLoc, SpawnLocation, SpawnRotation,EAttachLocation::KeepWorldPosition, true, true);
-		
 	}
 	
 	m_slot = m_slot - newSlot;

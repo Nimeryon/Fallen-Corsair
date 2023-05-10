@@ -68,10 +68,9 @@ float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		m_isDead = true;
 		Death(damageType);
 	}
-
-	if(m_hurtParticle)
+	else if(m_hurtParticle)
 	{
-		FVector SpawnLocation = GetActorLocation();
+		FVector SpawnLocation = GetActorLocation() + m_fxOffset;
 		FVector Scale = FVector(1, 1, 1);
 		FRotator SpawnRotation = FRotator::ZeroRotator;
 		// Spawn the Niagara FX system at the specified location and rotation
@@ -153,7 +152,7 @@ void AAlienBase::PlayDeathFX()
 {
 	if(!m_deathParticle) return;
 	
-	const FVector SpawnLocation = GetActorLocation();
+	const FVector SpawnLocation = GetActorLocation() + m_fxOffset;
 	const FVector Scale = FVector(1, 1, 1);
 	const FRotator SpawnRotation = FRotator::ZeroRotator;
 	

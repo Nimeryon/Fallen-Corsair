@@ -263,9 +263,13 @@ void AGroundAlien::Unstunned()
 
 void AGroundAlien::PlayStunMontage()
 {
-	FAlphaBlendArgs BlendArgs;
-	BlendArgs.BlendTime = m_blendTime;
-	GetMesh()->GetAnimInstance()->Montage_PlayWithBlendIn(m_stunMontage, BlendArgs);
+	if (m_stunMontage)
+	{
+		FAlphaBlendArgs BlendArgs;
+		BlendArgs.BlendTime = m_blendTime;
+		if (!GetMesh()->GetAnimInstance()->Montage_IsPlaying(m_stunMontage))
+			GetMesh()->GetAnimInstance()->Montage_PlayWithBlendIn(m_stunMontage, BlendArgs);
+	}
 }
 
 void AGroundAlien::AttachAttackFX()

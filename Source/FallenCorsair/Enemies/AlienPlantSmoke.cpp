@@ -31,7 +31,6 @@ void AAlienPlantSmoke::Tick(float DeltaTime)
 		{
 			if (NiagaraComponentSmoke)
 			{
-	
 				NiagaraComponentSmoke->DestroyComponent();
 				NiagaraComponentSmoke = nullptr;
 			}

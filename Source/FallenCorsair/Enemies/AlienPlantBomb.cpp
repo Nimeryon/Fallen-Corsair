@@ -19,12 +19,6 @@ AAlienPlantBomb::AAlienPlantBomb()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
-void AAlienPlantBomb::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 // Called every frame
 void AAlienPlantBomb::Tick(float DeltaTime)
 {
@@ -63,12 +57,6 @@ void AAlienPlantBomb::Tick(float DeltaTime)
 			UExplosion::PerformExplosion(GetWorld(), GetOwner(), Dammage, GetOwner()->GetActorLocation(), SphereRadius, PropulsionForce, RotationAngleDegrees, NS_Explosion, Debug);
 		}
 	}
-}
-
-// Called to bind functionality to input
-void AAlienPlantBomb::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
 float AAlienPlantBomb::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

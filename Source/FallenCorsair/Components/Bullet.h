@@ -11,8 +11,6 @@ UCLASS()
 class FALLENCORSAIR_API ABullet : public AActor
 {
 	GENERATED_BODY()
-
-	
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
 	class UStaticMeshComponent* bulletMesh;
@@ -51,10 +49,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundWave* SoundSplash;
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
 private:
 

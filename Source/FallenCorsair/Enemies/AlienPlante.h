@@ -13,7 +13,6 @@ class FALLENCORSAIR_API AAlienPlante : public AAlienBase
 	GENERATED_BODY()
 
 public:
-
 	// Sets default values for this character's properties
 	AAlienPlante();
 
@@ -43,9 +42,6 @@ public:
 
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 	bool CanEffect = true; // Permit the plant to explose or gaz
 
 	virtual TArray<FHitResult> MakeSphereCollision(float _SphereRadius);

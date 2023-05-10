@@ -7,19 +7,6 @@
 #include "GameFramework/Character.h"
 #include "AlienPlantSpawner.generated.h"
 
-USTRUCT(BlueprintType)
-struct FActorToSpawn
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor To Spawn")
-	UClass* BPClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Location Spawn")
-	FVector OffsetLocationSpawn = FVector(0, 0, 0);
-
-};
-
 UCLASS()
 class FALLENCORSAIR_API AAlienPlantSpawner : public AAlienPlante
 {
@@ -29,29 +16,30 @@ public:
 	// Sets default values for this character's properties
 	AAlienPlantSpawner();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor To Spawn")
-	TArray<FActorToSpawn> ActorToSpawns;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	class UClass* SpawnClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	float SpawnRadius;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	float MaxSpawnHeight;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	int MinSpawnCount;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	int MaxSpawnCount;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor To Spawn")
-	UClass* BPClassToSpawnForAll;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	USoundWave* SoundSpawn;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 	virtual void Spawn();
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
+public:	
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 private:
-	void SpawnActorByClass(UWorld* World, TSubclassOf<class AActor> ClassToSpawn, const FVector& Location, const FRotator& Rotation);
+	void SpawnActorByClass(UWorld* World, TSubclassOf<class AActor> ClassToSpawn, const FVector& Location);
 };

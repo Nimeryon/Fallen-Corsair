@@ -155,8 +155,6 @@ void UWaveSpawner::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 			++m_numberOfWaves;
 		}
 	}
-	
-	
 }
 
 void UWaveSpawner::OnWaveOver()

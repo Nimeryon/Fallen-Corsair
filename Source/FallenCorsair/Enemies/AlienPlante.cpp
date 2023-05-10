@@ -19,13 +19,6 @@ AAlienPlante::AAlienPlante()
 
 	SM_PlanteAlive->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	SM_PlanteUnlive->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-
-}
-
-// Called when the game starts or when spawned
-void AAlienPlante::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 // Called every frame

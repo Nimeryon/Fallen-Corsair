@@ -15,19 +15,6 @@ class FALLENCORSAIR_API UExplosion : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UExplosion();
-
-
-	void static PerformExplosion(const UWorld* InWorld, AActor *Self, float Dammage, FVector Origin, float SphereRadius, float PropulsionForce, float RotationAngleDegrees, class UNiagaraSystem* NS_Explosion, bool Debug = false);
 	
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
+	void static PerformExplosion(const UWorld* InWorld, AActor *Self, float Dammage, FVector Origin, float SphereRadius, float PropulsionForce, float RotationAngleDegrees, class UNiagaraSystem* NS_Explosion, bool Debug = false);
 };

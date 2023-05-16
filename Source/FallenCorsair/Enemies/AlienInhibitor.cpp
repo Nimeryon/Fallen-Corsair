@@ -26,7 +26,7 @@ float AAlienInhibitor::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	
 	if (!IsAlive()){
 		DisabledSpawner();
-
+		
 		if (SoundDeath)
 		{
 			UGameplayStatics::SpawnSound2D(GetWorld(), SoundDeath);

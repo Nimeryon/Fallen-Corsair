@@ -22,11 +22,28 @@ UMelee::UMelee()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 	OwnerCharacter = CreateDefaultSubobject<ACharacter>(TEXT("OwnerCharacter"));
 
 	// DeleguateMeleeSoft.AddDynamic(this, &UMelee::OnMyDelegateTriggered);
+}
+
+void UMelee::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+#if WITH_EDITOR
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Green, FString::Printf(TEXT("bCanAttack: %d"), bCanAttack ? 1 : 0));
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Green, FString::Printf(TEXT("bCanExecuteNextAttack: %d"), bCanExecuteNextAttack ? 1 : 0));
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Green, FString::Printf(TEXT("bExecuteNextAttack: %d"), bExecuteNextAttack ? 1 : 0));
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Green, FString::Printf(TEXT("bAttackStarted: %d"), bAttackStarted ? 1 : 0));
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Green, FString::Printf(TEXT("bInputReleased: %d"), bInputReleased ? 1 : 0));
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Green, FString::Printf(TEXT("bIsDeleguate: %d"), bIsDeleguate ? 1 : 0));
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Green, FString::Printf(TEXT("bMeleeEnded: %d"), bMeleeEnded ? 1 : 0));
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Green, FString::Printf(TEXT("bFreezeAnimation: %d"), bFreezeAnimation ? 1 : 0));
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Green, FString::Printf(TEXT("bMeleeHeavyChargeCompleted: %d"), bMeleeHeavyChargeCompleted ? 1 : 0));
+#endif
 }
 
 void UMelee::OnMyDelegateTriggered()
@@ -86,7 +103,7 @@ bool UMelee::PerformHeavyAttack(float& eslapsedSeconds)
 	if (!MeleeIsValid())
 		return false;
 
-	if (!AttackIsStarted())
+	if (bCanAttack && !AttackIsStarted())
 	{
 		if (eslapsedSeconds >= delayInputDepthMeleeHeavy)
 		{
@@ -110,6 +127,8 @@ bool UMelee::PerformHeavyAttack(float& eslapsedSeconds)
 			
 			SetTypeAttack(EAttackType::Heavy);
 			StartAttack(true);
+			
+			bCanAttack = false;
 			return true;
 		}
 	}
@@ -195,17 +214,16 @@ void UMelee::SetOwnerModeAttack(EAttackMode ModeAttack)
 	bMeleeEnded = false;
 }
 
-void UMelee::StartAttack(bool start, bool _bFreezeAnimation)
+void UMelee::StartAttack(bool start)
 {
 	bAttackStarted = start;
-	bFreezeAnimation = _bFreezeAnimation;
 
-	if (start && indexCurrentAttack == 0)
+	if (bAttackStarted && indexCurrentAttack == 0)
 	{
 		PerformAttack();
 	}
 	
-	if (!start){
+	if (!bAttackStarted){
 		attackType = EAttackType::Soft;
 	}
 }
@@ -299,6 +317,11 @@ void UMelee::PlaySoundCharge()
 {
 	if (SoundCharge)
 		UGameplayStatics::SpawnSound2D(GetWorld(), SoundCharge);
+}
+
+bool UMelee::CanAttack() const
+{
+	return bCanAttack;
 }
 
 bool UMelee::AttackIsStarted() const
@@ -484,6 +507,7 @@ void UMelee::OnNotifyBeginReceived(FName NotifyName, const FBranchingPointNotify
 	else if (NotifyName == "Recovery")
 	{
 		bMeleeEnded = true;
+		bCanAttack = true;
 		SetOwnerModeAttack(EAttackMode::Normal);
 	}
 	else if (NotifyName == "HitSound")
@@ -580,7 +604,7 @@ void UMelee::DammageOnHits(TArray<FHitResult> OutHits)
 
 					Distance = FVector::Distance(CharacterHited->GetActorLocation(), GetOwner()->GetActorLocation());
 				
-					if (Distance >=  GetCurrentMelee().MaxDistance)
+					if (Distance >= GetCurrentMelee().MaxDistance)
 					{
 						DammageValue = GetCurrentMelee().MinDammage;
 						break;
@@ -746,7 +770,6 @@ void UMelee::EnableWalk(bool enable)
 	else {
 		OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = 0;
 		OwnerCharacter->GetCharacterMovement()->MinAnalogWalkSpeed = 0;
-
 	}
 }
 

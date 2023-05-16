@@ -24,15 +24,18 @@ void UWaveTracker::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("WaveTracker begin"));
 #endif
 	CheckEnemyLeft();
-}
 
+	m_bCanSpawnEnemies = true;
+}
 
 // Called every frame
 void UWaveTracker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 #if WITH_EDITOR
-	GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Yellow, FString::Printf(TEXT("enemies alive: %d"), m_enemiesAlive));
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Yellow, FString::Printf(TEXT("Enemies alive: %d"), m_enemiesAlive));
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Yellow, FString::Printf(TEXT("Enemies Spawned: %d"), m_enemiesSpawned));
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Yellow, FString::Printf(TEXT("Enemies killed: %d"), m_enemiesKilled));
 #endif
 }
 
@@ -47,6 +50,8 @@ void UWaveTracker::CheckEnemyLeft() const
 
 void UWaveTracker::OnEnemyDeath()
 {
+	m_enemiesKilled++;
+	
 #if WITH_EDITOR
 	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.f, FColor::Yellow, FString::Printf(TEXT("enemy died")));
 #endif

@@ -69,15 +69,11 @@ void UVictoryConditionBase::CheckConditions()
 				m_waveTracker->m_maxEnemies = 0;
 				m_waveTracker->m_minEnemies = 0;
 				if (m_waveTracker->m_enemiesAlive == 0)
-				{
-					OnZoneVictory.Broadcast();
 					m_killAll = false;
-				}
 			}
-			else
-			{
-				OnZoneVictory.Broadcast();
-			}
+
+			m_waveTracker->m_bCanSpawnEnemies = false;
+			OnZoneVictory.Broadcast();
 		}
 	}
 }

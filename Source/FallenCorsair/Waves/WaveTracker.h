@@ -39,11 +39,20 @@ public:
 	FOnWaveOver OnWaveOver;
 	
 public:
+	UPROPERTY()
+	bool m_bCanSpawnEnemies;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")
 	int m_maxEnemies = UConfigUtils::GetMaxAICount();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wave")
 	int m_minEnemies = UConfigUtils::GetMaxAICount()/2;
+
+	UPROPERTY()
+	int m_enemiesSpawned;
+
+	UPROPERTY()
+	int m_enemiesKilled;
 
 	UPROPERTY()
 	int m_enemiesAlive;

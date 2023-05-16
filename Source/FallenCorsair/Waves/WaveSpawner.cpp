@@ -60,7 +60,7 @@ void UWaveSpawner::BeginPlay()
 
 void UWaveSpawner::SpawnEnemy()
 {
-	if(m_waveTracker && m_waveTracker->m_enemiesAlive < m_waveTracker->m_maxEnemies && m_waveZoneOwner)
+	if(m_waveZoneOwner && m_waveTracker && m_waveTracker->m_bCanSpawnEnemies && m_waveTracker->m_enemiesAlive < m_waveTracker->m_maxEnemies)
 	{
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Instigator = Cast<APawn>(GetOwner());
@@ -71,9 +71,10 @@ void UWaveSpawner::SpawnEnemy()
 		if(ActorToSpawn)
 		{
 			AAlienBase* SpawnedActor = GetWorld()->SpawnActor<AAlienBase>(ActorToSpawn, GetSpawnLocation(), FRotator::ZeroRotator, SpawnParams);
-
-			if(m_waveTracker)
-				SpawnedActor->OnDeath.AddDynamic(m_waveTracker, &UWaveTracker::OnEnemyDeath);
+			m_waveTracker->m_enemiesSpawned++;
+			m_waveTracker->m_enemiesAlive++;
+			
+			SpawnedActor->OnDeath.AddDynamic(m_waveTracker, &UWaveTracker::OnEnemyDeath);
 
 			if(m_zoneVictoryConditions)
 				SpawnedActor->OnDeathWithActor.AddDynamic(m_zoneVictoryConditions, &UVictoryConditionBase::OnEnemyDeath);
@@ -113,7 +114,7 @@ void UWaveSpawner::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		m_spawnTime += DeltaTime;
 	}
 #if WITH_EDITOR
-	GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Yellow, FString::Printf(TEXT("Should spawn: %d"), m_bShouldSpawn));
+	// GEngine->AddOnScreenDebugMessage(INDEX_NONE, DeltaTime, FColor::Yellow, FString::Printf(TEXT("Should spawn: %d"), m_bShouldSpawn));
 #endif
 	// Check if we should spawn
 	if(
@@ -144,11 +145,10 @@ void UWaveSpawner::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 #if WITH_EDITOR
 		UE_LOG(LogTemp, Warning, TEXT("Spawning %d enemies"), MinSpawn);
 #endif
+		
 		for (int i = 0; i < MinSpawn; ++i)
-		{
 			SpawnEnemy();
-			m_waveTracker->m_enemiesAlive++;
-		}
+		
 		m_bShouldSpawn = (m_waveTracker->m_maxEnemies > m_waveTracker->m_enemiesAlive);
 		if(!m_bSpawnIndefinitely)
 		{
@@ -157,8 +157,4 @@ void UWaveSpawner::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	}
 }
 
-void UWaveSpawner::OnWaveOver()
-{
-	m_bShouldSpawn = true;
-}
-
+void UWaveSpawner::OnWaveOver() { m_bShouldSpawn = true; }

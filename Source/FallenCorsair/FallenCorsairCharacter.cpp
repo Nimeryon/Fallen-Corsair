@@ -461,8 +461,7 @@ void AFallenCorsairCharacter::MeleeSoftStarted(const FInputActionValue& Value)
 
 	if (!MeleeComponent->MeleeIsValid())
 		return;
-
-
+	
 	Melee_IsTrigerred = false;
 	Melee_TriggeredSeconds = 0;
 
@@ -475,7 +474,7 @@ void AFallenCorsairCharacter::MeleeSoftStarted(const FInputActionValue& Value)
 		{
 			MeleeComponent->SetOwnerModeAttack(EAttackMode::None);
 			MeleeComponent->StopAnimationChargingMeleeHeavy();
-			MeleeComponent->StartAttack(true, true);
+			MeleeComponent->StartAttack(true);
 		}
 		else 
 		{
@@ -489,7 +488,6 @@ void AFallenCorsairCharacter::MeleeSoftStarted(const FInputActionValue& Value)
 
 void AFallenCorsairCharacter::MeleeHeavyStarted(const FInputActionValue& Value)
 {
-
 	if(!bIsHeavyMeleeAvailable)
 		return;
 	
@@ -521,6 +519,9 @@ void AFallenCorsairCharacter::MeleeHeavyStarted(const FInputActionValue& Value)
 
 	if (!MeleeComponent->MeleeIsValid())
 		return;
+	
+	if (!MeleeComponent->CanAttack())
+		return;
 
 	Melee_IsTrigerred = true;
 	MeleeComponent->SetTypeAttack(EAttackType::Heavy);
@@ -540,8 +541,11 @@ void AFallenCorsairCharacter::MeleeHeavyTriggered(const FInputActionValue& Value
 
 	if (MeleeTargetingComponent->IsMeleeTargeting())
 		return;
-
+	
 	if (!MeleeComponent->MeleeIsValid())
+		return;
+	
+	if (!MeleeComponent->CanAttack())
 		return;
 		
 	MeleeComponent->UpdateTypeAttack(Melee_TriggeredSeconds);

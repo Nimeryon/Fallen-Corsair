@@ -132,6 +132,8 @@ public:
 	// Sets default values for this component's properties
 	UMelee();
 
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 	UFUNCTION()
 	void OnMyDelegateTriggered();
 
@@ -185,7 +187,7 @@ public:
 	virtual void PlayAnimationChargingMeleeHeavy();
 	virtual void StopAnimationChargingMeleeHeavy();
 	virtual void SetTypeAttack(EAttackType at);
-	virtual void StartAttack(bool start, bool _bFreezeAnimation = false);
+	virtual void StartAttack(bool start);
 	virtual void UpdateTypeAttack(float& eslapsedSeconds);
 	virtual void SetReleased(bool released);
 	virtual void SetOwnerModeAttack(EAttackMode ModeAttack);
@@ -196,6 +198,7 @@ public:
 	virtual void ResumeAnimation();
 	virtual void PlaySoundCharge();
 
+	virtual bool CanAttack() const;
 	virtual bool AttackIsStarted() const;
 	virtual bool MeleeIsValid() const;
 	virtual bool IsReleased() const;

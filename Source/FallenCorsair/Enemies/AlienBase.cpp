@@ -6,6 +6,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -67,6 +68,10 @@ float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	{
 		m_isDead = true;
 		Death(damageType);
+
+		// Play death sound
+		if (m_deathSound)
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), m_deathSound, GetActorLocation());
 	}
 	else if(m_hurtParticle)
 	{
@@ -75,6 +80,10 @@ float AAlienBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		FRotator SpawnRotation = FRotator::ZeroRotator;
 		// Spawn the Niagara FX system at the specified location and rotation
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_hurtParticle, SpawnLocation, SpawnRotation,  Scale, true);	
+
+		// Play hurt sound
+		if (m_hurtSound)
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), m_hurtSound, GetActorLocation());
 	}
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);

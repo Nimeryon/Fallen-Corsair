@@ -35,11 +35,7 @@ public:
 	bool Debug = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-	USoundWave* SoundRevive;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-	USoundWave* SoundDestroy;
-
+	USoundBase* m_reviveSound;
 
 protected:
 	bool CanEffect = true; // Permit the plant to explose or gaz

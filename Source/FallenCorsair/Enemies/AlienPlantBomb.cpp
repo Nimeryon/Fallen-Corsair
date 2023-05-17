@@ -45,7 +45,7 @@ void AAlienPlantBomb::Tick(float DeltaTime)
 			CanEffect = false;
 
 			if (SoundExplosion)
-				UGameplayStatics::SpawnSound2D(GetWorld(), SoundExplosion);
+				UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundExplosion, GetActorLocation());
 
 	
 			if (AudioComponentDetonator)
@@ -73,7 +73,7 @@ float AAlienPlantBomb::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 		CanEffect = false;
 
 		if (SoundExplosion)
-			UGameplayStatics::SpawnSound2D(GetWorld(), SoundExplosion);
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundExplosion, GetActorLocation());
 
 		if (AudioComponentDetonator)
 		{
@@ -105,7 +105,7 @@ void AAlienPlantBomb::DetectPlayer() {
 			{
 				if (!AudioComponentDetonator)
 				{
-					AudioComponentDetonator = UGameplayStatics::SpawnSound2D(GetWorld(), SoundDetonator);
+					AudioComponentDetonator = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundDetonator, GetActorLocation());
 					if (AudioComponentDetonator)
 					{
 						AudioComponentDetonator->bAutoDestroy = false;

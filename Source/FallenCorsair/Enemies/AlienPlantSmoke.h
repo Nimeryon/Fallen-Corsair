@@ -26,7 +26,7 @@ public:
 	class UNiagaraSystem* NS_Smoke;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-	USoundWave* SoundSmoke;
+	USoundBase* m_smokeSound;
 	
 public:	
 	// Called every frame

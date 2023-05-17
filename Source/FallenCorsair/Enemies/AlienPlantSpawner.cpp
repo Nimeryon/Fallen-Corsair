@@ -31,7 +31,7 @@ void AAlienPlantSpawner::Spawn()
 	}
 	
 	if (SoundSpawn)
-		UGameplayStatics::SpawnSound2D(GetWorld(), SoundSpawn);
+		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundSpawn, GetActorLocation());
 }
 
 void AAlienPlantSpawner::SpawnActorByClass(UWorld* World, TSubclassOf<AActor> ClassToSpawn, const FVector& Location)

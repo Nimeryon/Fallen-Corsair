@@ -267,14 +267,14 @@ float AFallenCorsairCharacter::TakeDamage(float DamageAmount, FDamageEvent const
 		PlayerDeath();
 		if (SoundDeath)
 		{
-			UGameplayStatics::SpawnSound2D(GetWorld(), SoundDeath);
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundDeath, GetActorLocation());
 			SoundDeath = nullptr;
 		}
 	}
 	else
 	{
 		if (SoundGetHurt)
-			UGameplayStatics::SpawnSound2D(GetWorld(), SoundGetHurt);
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundGetHurt, GetActorLocation());
 	}
 
 	// UE_LOG(LogTemp, Warning, TEXT("Brutos life: %f"), m_currentHealth);
@@ -314,10 +314,6 @@ void AFallenCorsairCharacter::Charge(const FInputActionValue& value)
 	{
 		bool bDashSuccessed = dashComp->DashPressed();
 		OnDodge.Broadcast();
-
-		if (bDashSuccessed)
-			if (SoundDash)
-				UGameplayStatics::SpawnSound2D(GetWorld(), SoundDash);
 	}
 }
 

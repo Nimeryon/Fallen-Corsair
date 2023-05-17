@@ -104,7 +104,7 @@ void ABullet::Explosion()
 			}
 
 			if (SoundSplash)
-				UGameplayStatics::SpawnSound2D(GetWorld(), SoundSplash);
+				UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundSplash, GetActorLocation());
 		}
 	}
 	else if(m_bIsBulletLaunch)
@@ -142,7 +142,7 @@ void ABullet::LaunchBullet(FVector Dir)
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ABullet::IsLifeSpanDone, m_lifeSpan, false);
 	
 	if (SoundShoot)
-		UGameplayStatics::SpawnSound2D(GetWorld(), SoundShoot);
+		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundShoot, GetActorLocation());
 }
 
 TArray<FHitResult> ABullet::MakeSphereCollision(float _SphereRadius)
@@ -209,14 +209,13 @@ void ABullet::IsLifeSpanDone()
 	m_isLifeSpanDone = true;
 }
 
-
 void ABullet::PlayChargeSound()
 {
 	if (SoundCharge)
 	{
 		if (!AudioComponentCharge)
 		{
-			AudioComponentCharge = UGameplayStatics::SpawnSound2D(GetWorld(), SoundCharge);
+			AudioComponentCharge = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundCharge, GetActorLocation());
 		}
 	}
 }

@@ -26,7 +26,7 @@ void AAlienNexus::Tick(float DeltaTime)
 		{
 			bCanPlayBarrierDisparition = false;
 			if (SoundBarrierDisparition)
-				UGameplayStatics::SpawnSound2D(GetWorld(), SoundBarrierDisparition);
+				UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundBarrierDisparition, GetActorLocation());
 		}
 	}
 
@@ -47,7 +47,7 @@ float AAlienNexus::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 	if (IsAlive())
 	{
 		if (SoundBarrierHitPlayer)
-			UGameplayStatics::SpawnSound2D(GetWorld(), SoundBarrierHitPlayer);
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundBarrierHitPlayer, GetActorLocation());
 	}
 
 	if (!bAllAliensAreDestroyed())
@@ -59,7 +59,7 @@ float AAlienNexus::TakeDamage(float DamageAmount, FDamageEvent const& DamageEven
 	{
 		bCanPlaySoundDeath = false;
 		if (SoundNoyauDeath)
-			UGameplayStatics::SpawnSound2D(GetWorld(), SoundNoyauDeath);
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundNoyauDeath, GetActorLocation());
 
 		Death();
 	}

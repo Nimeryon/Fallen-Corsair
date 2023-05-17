@@ -75,8 +75,8 @@ void AAlienPlantSmoke::StunAlien()
 		NiagaraComponentSmoke = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Smoke, SpawnLocation, SpawnRotation, Scale, true);
 	}
 
-	if (SoundSmoke)
-		UGameplayStatics::SpawnSound2D(GetWorld(), SoundSmoke);
+	if (m_smokeSound)
+		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), m_smokeSound, GetActorLocation());
 
 }
 

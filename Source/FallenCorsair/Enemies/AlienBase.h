@@ -167,7 +167,13 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "FX")
 	class UNiagaraSystem* m_deathParticle;
+#pragma endregion
 
-#pragma endregion 
-	
+#pragma region Sound
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* m_hurtSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* m_deathSound;
+#pragma endregion
 };

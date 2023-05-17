@@ -37,8 +37,8 @@ void AAlienPlante::Tick(float DeltaTime)
 		bCanPlaySoundDestroy = true;
 		m_currentHealth = m_health;
 		ReviveTimer = 0;
-		if (SoundRevive)
-			UGameplayStatics::SpawnSound2D(GetWorld(), SoundRevive);
+		if (m_reviveSound)
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), m_reviveSound, GetActorLocation());
 
 		SM_PlanteAlive->SetVisibility(true);
 		SM_PlanteUnlive->SetVisibility(false);
@@ -58,8 +58,6 @@ float AAlienPlante::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	if (!IsAlive() && bCanPlaySoundDestroy)
 	{
 		bCanPlaySoundDestroy = false;
-		if (SoundDestroy)
-			UGameplayStatics::SpawnSound2D(GetWorld(), SoundDestroy);
 		SM_PlanteAlive->SetVisibility(false);
 		SM_PlanteUnlive->SetVisibility(true);
 	}

@@ -198,6 +198,7 @@ void UMelee::SetOwnerModeAttack(EAttackMode ModeAttack)
 		break;
 		
 	case EAttackMode::NoMove:
+		FreezeRotation(false);
 		EnableWalk(false);
 		break;
 		
@@ -316,7 +317,7 @@ void UMelee::CalculRotation(FVector _rot)
 void UMelee::PlaySoundCharge()
 {
 	if (SoundCharge)
-		UGameplayStatics::SpawnSound2D(GetWorld(), SoundCharge);
+		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundCharge, GetOwner()->GetActorLocation());
 }
 
 bool UMelee::CanAttack() const

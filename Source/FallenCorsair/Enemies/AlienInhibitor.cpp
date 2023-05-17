@@ -16,23 +16,10 @@ AAlienInhibitor::AAlienInhibitor()
 
 float AAlienInhibitor::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {	
-	float ActualDamage;
-
-	if (IsAlive())
-		if (SoundGetDammaged)
-			UGameplayStatics::SpawnSound2D(GetWorld(), SoundGetDammaged);
+	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
-	ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	
-	if (!IsAlive()){
+	if (!IsAlive())
 		DisabledSpawner();
-		
-		if (SoundDeath)
-		{
-			UGameplayStatics::SpawnSound2D(GetWorld(), SoundDeath);
-			SoundDeath = nullptr;
-		}
-	}
 
     return ActualDamage;
 }

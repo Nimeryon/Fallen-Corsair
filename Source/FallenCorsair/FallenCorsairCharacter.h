@@ -90,16 +90,10 @@ public:
 	class UDashComponent* dashComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-	USoundWave* SoundFootStep;
+	USoundBase* SoundGetHurt;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-	USoundWave* SoundDash;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-	USoundWave* SoundGetHurt;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-	USoundWave* SoundDeath;
+	USoundBase* SoundDeath;
 
 protected:
 	/** Called for movement input */

@@ -82,7 +82,7 @@ FVector UBTTask_GetRandomPointInRadius::GetRandomPositionInRadius(
 		NavPosition.Location,
 		Character->GetCapsuleComponent()->GetScaledCapsuleRadius() * 2.f,
 		Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight(),
-		"Player",
+		"AlienAttack",
 		false,
 		ActorsToIgnore,
 		EDrawDebugTrace::None,

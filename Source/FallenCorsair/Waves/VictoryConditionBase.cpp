@@ -140,11 +140,15 @@ void UVictoryConditionBase::OnDodgePerformed()
 
 void UVictoryConditionBase::OnEnemyDeath(AAlienBase* Alien)
 {
+	if (!Alien) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *Alien->GetName());
+	
 	for ( auto& VictoryCondition : m_victoryConditions )
 	{
 		if (
 			VictoryCondition.ConditionType == EConditionType::EnemiesKilled
-			&& Alien && Alien->IsA(VictoryCondition.AlienType)
+			&& Alien->IsA(VictoryCondition.AlienType)
 			)
 		{
 			VictoryCondition.Count++;

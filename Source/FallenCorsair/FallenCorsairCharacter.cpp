@@ -277,7 +277,7 @@ float AFallenCorsairCharacter::TakeDamage(float DamageAmount, FDamageEvent const
 			UGameplayStatics::SpawnSound2D(GetWorld(), SoundGetHurt);
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Brutos life: %f"), m_currentHealth);
+	// UE_LOG(LogTemp, Warning, TEXT("Brutos life: %f"), m_currentHealth);
 	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }

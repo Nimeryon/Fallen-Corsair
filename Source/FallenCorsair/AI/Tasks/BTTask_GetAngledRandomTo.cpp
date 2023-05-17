@@ -78,7 +78,7 @@ FVector UBTTask_GetAngledRandomTo::GetNextRandomPosition(const AActor* Actor, co
 	if (DrawDebugPoint)
 		UKismetSystemLibrary::DrawDebugPoint(GetWorld(), NavPosition.Location, 8, FLinearColor::Red, 2);
 
-	UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), Position.X, Position.Y, Position.Z);
+	// UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), Position.X, Position.Y, Position.Z);
 	
 	return NavPosition.Location;
 }

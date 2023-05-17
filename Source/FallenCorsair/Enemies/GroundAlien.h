@@ -167,6 +167,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attack")
 	FVector m_attackTargetPosition;
+
+	EDamageType m_killDamageType;
 #pragma endregion
 
 #pragma region Hit Chance

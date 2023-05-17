@@ -142,9 +142,9 @@ void UWaveSpawner::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 		}
 		const int MinSpawn = FMath::Min(m_waveTracker->m_maxEnemies - m_waveTracker->m_enemiesAlive, m_numberToSpawn);
 
-#if WITH_EDITOR
-		UE_LOG(LogTemp, Warning, TEXT("Spawning %d enemies"), MinSpawn);
-#endif
+// #if WITH_EDITOR
+// 		UE_LOG(LogTemp, Warning, TEXT("Spawning %d enemies"), MinSpawn);
+// #endif
 		
 		for (int i = 0; i < MinSpawn; ++i)
 			SpawnEnemy();

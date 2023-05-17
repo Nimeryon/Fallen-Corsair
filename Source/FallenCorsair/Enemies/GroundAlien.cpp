@@ -125,7 +125,7 @@ bool AGroundAlien::Attack()
 		Position,
 		m_attackBoxSize / 2.f,
 		GetActorRotation(),
-		"Player",
+		"AlienAttack",
 		false,
 		ActorsToIgnore,
 		EDrawDebugTrace::None,
@@ -133,8 +133,8 @@ bool AGroundAlien::Attack()
 		true
 	);
 
-	if (Hit.GetActor())
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *Hit.GetActor()->GetName());
+	// if (Hit.GetActor())
+		// UE_LOG(LogTemp, Warning, TEXT("%s"), *Hit.GetActor()->GetName());
 
 	if (Hit.GetActor() == m_attackTarget)
 	{
@@ -165,7 +165,7 @@ bool AGroundAlien::CreateAvoidBox()
 		Position,
 		m_avoidBoxSize / 2.f,
 		GetActorRotation(),
-		"Player",
+		"AlienAttack",
 		false,
 		ActorsToIgnore,
 		EDrawDebugTrace::ForDuration,
@@ -175,8 +175,8 @@ bool AGroundAlien::CreateAvoidBox()
 		FColor::Orange
 	);
 
-	if (Hit.GetActor())
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *Hit.GetActor()->GetName());
+	// if (Hit.GetActor())
+		// UE_LOG(LogTemp, Warning, TEXT("%s"), *Hit.GetActor()->GetName());
 
 	if (Hit.GetActor() == m_attackTarget)
 	{
@@ -225,8 +225,7 @@ void AGroundAlien::SetState(AlienState State) { m_state = State; }
 
 void AGroundAlien::Death(EDamageType DamageType)
 {
-	if (DamageType == EDamageType::MeleeHeavy || DamageType == EDamageType::MeleeSoft)
-		GetWorld()->SpawnActor<ADropSoul>(m_soul, GetActorLocation(), FRotator::ZeroRotator);
+	m_killDamageType = DamageType;
 
 	m_material->SetScalarParameterValue("AngryLevel", 0);
 	AAIController* AIController = Cast<AAIController>(GetController());
@@ -245,6 +244,8 @@ bool AGroundAlien::Stun(float Time)
 	GetCharacterMovement()->RotationRate.Yaw = 0;
 	GetCharacterMovement()->Velocity = FVector::ZeroVector;
 	GetCharacterMovement()->StopMovementImmediately();
+	
+	GetCapsuleComponent()->SetCollisionProfileName("AlienGround");
 
 	PlayStunMontage();
 
@@ -304,4 +305,7 @@ void AGroundAlien::PlayDeathFX()
 {
 	GetMesh()->DestroyComponent();
 	Super::PlayDeathFX();
+	
+	if (m_killDamageType == EDamageType::MeleeHeavy || m_killDamageType == EDamageType::MeleeSoft)
+		GetWorld()->SpawnActor<ADropSoul>(m_soul, GetActorLocation(), FRotator::ZeroRotator);
 }
